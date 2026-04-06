@@ -36,7 +36,7 @@ export default function LoRATraining() {
     let p = 0;
     intervalRef.current = setInterval(() => {
       p += 10;
-      setTraining(t => ({ ...t, progress: p, log: t.log + `\nEpoch ${p/10}` }));
+      setTraining(t => ({ ...t, progress: p, log: t.log + `\nEpoch ${p / 10}` }));
       if (p >= 100) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -106,7 +106,7 @@ export default function LoRATraining() {
       )}
       {step === 3 && (
         <div>
-          <h3 className="font-semibold mb-2">4. Preview &amp; Export</h3>
+          <h3 className="font-semibold mb-2">4. Preview & Export</h3>
           {preview && <img src={preview} alt="preview" className="max-h-48 mb-2" />}
           {exportUrl && <a href={exportUrl} download className="text-blue-600 underline">Download LoRA Model</a>}
         </div>

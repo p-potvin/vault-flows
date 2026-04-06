@@ -23,7 +23,7 @@ export function ImageTools() {
       {image && (
         <div className="flex flex-col md:flex-row gap-8">
           <div className="w-full md:w-1/2">
-            <h3 className="font-semibold mb-2">Crop &amp; Mask (react-easy-crop)</h3>
+            <h3 className="font-semibold mb-2">Crop & Mask (react-easy-crop)</h3>
             <div className="relative w-full h-64 bg-gray-200 dark:bg-gray-800 rounded">
               <Cropper
                 image={image}

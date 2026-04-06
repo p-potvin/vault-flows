@@ -25,7 +25,7 @@ export function ImageCaptioning() {
 
   return (
     <div className="p-4 bg-white dark:bg-gray-900 rounded shadow mb-8">
-      <h2 className="text-xl font-bold mb-2">Image Captioning &amp; Tagging</h2>
+      <h2 className="text-xl font-bold mb-2">Image Captioning & Tagging</h2>
       <input type="file" accept="image/*" onChange={onSelectFile} className="mb-4" />
       {image && (
         <div className="flex flex-col md:flex-row gap-8">
