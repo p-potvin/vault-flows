@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 const steps = [
   "Dataset",
@@ -22,6 +22,7 @@ export default function LoRATraining() {
   const [training, setTraining] = useState({ running: false, progress: 0, log: "" });
   const [preview, setPreview] = useState(null);
   const [exportUrl, setExportUrl] = useState(null);
+  const intervalRef = useRef(null);
 
   function handleDatasetUpload(e) {
     setDataset(e.target.files);
@@ -30,19 +31,27 @@ export default function LoRATraining() {
     setParams({ ...params, [e.target.name]: e.target.value });
   }
   function startTraining() {
+    if (intervalRef.current) clearInterval(intervalRef.current);
     setTraining({ running: true, progress: 0, log: "Training started..." });
     let p = 0;
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       p += 10;
       setTraining(t => ({ ...t, progress: p, log: t.log + `\nEpoch ${p/10}` }));
       if (p >= 100) {
-        clearInterval(interval);
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
         setTraining(t => ({ ...t, running: false, log: t.log + "\nTraining complete!" }));
         setPreview("/placeholder_lora_preview.png");
         setExportUrl("/placeholder_lora.safetensors");
       }
     }, 500);
   }
+
+  React.useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
   return (
     <div className="p-4 bg-white rounded shadow mt-4">

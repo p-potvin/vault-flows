@@ -6,7 +6,7 @@ import { ImageTools } from './components/features/ImageTools';
 import { ImageCaptioning } from './components/features/ImageCaptioning';
 import LoRATraining from './components/features/LoRATraining';
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { fetchWorkflows, createWorkflow } from './api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setWorkflows, setLoading, setError } from './store';
@@ -45,17 +45,17 @@ function App() {
   const [newCategory, setNewCategory] = useState('');
   const [formError, setFormError] = useState('');
 
-  const loadWorkflows = () => {
+  const loadWorkflows = useCallback(() => {
     dispatch(setLoading(true));
     fetchWorkflows()
       .then((data) => dispatch(setWorkflows(data)))
       .catch((err) => dispatch(setError(err.message)))
       .finally(() => dispatch(setLoading(false)));
-  };
+  }, [dispatch]);
+
   useEffect(() => {
     loadWorkflows();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadWorkflows]);
 
   const categories = ['All', 'Data', 'ML', 'Reporting'];
   const filtered = category === 'All' ? workflows : workflows.filter(wf => wf.category === category);
