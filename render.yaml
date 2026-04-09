@@ -1,0 +1,32 @@
+# Render.com Blueprint — deploys vault-flows as a static site
+# https://render.com/docs/blueprint-spec
+#
+# Setup instructions:
+# 1. Sign up at https://render.com (free tier available)
+# 2. Connect your GitHub repository
+# 3. Render will detect this file and provision the service automatically
+# 4. Set the VITE_API_URL environment variable in the Render dashboard to point
+#    at your vaultwares-pipelines FastAPI backend URL
+# 5. Copy the Deploy Hook URL from Render and add it as RENDER_DEPLOY_HOOK_URL
+#    in your GitHub repository secrets for automatic deploys on push to main
+
+services:
+  - type: web
+    name: vault-flows
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    branch: main
+    pullRequestPreviewsEnabled: true
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+    routes:
+      # Redirect all paths to index.html for SPA client-side routing
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        sync: false   # Set this in the Render dashboard to the FastAPI backend URL
