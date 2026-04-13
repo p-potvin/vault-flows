@@ -28,3 +28,4 @@ test-results/
 !.vscode/extensions.json
 .idea
 .DS_Store
+package-lock.json

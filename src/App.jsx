@@ -1,10 +1,15 @@
 import './tailwind.css';
 import { WorkflowList } from './components/ui/WorkflowList';
+import { VaultwaresBranding } from './components/ui/VaultwaresBranding';
 import { Sidebar } from './components/ui/Sidebar';
 import { Modal } from './components/ui/Modal';
 import { ImageTools } from './components/features/ImageTools';
 import { ImageCaptioning } from './components/features/ImageCaptioning';
 import LoRATraining from './components/features/LoRATraining';
+import { BackupRestorePanel } from './components/ui/BackupRestorePanel';
+import { ExportPanel } from './components/ui/ExportPanel';
+import { StoragePanel } from './components/ui/StoragePanel';
+import { ConfigPanel } from './components/ui/ConfigPanel';
 
 import { useEffect, useCallback } from 'react';
 import { fetchWorkflows, createWorkflow } from './api';
@@ -44,6 +49,7 @@ function App() {
   const [newName, setNewName] = useState('');
   const [newCategory, setNewCategory] = useState('');
   const [formError, setFormError] = useState('');
+  const [panel, setPanel] = useState('workflows');
 
   const loadWorkflows = useCallback(() => {
     dispatch(setLoading(true));
@@ -81,63 +87,86 @@ function App() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-vault-100 via-vault-50 to-gray-50 dark:from-vault-900 dark:via-gray-900 dark:to-gray-950">
-      <header className="p-4 border-b border-vault-200 dark:border-vault-700 bg-vault-50 dark:bg-vault-900">
-        <h1 className="text-3xl font-bold text-vault-900 dark:text-vault-100 font-vault">Workflow Manager</h1>
-      </header>
-      <div className="flex flex-col md:flex-row max-w-5xl mx-auto">
-        <Sidebar categories={categories} onSelect={setCategory} selected={category} />
-        <main className="flex-1 py-4 md:py-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Workflows</h2>
+        <header className="p-4 border-b border-vault-200 dark:border-vault-700 bg-vault-50 dark:bg-vault-900">
+          <VaultwaresBranding />
+          <h1 className="text-3xl font-bold text-vault-900 dark:text-vault-100 font-vault mb-2">Vaultwares Workflow Manager</h1>
+          <nav className="flex gap-4 mt-2">
+            <button className={`px-3 py-1 rounded font-semibold ${panel === 'workflows' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('workflows')}>Workflows</button>
+            <button className={`px-3 py-1 rounded font-semibold ${panel === 'backup' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('backup')}>Backup/Restore</button>
+            <button className={`px-3 py-1 rounded font-semibold ${panel === 'export' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('export')}>Export</button>
+            <button className={`px-3 py-1 rounded font-semibold ${panel === 'storage' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('storage')}>Storage</button>
+            <button className={`px-3 py-1 rounded font-semibold ${panel === 'config' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('config')}>Config</button>
+          </nav>
+        </header>
+        <div className="flex flex-col md:flex-row max-w-5xl mx-auto">
+          {panel === 'workflows' && (
+            <>
+              <Sidebar categories={categories} onSelect={setCategory} selected={category} />
+              <main className="flex-1 py-4 md:py-8">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold">Workflows</h2>
+                  <button
+                    className="px-4 py-2 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold shadow hover:bg-vault-800 dark:hover:bg-vault-200"
+                    onClick={() => setShowCreate(true)}
+                  >
+                    + Create Workflow
+                  </button>
+                </div>
+                {loading ? (
+                  <div className="text-vault-500">Loading workflows...</div>
+                ) : error ? (
+                  <div className="text-red-500">Error: {error}</div>
+                ) : (
+                  <WorkflowList workflows={filtered} />
+                )}
+                <ImageTools />
+                <ImageCaptioning />
+                <LoRATraining />
+              </main>
+            </>
+          )}
+          {panel === 'backup' && (
+            <main className="flex-1 py-4 md:py-8"><BackupRestorePanel /></main>
+          )}
+          {panel === 'export' && (
+            <main className="flex-1 py-4 md:py-8"><ExportPanel /></main>
+          )}
+          {panel === 'storage' && (
+            <main className="flex-1 py-4 md:py-8"><StoragePanel /></main>
+          )}
+          {panel === 'config' && (
+            <main className="flex-1 py-4 md:py-8"><ConfigPanel /></main>
+          )}
+        </div>
+        <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Create Workflow">
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Name:</label>
+            <input
+              className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
+              value={newName}
+              onChange={e => setNewName(e.target.value)}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Category:</label>
+            <input
+              className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
+              value={newCategory}
+              onChange={e => setNewCategory(e.target.value)}
+            />
+          </div>
+          {formError && <div className="text-red-500 mb-2">{formError}</div>}
+          <div className="flex justify-end space-x-2">
+            <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={() => setShowCreate(false)}>Cancel</button>
             <button
-              className="px-4 py-2 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold shadow hover:bg-vault-800 dark:hover:bg-vault-200"
-              onClick={() => setShowCreate(true)}
+              className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold"
+              onClick={handleCreate}
+              disabled={!newName.trim()}
             >
-              + Create Workflow
+              Create
             </button>
           </div>
-          {loading ? (
-            <div className="text-vault-500">Loading workflows...</div>
-          ) : error ? (
-            <div className="text-red-500">Error: {error}</div>
-          ) : (
-            <WorkflowList workflows={filtered} />
-          )}
-
-          <ImageTools />
-          <ImageCaptioning />
-          <LoRATraining />
-        </main>
-      </div>
-      <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Create Workflow">
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Name:</label>
-          <input
-            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
-            value={newName}
-            onChange={e => setNewName(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Category:</label>
-          <input
-            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
-            value={newCategory}
-            onChange={e => setNewCategory(e.target.value)}
-          />
-        </div>
-        {formError && <div className="text-red-500 mb-2">{formError}</div>}
-        <div className="flex justify-end space-x-2">
-          <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={() => setShowCreate(false)}>Cancel</button>
-          <button
-            className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold"
-            onClick={handleCreate}
-            disabled={!newName.trim()}
-          >
-            Create
-          </button>
-        </div>
-      </Modal>
+        </Modal>
       </div>
     </ErrorBoundary>
   );
