@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal } from './Modal';
 import { useVaultTheme } from '../../lib/vaultTheme';
+import { updateWorkflow } from '../../api';
 
 function ThemeSwitcher({ theme, themeIndex, setThemeIndex, themes }) {
   return (
@@ -25,10 +26,12 @@ function ThemeSwitcher({ theme, themeIndex, setThemeIndex, themes }) {
   );
 }
 
-export function WorkflowList({ workflows }) {
+export function WorkflowList({ workflows, onUpdated }) {
   const [editing, setEditing] = useState(null);
   const [editName, setEditName] = useState('');
   const [editCategory, setEditCategory] = useState('');
+  const [saveError, setSaveError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const { theme, themeIndex, setThemeIndex, themes } = useVaultTheme();
 
   const openEdit = (wf) => {
@@ -40,10 +43,32 @@ export function WorkflowList({ workflows }) {
     setEditing(null);
     setEditName('');
     setEditCategory('');
+    setSaveError('');
   };
-  const saveEdit = () => {
-    // TODO: Implement update logic (API call)
-    closeEdit();
+  const saveEdit = async () => {
+    if (!editing) {
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveError('');
+
+    try {
+      await updateWorkflow(editing.id, {
+        name: editName.trim(),
+        category: editCategory.trim(),
+      });
+      closeEdit();
+      if (onUpdated) {
+        onUpdated();
+      }
+    } catch (error) {
+      setSaveError(error.message);
+      setIsSaving(false);
+      return;
+    }
+
+    setIsSaving(false);
   };
 
   return (
@@ -78,24 +103,33 @@ export function WorkflowList({ workflows }) {
 
       <Modal open={!!editing} onClose={closeEdit} title="Edit Workflow">
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Name:</label>
+          <label htmlFor="edit-workflow-name" className="block text-sm font-medium mb-1">Name:</label>
           <input
+            id="edit-workflow-name"
             className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
             value={editName}
             onChange={e => setEditName(e.target.value)}
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Category:</label>
+          <label htmlFor="edit-workflow-category" className="block text-sm font-medium mb-1">Category:</label>
           <input
+            id="edit-workflow-category"
             className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
             value={editCategory}
             onChange={e => setEditCategory(e.target.value)}
           />
         </div>
+        {saveError ? <div className="mb-2 text-sm text-red-500">{saveError}</div> : null}
         <div className="flex justify-end space-x-2">
           <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={closeEdit}>Cancel</button>
-          <button className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold" onClick={saveEdit}>Save</button>
+          <button
+            className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold"
+            onClick={saveEdit}
+            disabled={isSaving || !editName.trim() || !editCategory.trim()}
+          >
+            {isSaving ? 'Saving...' : 'Save'}
+          </button>
         </div>
       </Modal>
     </div>

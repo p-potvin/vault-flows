@@ -6,6 +6,7 @@ import { Modal } from './components/ui/Modal';
 import { ImageTools } from './components/features/ImageTools';
 import { ImageCaptioning } from './components/features/ImageCaptioning';
 import LoRATraining from './components/features/LoRATraining';
+import { FaceSwapVideo } from './components/features/FaceSwapVideo';
 import { BackupRestorePanel } from './components/ui/BackupRestorePanel';
 import { ExportPanel } from './components/ui/ExportPanel';
 import { StoragePanel } from './components/ui/StoragePanel';
@@ -117,11 +118,12 @@ function App() {
                 ) : error ? (
                   <div className="text-red-500">Error: {error}</div>
                 ) : (
-                  <WorkflowList workflows={filtered} />
+                  <WorkflowList workflows={filtered} onUpdated={loadWorkflows} />
                 )}
                 <ImageTools />
                 <ImageCaptioning />
                 <LoRATraining />
+                <FaceSwapVideo />
               </main>
             </>
           )}
@@ -140,16 +142,18 @@ function App() {
         </div>
         <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Create Workflow">
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Name:</label>
+            <label htmlFor="create-workflow-name" className="block text-sm font-medium mb-1">Name:</label>
             <input
+              id="create-workflow-name"
               className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
               value={newName}
               onChange={e => setNewName(e.target.value)}
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Category:</label>
+            <label htmlFor="create-workflow-category" className="block text-sm font-medium mb-1">Category:</label>
             <input
+              id="create-workflow-category"
               className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
               value={newCategory}
               onChange={e => setNewCategory(e.target.value)}
