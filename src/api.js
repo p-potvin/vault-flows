@@ -55,6 +55,7 @@ const DEFAULT_CONFIG = normalizeExecutionConfig({
   preferredStorageProvider: 'other',
   apiMode: configuredBase ? 'remote-with-local-fallback' : 'local-demo',
   apiBase: configuredBase || '',
+  apiKey: '', // Stub for API Key Auth
   themeIndex: 0,
   runtimeProvider: configuredBase ? 'remote-api' : 'browser-local',
   scannedModels: createEmptyScannedModels(),

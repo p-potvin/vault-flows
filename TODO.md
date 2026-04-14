@@ -27,9 +27,27 @@ Current execution focus is moving the app from a broken backend-dependent shell 
 - e2e-depth [ ] Expand Playwright coverage further to cover restore paths, image captioning interactions, and LoRA export artifacts.
 - vercel-deploy [ ] Claim and/or promote the preview deployment once the target Vercel project and ownership are finalized.
 
-## Later
 
-- backend-implementation [ ] Build or connect the missing backend service instead of relying on local fallback mode.
-- feature-completion [ ] Replace heuristic captioning and planning-only LoRA flows with real inference/training orchestration.
-- python-agent-hardening [ ] Turn the Redis multi-agent prototype into a real tested service layer or separate it from the deployable frontend.
-- duplication-cleanup [ ] Eliminate the duplicated `vaultwares-agentciation/` and `vaultwares_agentciation/` package trees.
+### Web-Exposure & Security
+- [ ] Setup PostgreSQL schema (Users, Workflows, Datasets, Configs). (API)
+- [ ] Build User Registration & Authentication flow. (API)
+- [ ] Implement API Key generation, validation, and middleware protection. (API)
+
+### Workflows & Core UI
+- [ ] Refactor React Router to support dedicated workflow pages (`/workflows/:id`).
+- [ ] Create `LIBRARIES.md` outlining image manipulation libraries (Fabric.js, CamanJS, OpenCV, etc).
+- [ ] Build the Advanced Workflow Creator interface with expanded settings.
+
+### Image Processing & Editing
+- [ ] Debug and fix FaceFusion blurry preview (check downscaling / missing restoration models).
+- [ ] Build Dataset Manager UI (save, load, batch edit, bulk crop/resize).
+- [ ] Implement Mask Creation Widget (fabric.js) for localized inpainting/outpainting.
+- [ ] Add Face Enhancer action (trigger GFPGAN/CodeFormer pipeline).
+- [ ] Implement color profile and level adjustment presets in the canvas.
+
+### Training & Captioning
+- [ ] Build Advanced Captioning UI (structural tags + natural language text areas).
+- [ ] Integrate auto-captioning backend mechanism (WD14 Tagger / JoyCaption). (API)
+- [ ] Connect LoRA training trigger to backend script execution. (API)
+- [ ] Implement strict LoRA training validation defaults to prevent VRAM OOM exceptions. (API)
+- [ ] Integrate email dispatcher for training completion alerts. (API)

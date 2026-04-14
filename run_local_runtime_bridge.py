@@ -65,8 +65,9 @@ def json_response(handler: BaseHTTPRequestHandler, status: int, payload: dict) -
     handler.send_header("Content-Type", "application/json")
     handler.send_header("Content-Length", str(len(encoded)))
     handler.send_header("Access-Control-Allow-Origin", "*")
-    handler.send_header("Access-Control-Allow-Headers", "Content-Type")
-    handler.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+    handler.send_header("Access-Control-Allow-Headers", "*")
+    handler.send_header("Access-Control-Allow-Methods", "*")
+    handler.send_header("Access-Control-Allow-Private-Network", "true")
     handler.end_headers()
     handler.wfile.write(encoded)
 
@@ -105,7 +106,7 @@ def scan_models(models_dir: str) -> dict:
                     }
                 )
         else:
-            warnings.append(f"Missing model subfolder: {target_dir}")
+            pass
 
         categories[group_key] = entries
 
@@ -223,23 +224,26 @@ class VaultFlowsBridgeHandler(BaseHTTPRequestHandler):
     server_version = "VaultFlowsLocalBridge/0.1"
 
     def do_OPTIONS(self) -> None:  # noqa: N802
-        self.send_response(HTTPStatus.NO_CONTENT)
+        self.send_response(HTTPStatus.OK)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "*")
+        self.send_header("Access-Control-Allow-Methods", "*")
+        self.send_header("Access-Control-Allow-Private-Network", "true")
+        self.send_header("Content-Length", "0")
         self.end_headers()
 
     def do_GET(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
-        if parsed.path == "/health":
+        path = parsed.path.rstrip("/")
+        if path == "/health":
             json_response(self, HTTPStatus.OK, {"status": "ok"})
             return
 
-        if parsed.path.startswith("/jobs/") and parsed.path.endswith("/output"):
+        if path.startswith("/jobs/") and path.endswith("/output"):
             job_id = parsed.path.split("/")[2]
             output_path = JOB_OUTPUTS.get(job_id)
             if not output_path or not output_path.exists():
-                error_response(self, HTTPStatus.NOT_FOUND, "Job output not found.")
+                error_response(self, HTTPStatus.NOT_FOUND, f"Job output not found: {job_id}")
                 return
 
             mime_type = mimetypes.guess_type(output_path.name)[0] or "application/octet-stream"
@@ -249,23 +253,30 @@ class VaultFlowsBridgeHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(payload)))
             self.send_header("Content-Disposition", f'inline; filename="{output_path.name}"')
             self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Private-Network", "true")
             self.end_headers()
             self.wfile.write(payload)
             return
 
-        error_response(self, HTTPStatus.NOT_FOUND, "Route not found.")
+        if "/models" in path:
+            # Fallback for ComfyUI UI looking for models endpoint to not crash with 404
+            json_response(self, HTTPStatus.OK, [])
+            return
+
+        error_response(self, HTTPStatus.NOT_FOUND, f"Route not found: {parsed.path}")
 
     def do_POST(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
-        if parsed.path == "/models/scan":
+        path = parsed.path.rstrip("/")
+        if path == "/models/scan" or path.endswith("/models/scan"):
             self.handle_model_scan()
             return
 
-        if parsed.path == "/faceswap/run":
+        if path == "/faceswap/run" or path.endswith("/faceswap/run"):
             self.handle_faceswap_run()
             return
 
-        error_response(self, HTTPStatus.NOT_FOUND, "Route not found.")
+        error_response(self, HTTPStatus.NOT_FOUND, f"Route not found: {parsed.path}")
 
     def handle_model_scan(self) -> None:
         content_length = int(self.headers.get("Content-Length", "0") or 0)

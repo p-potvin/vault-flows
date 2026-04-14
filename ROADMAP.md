@@ -21,9 +21,23 @@
 - Add environment-aware remote/local health visibility in the UI.
 - Validate remote mode against a real non-local deployment target.
 
-## Phase 4: Complete AI workflow features
 
-- Replace demo captioning with actual caption/tag generation.
-- Replace simulated LoRA progress with queued training execution and artifact retrieval.
-- Decide whether the Python multi-agent system is part of the product or separate internal tooling.
-- Add end-to-end tests for real backend-backed flows.
+## Phase 4: Core Expansion & Web-Exposure (Current)
+- [ ] **Security & Persistence (API)**
+	- Integrate PostgreSQL database for user configs, datasets, and workflows.
+	- Implement Account Creation (Username, Password, Optional Email).
+	- Implement comprehensive API Key system for all endpoints.
+- [ ] **UI & Architecture Overhaul**
+	- Refactor routing: Dedicated pages per workflow.
+	- Advanced Workflow Builder (branching, node-based logic, granular options).
+- [ ] **Advanced Image Manipulation**
+	- Integrate FaceFusion directly into the UI (resolve blurry preview issues).
+	- Batch image editing capabilities (beyond React crop widget).
+	- Face Enhancer button (GFPGAN/CodeFormer integrations).
+	- Photoshop-style presets (levels, color profiles).
+	- Mask creation widget (brush & polygon lasso) for inpainting/outpainting.
+- [ ] **LoRA & Dataset Orchestration (API)**
+	- Direct LoRA training execution on backend via strict OOM-safe defaults.
+	- Fine-tuning dials and email completion notifications.
+	- Real captioning mechanism (tags + natural language) with VLM auto-tagger support.
+	- Save and load reusable datasets from the database.
