@@ -29,12 +29,12 @@ Current execution focus is moving the app from a broken backend-dependent shell 
 
 
 ### Web-Exposure & Security
-- [ ] Setup PostgreSQL schema (Users, Workflows, Datasets, Configs). (API)
+- [x] Setup PostgreSQL schema (Users, Workflows, Datasets, Configs). (API)
 - [ ] Build User Registration & Authentication flow. (API)
-- [ ] Implement API Key generation, validation, and middleware protection. (API)
+- [x] Implement API Key generation, validation, and middleware protection. (API)
 
 ### Workflows & Core UI
-- [ ] Refactor React Router to support dedicated workflow pages (`/workflows/:id`).
+- [x] Refactor React Router to support dedicated workflow pages (`/workflows/:id`).
 - [ ] Create `LIBRARIES.md` outlining image manipulation libraries (Fabric.js, CamanJS, OpenCV, etc).
 - [ ] Build the Advanced Workflow Creator interface with expanded settings.
 

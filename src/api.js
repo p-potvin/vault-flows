@@ -179,10 +179,17 @@ async function requestWithFallback(path, options, fallback) {
   try {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
+    const state = getConfigState();
+    const headers = options?.headers || {};
+    if (state.apiKey) {
+      headers['X-Api-Key'] = state.apiKey;
+    }
+    
     let res;
     try {
       res = await fetch(`${configuredBase}${path}`, {
         ...options,
+        headers,
         signal: controller.signal,
       });
     } finally {
