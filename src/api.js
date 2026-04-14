@@ -623,10 +623,26 @@ export async function runFaceSwapVideo({ sourceFile, targetFile, prompt = '', ou
   formData.append('source', sourceFile);
   formData.append('target', targetFile);
 
-  const result = await fetchJson(`${bridgeUrl}/faceswap/run`, {
-    method: 'POST',
-    body: formData,
-  });
+  let result;
+  try {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
+    try {
+      result = await fetchJson(`${bridgeUrl}/faceswap/run`, {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal,
+      });
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  } catch (error) {
+    return {
+      status: 'manual',
+      manifest,
+      reason: `Local bridge execution failed: ${error.message}`,
+    };
+  }
 
   return {
     ...result,

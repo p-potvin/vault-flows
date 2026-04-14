@@ -52,7 +52,7 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await page.getByLabel('Category:').fill('ML');
     await page.getByRole('button', { name: 'Create', exact: true }).click();
 
-    await expect(page.getByText('Smoke Test Workflow')).toBeVisible();
+    await expect(page.getByText('Smoke Test Workflow').first()).toBeVisible();
 
     await page.getByRole('button', { name: 'Edit' }).first().click();
     await page.getByLabel('Name:').fill('Edited Workflow');
@@ -96,7 +96,7 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await page.getByRole('button', { name: 'Run Local Face Swap' }).click();
 
     await expect(
-      page.locator('div').filter({ hasText: 'Local face-swap execution requires the local bridge runtime.' }).first(),
+      page.locator('div').filter({ hasText: 'Local bridge execution failed:' }).first(),
     ).toBeVisible();
     await expect(page.getByText('"flowId": "videoFaceSwap"')).toBeVisible();
   });
