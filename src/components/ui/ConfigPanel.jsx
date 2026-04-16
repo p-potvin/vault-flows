@@ -116,6 +116,9 @@ export function ConfigPanel() {
     setLoading(true);
     setBanner(null);
 
+    const runtime = api.getApiRuntime ? api.getApiRuntime() : { mode: 'local-fallback' };
+    const usingRemote = runtime.mode === 'remote-with-local-fallback';
+
     try {
       let config;
       let source = 'local';
@@ -123,7 +126,7 @@ export function ConfigPanel() {
       if (typeof api.fetchConfig === 'function') {
         const response = await api.fetchConfig();
         config = normalizeConfigPayload(response);
-        source = 'api';
+        source = usingRemote ? 'api' : 'local';
         saveLocalConfig(config);
       } else {
         config = getLocalConfig();
@@ -131,11 +134,11 @@ export function ConfigPanel() {
 
       syncEditor(config, source);
 
-      if (source === 'local') {
+      if (!usingRemote) {
         setBanner({
           type: 'warning',
-          title: 'Using local config',
-          description: 'The config API is not available yet, so the editor is using local storage.',
+          title: 'Using browser-local configuration',
+          description: 'The app is running in local-demo fallback mode. Your settings are stored in local storage instead of a remote database. Please configure VITE_API_URL to run connected.',
         });
       }
     } catch (error) {

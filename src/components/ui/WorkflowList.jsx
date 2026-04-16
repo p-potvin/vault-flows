@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from './Modal';
 import { useVaultTheme } from '../../lib/vaultTheme';
 import { updateWorkflow } from '../../api';
+import { Link } from 'react-router-dom';
 
 function ThemeSwitcher({ theme, themeIndex, setThemeIndex, themes }) {
   return (
@@ -88,12 +89,20 @@ export function WorkflowList({ workflows, onUpdated }) {
                   <div className="text-gray-600 dark:text-gray-300 text-sm mt-1">{wf.description}</div>
                 )}
               </div>
-              <button
-                className="ml-4 px-3 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600 font-semibold"
-                onClick={() => openEdit(wf)}
-              >
-                Edit
-              </button>
+              <div className="flex items-center gap-2 ml-4">
+                <Link
+                  to={`/workflows/${wf.id}`}
+                  className="px-3 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 hover:bg-vault-800 dark:hover:bg-vault-200 font-semibold"
+                >
+                  Design
+                </Link>
+                <button
+                  className="px-3 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600 font-semibold"
+                  onClick={() => openEdit(wf)}
+                >
+                  Edit
+                </button>
+              </div>
             </li>
           ))
         ) : (

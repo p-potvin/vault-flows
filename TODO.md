@@ -21,21 +21,21 @@ Current execution focus is moving the app from a broken backend-dependent shell 
 
 ## Next
 
-- workflow-actions [ ] Finish wiring any remaining exposed workflow actions that still rely on dead UI paths.
-- storage-providers [ ] Decide whether provider-specific uploads remain demo metadata only or should move behind a real API contract.
-- config-contract [ ] Tighten the configuration schema and UI around remote/local API mode visibility.
+- workflow-actions [x] Finish wiring any remaining exposed workflow actions that still rely on dead UI paths.
+- storage-providers [x] Decide whether provider-specific uploads remain demo metadata only or should move behind a real API contract.
+- config-contract [x] Tighten the configuration schema and UI around remote/local API mode visibility.
 - e2e-depth [ ] Expand Playwright coverage further to cover restore paths, image captioning interactions, and LoRA export artifacts.
 - vercel-deploy [ ] Claim and/or promote the preview deployment once the target Vercel project and ownership are finalized.
 
 
 ### Web-Exposure & Security
 - [x] Setup PostgreSQL schema (Users, Workflows, Datasets, Configs). (API)
-- [ ] Build User Registration & Authentication flow. (API)
+- [x] Build User Registration & Authentication flow. (API)
 - [x] Implement API Key generation, validation, and middleware protection. (API)
 
 ### Workflows & Core UI
 - [x] Refactor React Router to support dedicated workflow pages (`/workflows/:id`).
-- [ ] Create `LIBRARIES.md` outlining image manipulation libraries (Fabric.js, CamanJS, OpenCV, etc).
+- [x] Create `LIBRARIES.md` outlining image manipulation libraries (Fabric.js, CamanJS, OpenCV, etc).
 - [ ] Build the Advanced Workflow Creator interface with expanded settings.
 
 ### Image Processing & Editing

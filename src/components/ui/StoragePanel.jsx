@@ -84,27 +84,41 @@ export function StoragePanel() {
     setLoading(true);
     setMessage(null);
 
+    const runtime = api.getApiRuntime ? api.getApiRuntime() : { mode: 'local-fallback' };
+    const usingRemote = runtime.mode === 'remote-with-local-fallback';
+
     try {
       let nextMessage;
       let historyEntry;
 
       if (typeof api.uploadToStorage === 'function') {
         const response = await api.uploadToStorage(file);
-        historyEntry = createHistoryEntry(file, 'api', 'uploaded', { response });
-        nextMessage = {
-          type: 'success',
-          title: 'Upload completed',
-          description: `${file.name} was uploaded through the configured API.`,
-          details: response,
-        };
+        
+        if (usingRemote) {
+          historyEntry = createHistoryEntry(file, 'api', 'uploaded', { response });
+          nextMessage = {
+            type: 'success',
+            title: 'Upload completed',
+            description: `${file.name} was uploaded via the real API contract.`,
+            details: response,
+          };
+        } else {
+          historyEntry = createHistoryEntry(file, 'local', 'queued', { response, note: 'Demo mode metadata' });
+          nextMessage = {
+            type: 'warning',
+            title: 'Saved local metadata only',
+            description: `${file.name} metadata was recorded in localStorage demo mode. Establish API connection to truly upload.`,
+            details: historyEntry,
+          };
+        }
       } else {
         historyEntry = createHistoryEntry(file, 'local', 'queued', {
-          note: 'Upload API is not available yet. File contents are not persisted locally.',
+          note: 'Upload API is completely missing. File contents are not persisted locally.',
         });
         nextMessage = {
           type: 'warning',
           title: 'Saved locally only',
-          description: `${file.name} was added to the local upload queue because the upload API is not available yet.`,
+          description: `${file.name} was added to the local upload queue.`,
           details: historyEntry,
         };
       }

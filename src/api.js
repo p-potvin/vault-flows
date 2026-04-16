@@ -451,7 +451,12 @@ export async function favoriteWorkflow(id, favorite) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, favorite }),
     },
-    () => updateWorkflow(id, { favorite }),
+    () => {
+      const workflows = getWorkflows();
+      const updated = workflows.map(wf => wf.id === id ? { ...wf, favorite } : wf);
+      saveWorkflows(updated);
+      return updated.find(wf => wf.id === id);
+    },
   );
 }
 
