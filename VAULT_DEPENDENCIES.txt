@@ -1,3 +1,5 @@
 # VaultWares Git Submodule Manifest
 # Pattern: [Target Folder] [GitHub HTTPS URL] [Branch/Tag]
-vaultwares-agentciation https://github.com/p-potvin/vaultwares-agentciation origin/main
+vault-themes https://github.com/p-potvin/vault-themes heads/main
+vaultwares-agentciation https://github.com/p-potvin/vaultwares-agentciation heads/main
+facefusion https://github.com/facefusion/facefusion 3.6.0-2-g2354d62
