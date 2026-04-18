@@ -346,11 +346,16 @@ export async function updateWorkflow(id, data) {
     },
     () => {
       const workflows = getWorkflows();
-      const updatedWorkflows = workflows.map((workflow) =>
-        workflow.id === id ? normalizeWorkflow({ ...workflow, ...data, id }) : workflow,
-      );
+      let updated;
+      const updatedWorkflows = workflows.map((workflow) => {
+        if (workflow.id === id) {
+          updated = normalizeWorkflow({ ...workflow, ...data, id });
+          return updated;
+        }
+        return workflow;
+      });
       saveWorkflows(updatedWorkflows);
-      return updatedWorkflows.find((workflow) => workflow.id === id);
+      return updated;
     },
   );
 }
@@ -453,9 +458,16 @@ export async function favoriteWorkflow(id, favorite) {
     },
     () => {
       const workflows = getWorkflows();
-      const updated = workflows.map(wf => wf.id === id ? { ...wf, favorite } : wf);
-      saveWorkflows(updated);
-      return updated.find(wf => wf.id === id);
+      let updated;
+      const updatedWorkflows = workflows.map((wf) => {
+        if (wf.id === id) {
+          updated = { ...wf, favorite };
+          return updated;
+        }
+        return wf;
+      });
+      saveWorkflows(updatedWorkflows);
+      return updated;
     },
   );
 }
