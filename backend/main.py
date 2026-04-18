@@ -5,13 +5,17 @@ from .auth import authenticate_user
 from .api_key_middleware import api_key_required
 from fastapi.middleware.cors import CORSMiddleware
 from backend.auth_routes import router as auth_router
+import os
 
 app = FastAPI(title="Vault-Flows Core API", version="1.0.0")
 
-# Security, allow cross origin for decoupled frontend
+# Security: Configure CORS properly using environment variable or safe defaults
+allowed_origins_str = os.environ.get("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000")
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
