@@ -81,6 +81,15 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
   test('can prepare a face-swap job in manual mode', async ({ page }) => {
     await page.goto('/');
 
+    await page.getByRole('button', { name: 'Config' }).click();
+    await page.getByLabel('Runtime Provider').selectOption('local-bridge');
+    await page.getByLabel('Model Directory').fill('D:\\comfyui\\resources\\comfyui\\models');
+    await page.getByLabel('Local Bridge URL').fill('http://127.0.0.1:8484');
+    await page.getByRole('button', { name: 'Save Runtime Settings' }).click();
+    await expect(page.getByText('Runtime settings updated')).toBeVisible();
+
+    await page.goto('/');
+
     await page.getByLabel('Source face image').setInputFiles({
       name: 'source.png',
       mimeType: 'image/png',
