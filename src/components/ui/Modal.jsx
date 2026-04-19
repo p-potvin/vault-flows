@@ -7,7 +7,13 @@ export function Modal({ open, onClose, title, children }) {
       <div className="bg-white dark:bg-gray-800 rounded shadow-lg p-6 min-w-[300px] max-w-lg">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{title}</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">&times;</button>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 rounded px-1"
+            aria-label="Close"
+          >
+            &times;
+          </button>
         </div>
         {children}
       </div>
