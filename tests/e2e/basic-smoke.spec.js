@@ -96,7 +96,7 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await page.getByRole('button', { name: 'Run Local Face Swap' }).click();
 
     await expect(
-      page.locator('div').filter({ hasText: 'Local bridge execution failed:' }).first(),
+      page.locator('div').filter({ hasText: 'Local face-swap execution requires the local bridge runtime.' }).first(),
     ).toBeVisible();
     await expect(page.getByText('"flowId": "videoFaceSwap"')).toBeVisible();
   });

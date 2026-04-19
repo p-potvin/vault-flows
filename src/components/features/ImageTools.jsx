@@ -176,7 +176,7 @@ export function ImageTools() {
 
   return (
     <div className="p-4 bg-white dark:bg-gray-900 rounded shadow mb-8">
-      <h2 className="text-2xl font-bold mb-4">Advanced Image Editor (Canvas)</h2>
+      <h2 className="text-2xl font-bold mb-4">Photo Editing Tools</h2>
       
       <div className="flex flex-col xl:flex-row gap-4">
         {/* Sidebar Tools */}
