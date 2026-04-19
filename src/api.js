@@ -665,7 +665,7 @@ export async function runFaceSwapVideo({ sourceFile, targetFile, prompt = '', ou
     return {
       status: 'manual',
       manifest,
-      reason: `Local bridge execution failed: ${error.message}`,
+      reason: `Local face swap execution failed. ${error.message}`,
     };
   }
 
