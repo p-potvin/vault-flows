@@ -38,10 +38,10 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
 
   test('displays workflow sections', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByText('Advanced Image Editor')).toBeVisible();
-    await expect(page.getByText('Image Captioning')).toBeVisible();
-    await expect(page.getByText('LoRA Dataset & Training Planner')).toBeVisible();
-    await expect(page.getByText('Image to Video Face Swap')).toBeVisible();
+    await expect(page.getByText('Image Caption Review')).toBeVisible();
+    await expect(page.getByText('Workflow Backup Export')).toBeVisible();
+    await expect(page.getByText('LoRA Prep Pipeline')).toBeVisible();
+    await expect(page.getByText('Video Face Swap', { exact: true })).toBeVisible();
   });
 
   test('can create and edit a workflow in local fallback mode', async ({ page }) => {
