@@ -136,7 +136,20 @@ class VideoAgent(ExtrovertAgent):
     def _export_comfyui(self, details: dict):
         """Export a workflow to ComfyUI JSON format."""
         workflow_name = details.get("workflow_name", "unnamed")
-        output_path = details.get("output_path", f"{workflow_name}.json")
+
+        # Security: Prevent path traversal by resolving relative to an exports directory
+        base_dir = os.path.abspath("exports")
+        requested_path = details.get("output_path", f"{workflow_name}.json")
+        resolved_path = os.path.abspath(os.path.join(base_dir, requested_path))
+
+        if os.path.commonpath([base_dir, resolved_path]) != base_dir:
+            error_msg = "Invalid output path: Path traversal detected."
+            print(f"❌ [{self.agent_id}] Export failed: {error_msg}")
+            self._publish_result("export_comfyui", f"Export failed: {error_msg}")
+            return
+
+        output_path = resolved_path
+
         print(f"📦 [{self.agent_id}] Exporting to ComfyUI: {workflow_name} → {output_path}")
         time.sleep(1)
         self._publish_result("export_comfyui", f"ComfyUI export complete: {output_path}")
