@@ -141,7 +141,7 @@ export function WorkflowList({ workflows, onUpdated }) {
         <div className="flex justify-end space-x-2">
           <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={closeEdit}>Cancel</button>
           <button
-            className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold"
+            className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={saveEdit}
             disabled={isSaving || !editName.trim() || !editCategory.trim()}
           >
