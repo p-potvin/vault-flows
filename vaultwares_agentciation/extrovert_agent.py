@@ -229,16 +229,11 @@ class ExtrovertAgent(AgentBase):
             with open(tasks_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
-            pattern = rf"^(\s*{re.escape(task_id)}\s+\[)([ ~])(\].*)$"
-            new_content = []
-            for line in content.splitlines():
-                if re.match(pattern, line):
-                    new_content.append(re.sub(pattern, r"\1x\3", line))
-                else:
-                    new_content.append(line)
+            pattern = rf"(?m)^(\s*{re.escape(task_id)}\s+\[)[ ~](\].*)$"
+            content = re.sub(pattern, r"\1x\2", content)
 
             with open(tasks_path, "w", encoding="utf-8") as f:
-                f.write("\n".join(new_content) + "\n")
+                f.write(content)
         except Exception as e:
             print(f"Error updating TODO.md: {e}")
 
