@@ -1,0 +1,63 @@
+name: Daily Flow Generator
+
+on:
+  schedule:
+    - cron: '0 1 * * *' # 1:00 AM daily
+  workflow_dispatch: # Allow manual trigger for testing
+
+jobs:
+  generate-flow:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Flow Generator Script
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: python scripts/daily_flow_generator.py
+
+      - name: Run E2E Tests on Generated Code
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Run Backend Tests
+        run: pip install pytest && pytest backend/
+
+      - name: Create Pull Request
+        # Only runs if tests pass
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          commit-message: "feat(workflows): auto-generated daily flow"
+          title: "Automated Daily AI Workflow"
+          body: |
+            This is an auto-generated PR created by the Daily Flow Generator.
+            It adds a new, creative AI workflow to the system and has passed automated tests.
+          branch: auto-daily-flow
+          base: main
+          # Using github.repository_owner ensures the repo owner is requested for review,
+          # avoiding github.actor being 'github-actions' in cron jobs.
+          reviewers: ${{ github.repository_owner }}
