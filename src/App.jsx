@@ -12,12 +12,11 @@ import { ExportPanel } from './components/ui/ExportPanel';
 import { StoragePanel } from './components/ui/StoragePanel';
 import { ConfigPanel } from './components/ui/ConfigPanel';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 import { fetchWorkflows, createWorkflow } from './api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setWorkflows, setLoading, setError } from './store';
 
-import { useState } from 'react';
 import { workflowSchema } from './validation';
 import React from 'react';
 
@@ -65,7 +64,12 @@ function App() {
   }, [loadWorkflows]);
 
   const categories = ['All', 'Data', 'ML', 'Reporting'];
-  const filtered = category === 'All' ? workflows : workflows.filter(wf => wf.category === category);
+
+  // ⚡ Bolt: Memoize filtered list to prevent unnecessary re-filtering
+  // on every keystroke in the "Create Workflow" modal form.
+  const filtered = useMemo(() => {
+    return category === 'All' ? workflows : workflows.filter(wf => wf.category === category);
+  }, [category, workflows]);
 
   const handleCreate = async () => {
     setFormError('');
