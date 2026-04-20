@@ -31,6 +31,7 @@ class ImageAgent(ExtrovertAgent):
         "prompt_generation",
         "workflow_creation",
         "comfyui_export",
+        "nerf_generation",
     ]
 
     def __init__(
@@ -59,6 +60,7 @@ class ImageAgent(ExtrovertAgent):
             "outpaint": self._outpaint,
             "create_workflow": self._create_image_workflow,
             "export_comfyui": self._export_comfyui,
+            "generate_nerf": self._generate_nerf,
         }
 
         handler = handlers.get(task)
@@ -132,6 +134,16 @@ class ImageAgent(ExtrovertAgent):
         print(f"📦 [{self.agent_id}] Exporting to ComfyUI: {workflow_name} → {output_path}")
         time.sleep(1)
         self._publish_result("export_comfyui", f"ComfyUI export complete: {output_path}")
+
+    def _generate_nerf(self, details: dict):
+        """Automated generation of NeRF models from a folder of images."""
+        images_dir = details.get("images_dir", "unknown")
+        model = details.get("model", "instant-ngp")
+        print(f"🧊 [{self.agent_id}] Generating NeRF model | model={model}")
+        print(f"   Images: '{images_dir}'")
+        time.sleep(2)
+        result = f"[NeRF model generated using {model} from '{images_dir}']"
+        self._publish_result("generate_nerf", result)
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""
