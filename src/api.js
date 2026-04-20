@@ -180,7 +180,7 @@ async function requestWithFallback(path, options, fallback) {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
     const state = getConfigState();
-    const headers = options?.headers || {};
+    const headers = { ...(options?.headers || {}) };
     if (state.apiKey) {
       headers['X-Api-Key'] = state.apiKey;
     }
