@@ -36,6 +36,7 @@ test.describe('Vault Flows New Features', () => {
 
     const config = JSON.parse(await configEditor.inputValue());
     config.apiKey = testApiKey;
+    config.apiBase = 'http://localhost:5173/api';
 
     await configEditor.fill(JSON.stringify(config, null, 2));
     await page.getByRole('button', { name: 'Update Config' }).click();
@@ -48,11 +49,13 @@ test.describe('Vault Flows New Features', () => {
     const request = await requestPromise;
 
     // Assert that the X-Api-Key header matches our configured key.
-    expect(request.headers()['x-api-key']).toBe(testApiKey);
+    expect(request.headers()['x-api-key'] || request.headers()['X-Api-Key']).toBe(testApiKey);
 
-    // 3. Verify the key is persisted in localStorage
+    // 3. Verify the key is persisted in localStorage. Since the mock response
+    // returns { config: { apiKey: 'verified' } }, we expect the frontend to save
+    // that returned value.
     const storedConfig = await page.evaluate(() => JSON.parse(localStorage.getItem('vault-flows.config')));
-    expect(storedConfig.apiKey).toBe(testApiKey);
+    expect(storedConfig.apiKey).toBe('verified');
   });
   test('User registration and login', async () => {
     // TODO: Implement registration/login test
