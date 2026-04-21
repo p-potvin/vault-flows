@@ -19,6 +19,7 @@ import cgi
 import datetime as dt
 import json
 import mimetypes
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -123,8 +124,30 @@ def resolve_command(command: str) -> List[str]:
     command = command.strip() if command else "facefusion"
     if not command:
         command = "facefusion"
-    parts = command.split()
+
+    try:
+        parts = shlex.split(command, posix=False)
+    except ValueError:
+        parts = command.split()
+
+    if not parts:
+        parts = ["facefusion"]
+
+    parts = [p.strip('"\'') for p in parts]
     executable = parts[0]
+
+    exe_name = executable.split('\\')[-1].split('/')[-1].lower()
+
+    allowed_binaries = {
+        "facefusion", "facefusion.exe", "facefusion.bat", "facefusion.cmd",
+        "python", "python3", "python.exe", "py", "py.exe"
+    }
+    if exe_name not in allowed_binaries:
+        raise ValueError(f"Security Error: Executable '{exe_name}' is not allowed to prevent arbitrary code execution.")
+
+    if exe_name.startswith("py"):
+        if any(arg in {"-c", "-m"} for arg in parts):
+            raise ValueError("Security Error: Python -c or -m flags are not allowed.")
 
     if not shutil.which(executable) and not Path(executable).exists():
         raise FileNotFoundError(
