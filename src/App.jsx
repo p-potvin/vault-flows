@@ -39,6 +39,10 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+// ⚡ Bolt: Move static categories array outside of the component to prevent
+// unnecessary re-allocation and memory pressure on every render.
+const categories = ['All', 'Data', 'ML', 'Reporting'];
+
 function App() {
   const dispatch = useDispatch();
   const workflows = useSelector((state) => state.workflows.items);
@@ -62,8 +66,6 @@ function App() {
   useEffect(() => {
     loadWorkflows();
   }, [loadWorkflows]);
-
-  const categories = ['All', 'Data', 'ML', 'Reporting'];
 
   // ⚡ Bolt: Memoize filtered list to prevent unnecessary re-filtering
   // on every keystroke in the "Create Workflow" modal form.

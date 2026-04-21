@@ -404,11 +404,16 @@ export async function backupWorkflows() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
     },
-    () => ({
-      backedUpAt: new Date().toISOString(),
-      count: getWorkflows().length,
-      data: getWorkflows(),
-    }),
+    () => {
+      // ⚡ Bolt: Cache getWorkflows() result to avoid executing the expensive
+      // synchronous local storage read and JSON parse operations multiple times.
+      const workflows = getWorkflows();
+      return {
+        backedUpAt: new Date().toISOString(),
+        count: workflows.length,
+        data: workflows,
+      };
+    },
   );
 }
 
