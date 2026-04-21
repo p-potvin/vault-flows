@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function Sidebar({ categories, onSelect, selected }) {
+export const Sidebar = React.memo(function Sidebar({ categories, onSelect, selected }) {
   return (
     <aside className="w-full md:w-64 bg-vault-50 dark:bg-vault-900 border-b md:border-b-0 md:border-r border-vault-200 dark:border-vault-700 p-4 font-vault flex-shrink-0">
       <h3 className="text-lg font-bold mb-4 text-vault-800 dark:text-vault-100">Categories</h3>
@@ -18,4 +18,4 @@ export function Sidebar({ categories, onSelect, selected }) {
       </ul>
     </aside>
   );
-}
+});
