@@ -131,25 +131,29 @@ export function WorkflowList({ workflows, onUpdated }) {
             autoFocus
             value={editName}
             onChange={e => setEditName(e.target.value)}
+            required
+            aria-required="true"
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="edit-workflow-category" className="block text-sm font-medium mb-1">Category:</label>
+          <label htmlFor="edit-workflow-category" className="block text-sm font-medium mb-1">Category: <span className="text-red-500">*</span></label>
           <input
             id="edit-workflow-category"
             className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
             value={editCategory}
             onChange={e => setEditCategory(e.target.value)}
+            required
+            aria-required="true"
           />
         </div>
         {saveError ? <div className="mb-2 text-sm text-red-500">{saveError}</div> : null}
         <div className="flex justify-end space-x-2">
           <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={closeEdit}>Cancel</button>
           <button
-            className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-60 disabled:cursor-not-allowed"
             onClick={saveEdit}
             disabled={isSaving || !editName.trim() || !editCategory.trim()}
-            title={(!editName.trim() || !editCategory.trim()) ? "Name and category are required" : undefined}
+            title={(!editName.trim() || !editCategory.trim()) ? 'Name and category are required' : undefined}
           >
             {isSaving ? 'Saving...' : 'Save'}
           </button>
