@@ -151,7 +151,7 @@ def resolve_command(command: str) -> List[str]:
 
     if not shutil.which(executable) and not Path(executable).exists():
         raise FileNotFoundError(
-            f"Could not resolve FaceFusion command '{command}'. Install FaceFusion or update facefusionCommand."
+            f"Could not resolve command '{command}'. Ensure it is installed and accessible."
         )
 
     return parts
