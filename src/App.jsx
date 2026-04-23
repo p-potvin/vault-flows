@@ -63,7 +63,21 @@ function App() {
     loadWorkflows();
   }, [loadWorkflows]);
 
-  const categories = ['All', 'Data', 'ML', 'Reporting'];
+  // ⚡ Bolt: Memoize categories array so it maintains a stable reference
+  const categories = useMemo(() => ['All', 'Data', 'ML', 'Reporting'], []);
+
+  // ⚡ Bolt: Memoize heavy feature components to prevent re-rendering them
+  // on every single keystroke when typing in the "Create Workflow" modal form.
+  const featureComponents = useMemo(() => (
+    <>
+      <ImageTools />
+      <ImageCaptioning />
+      <LoRATraining />
+      <FaceSwapVideo />
+    </>
+  ), []);
+
+
 
   // ⚡ Bolt: Memoize filtered list to prevent unnecessary re-filtering
   // on every keystroke in the "Create Workflow" modal form.
@@ -124,10 +138,7 @@ function App() {
                 ) : (
                   <WorkflowList workflows={filtered} onUpdated={loadWorkflows} />
                 )}
-                <ImageTools />
-                <ImageCaptioning />
-                <LoRATraining />
-                <FaceSwapVideo />
+                {featureComponents}
               </main>
             </>
           )}
