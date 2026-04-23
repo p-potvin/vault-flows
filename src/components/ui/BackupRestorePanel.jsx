@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { backupWorkflows, restoreWorkflows } from '../../api';
 import { useVaultTheme } from '../../lib/vaultTheme';
 
-export function BackupRestorePanel() {
+export const BackupRestorePanel = React.memo(function BackupRestorePanel() {
   const { theme } = useVaultTheme();
   const [backupResult, setBackupResult] = useState(null);
   const [restoreData, setRestoreData] = useState('');
@@ -70,4 +70,4 @@ export function BackupRestorePanel() {
       </div>
     </div>
   );
-}
+});
