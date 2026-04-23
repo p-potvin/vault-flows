@@ -39,6 +39,20 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+
+// ⚡ Bolt: Memoize heavy feature components to prevent them from re-rendering
+// when fast-updating state (like modal form inputs) changes in App.
+const HeavyFeatures = React.memo(() => (
+  <>
+    <ImageTools />
+    <ImageCaptioning />
+    <LoRATraining />
+    <FaceSwapVideo />
+  </>
+));
+
+const categories = ['All', 'Data', 'ML', 'Reporting'];
+
 function App() {
   const dispatch = useDispatch();
   const workflows = useSelector((state) => state.workflows.items);
@@ -62,22 +76,6 @@ function App() {
   useEffect(() => {
     loadWorkflows();
   }, [loadWorkflows]);
-
-  // ⚡ Bolt: Memoize categories array so it maintains a stable reference
-  const categories = useMemo(() => ['All', 'Data', 'ML', 'Reporting'], []);
-
-  // ⚡ Bolt: Memoize heavy feature components to prevent re-rendering them
-  // on every single keystroke when typing in the "Create Workflow" modal form.
-  const featureComponents = useMemo(() => (
-    <>
-      <ImageTools />
-      <ImageCaptioning />
-      <LoRATraining />
-      <FaceSwapVideo />
-    </>
-  ), []);
-
-
 
   // ⚡ Bolt: Memoize filtered list to prevent unnecessary re-filtering
   // on every keystroke in the "Create Workflow" modal form.
