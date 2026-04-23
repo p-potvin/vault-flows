@@ -124,40 +124,32 @@ def resolve_command(command: str) -> List[str]:
     command = command.strip() if command else "facefusion"
     if not command:
         command = "facefusion"
-    raw_parts = shlex.split(command, posix=False)
-    parts = [p.strip("\"'") for p in raw_parts]
+
+    try:
+        parts = shlex.split(command, posix=False)
+    except ValueError:
+        parts = command.split()
 
     if not parts:
-        raise ValueError("Invalid command provided.")
+        parts = ["facefusion"]
 
-    executable_path = Path(parts[0])
-    executable_stem = executable_path.stem.lower()
-    executable_ext = executable_path.suffix.lower()
+    parts = [p.strip('"\'') for p in parts]
+    executable = parts[0]
 
-    allowed_executables = {"facefusion", "python", "python3", "py", "conda", "poetry"}
-    allowed_extensions = {".bat", ".cmd", ".sh", ".ps1"}
+    exe_name = executable.split('\\')[-1].split('/')[-1].lower()
 
-    if executable_stem not in allowed_executables and executable_ext not in allowed_extensions:
-        raise ValueError(f"Executable '{parts[0]}' is not allowed. Restricted to known interpreters or scripts.")
+    allowed_binaries = {
+        "facefusion", "facefusion.exe", "facefusion.bat", "facefusion.cmd",
+        "python", "python3", "python.exe", "py", "py.exe"
+    }
+    if exe_name not in allowed_binaries:
+        raise ValueError(f"Security Error: Executable '{exe_name}' is not allowed to prevent arbitrary code execution.")
 
-    if executable_stem in {"python", "python3", "py"}:
-        skip_next = False
-        for arg in parts[1:]:
-            if skip_next:
-                skip_next = False
-                continue
+    if exe_name.startswith("py"):
+        if any(arg in {"-c", "-m"} for arg in parts):
+            raise ValueError("Security Error: Python -c or -m flags are not allowed.")
 
-            if not arg.startswith("-"):
-                break
-
-            if arg.startswith("-") and not arg.startswith("--") and "c" in arg:
-                raise ValueError("Inline python execution (-c) is blocked for security.")
-
-            # If it's a known flag that takes an argument, skip evaluating the next token as a flag
-            if arg in {"-W", "-X", "-m", "-c"} or arg.startswith("-W") or arg.startswith("-X"):
-                skip_next = True
-
-    if not shutil.which(parts[0]) and not Path(parts[0]).exists():
+    if not shutil.which(executable) and not Path(executable).exists():
         raise FileNotFoundError(
             f"Could not resolve command '{command}'. Ensure it is installed and accessible."
         )
