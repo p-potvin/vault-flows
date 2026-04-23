@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { exportWorkflows } from '../../api';
 import { useVaultTheme } from '../../lib/vaultTheme';
 
-export function ExportPanel() {
+export const ExportPanel = React.memo(function ExportPanel() {
   const { theme } = useVaultTheme();
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -35,4 +35,4 @@ export function ExportPanel() {
       )}
     </div>
   );
-}
+});

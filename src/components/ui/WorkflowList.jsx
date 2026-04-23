@@ -78,7 +78,11 @@ export function WorkflowList({ workflows, onUpdated }) {
   // of <li> elements on every keystroke when typing in the "Edit Workflow" modal.
   const renderedWorkflows = useMemo(() => {
     if (!workflows || workflows.length === 0) {
-      return <li className="text-gray-500">No workflows found.</li>;
+      return (
+        <li className="p-8 text-center text-gray-500 border border-dashed border-gray-300 dark:border-gray-700 rounded">
+          No workflows found. Click "+ Create Workflow" to get started.
+        </li>
+      );
     }
 
     return workflows.map((wf, i) => (
@@ -123,7 +127,8 @@ export function WorkflowList({ workflows, onUpdated }) {
           <label htmlFor="edit-workflow-name" className="block text-sm font-medium mb-1">Name: <span className="text-red-500">*</span></label>
           <input
             id="edit-workflow-name"
-            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
+            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-vault-500"
+            autoFocus
             value={editName}
             onChange={e => setEditName(e.target.value)}
             required

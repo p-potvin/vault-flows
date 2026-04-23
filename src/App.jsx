@@ -63,7 +63,21 @@ function App() {
     loadWorkflows();
   }, [loadWorkflows]);
 
-  const categories = ['All', 'Data', 'ML', 'Reporting'];
+  // ⚡ Bolt: Memoize categories array so it maintains a stable reference
+  const categories = useMemo(() => ['All', 'Data', 'ML', 'Reporting'], []);
+
+  // ⚡ Bolt: Memoize heavy feature components to prevent re-rendering them
+  // on every single keystroke when typing in the "Create Workflow" modal form.
+  const featureComponents = useMemo(() => (
+    <>
+      <ImageTools />
+      <ImageCaptioning />
+      <LoRATraining />
+      <FaceSwapVideo />
+    </>
+  ), []);
+
+
 
   // ⚡ Bolt: Memoize filtered list to prevent unnecessary re-filtering
   // on every keystroke in the "Create Workflow" modal form.
@@ -124,10 +138,7 @@ function App() {
                 ) : (
                   <WorkflowList workflows={filtered} onUpdated={loadWorkflows} />
                 )}
-                <ImageTools />
-                <ImageCaptioning />
-                <LoRATraining />
-                <FaceSwapVideo />
+                {featureComponents}
               </main>
             </>
           )}
@@ -146,10 +157,12 @@ function App() {
         </div>
         <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Create Workflow">
           <div className="mb-4">
-            <label htmlFor="create-workflow-name" className="block text-sm font-medium mb-1">Name:</label>
+            <label htmlFor="create-workflow-name" className="block text-sm font-medium mb-1">Name: <span className="text-red-500">*</span></label>
             <input
               id="create-workflow-name"
-              className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
+              className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-vault-500"
+              placeholder="e.g. Data Pipeline"
+              autoFocus
               value={newName}
               onChange={e => setNewName(e.target.value)}
             />
@@ -167,9 +180,10 @@ function App() {
           <div className="flex justify-end space-x-2">
             <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={() => setShowCreate(false)}>Cancel</button>
             <button
-              className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold"
+              className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleCreate}
               disabled={!newName.trim()}
+              title={!newName.trim() ? "Workflow name is required" : undefined}
             >
               Create
             </button>
