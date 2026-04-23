@@ -19,6 +19,7 @@ import cgi
 import datetime as dt
 import json
 import mimetypes
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -123,12 +124,42 @@ def resolve_command(command: str) -> List[str]:
     command = command.strip() if command else "facefusion"
     if not command:
         command = "facefusion"
-    parts = command.split()
-    executable = parts[0]
+    raw_parts = shlex.split(command, posix=False)
+    parts = [p.strip("\"'") for p in raw_parts]
 
-    if not shutil.which(executable) and not Path(executable).exists():
+    if not parts:
+        raise ValueError("Invalid command provided.")
+
+    executable_path = Path(parts[0])
+    executable_stem = executable_path.stem.lower()
+    executable_ext = executable_path.suffix.lower()
+
+    allowed_executables = {"facefusion", "python", "python3", "py", "conda", "poetry"}
+    allowed_extensions = {".bat", ".cmd", ".sh", ".ps1"}
+
+    if executable_stem not in allowed_executables and executable_ext not in allowed_extensions:
+        raise ValueError(f"Executable '{parts[0]}' is not allowed. Restricted to known interpreters or scripts.")
+
+    if executable_stem in {"python", "python3", "py"}:
+        skip_next = False
+        for arg in parts[1:]:
+            if skip_next:
+                skip_next = False
+                continue
+
+            if not arg.startswith("-"):
+                break
+
+            if arg.startswith("-") and not arg.startswith("--") and "c" in arg:
+                raise ValueError("Inline python execution (-c) is blocked for security.")
+
+            # If it's a known flag that takes an argument, skip evaluating the next token as a flag
+            if arg in {"-W", "-X", "-m", "-c"} or arg.startswith("-W") or arg.startswith("-X"):
+                skip_next = True
+
+    if not shutil.which(parts[0]) and not Path(parts[0]).exists():
         raise FileNotFoundError(
-            f"Could not resolve FaceFusion command '{command}'. Install FaceFusion or update facefusionCommand."
+            f"Could not resolve command '{command}'. Ensure it is installed and accessible."
         )
 
     return parts
