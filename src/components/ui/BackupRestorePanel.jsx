@@ -38,31 +38,32 @@ export const BackupRestorePanel = React.memo(function BackupRestorePanel() {
     <div className="p-4 rounded shadow bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700" style={{ borderColor: theme.accent }}>
       <h2 className="text-xl font-bold mb-4" style={{ color: theme.accent }}>Backup & Restore Workflows</h2>
       <button
-        className="px-4 py-2 rounded font-bold mb-4"
+        className="px-4 py-2 rounded font-bold mb-4 disabled:opacity-60 disabled:cursor-not-allowed"
         style={{ background: theme.accent, color: theme.primary }}
         onClick={handleBackup}
         disabled={loading}
       >
-        Backup Workflows
+        {loading ? 'Backing up...' : 'Backup Workflows'}
       </button>
       {backupResult && (
         <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded text-xs overflow-x-auto">{JSON.stringify(backupResult, null, 2)}</pre>
       )}
       <div className="mt-6">
-        <label className="block mb-2 font-semibold">Restore Data (JSON):</label>
+        <label htmlFor="restore-data" className="block mb-2 font-semibold">Restore Data (JSON):</label>
         <textarea
+          id="restore-data"
           className="w-full p-2 border rounded dark:bg-gray-900 dark:text-gray-100"
           rows={5}
           value={restoreData}
           onChange={e => setRestoreData(e.target.value)}
         />
         <button
-          className="px-4 py-2 rounded font-bold mt-2"
+          className="px-4 py-2 rounded font-bold mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
           style={{ background: theme.accent, color: theme.primary }}
           onClick={handleRestore}
           disabled={loading}
         >
-          Restore Workflows
+          {loading ? 'Restoring...' : 'Restore Workflows'}
         </button>
         {restoreResult && (
           <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded text-xs overflow-x-auto">{JSON.stringify(restoreResult, null, 2)}</pre>
