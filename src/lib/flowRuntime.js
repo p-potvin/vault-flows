@@ -1,4 +1,4 @@
-const MODEL_GROUPS = [
+export const MODEL_GROUPS = [
   { key: 'checkpoints', label: 'Checkpoints' },
   { key: 'loras', label: 'LoRAs' },
   { key: 'insightface', label: 'InsightFace / swap models' },
@@ -8,6 +8,23 @@ const MODEL_GROUPS = [
   { key: 'ultralytics', label: 'Detection models' },
   { key: 'sams', label: 'SAM models' },
 ];
+
+export const WORKFLOW_MODEL_COMPATIBILITY = {
+  imageCaptioning: {
+    captionModel: ['checkpoints'],
+    captionAdapter: ['loras'],
+  },
+  loraTraining: {
+    baseModel: ['checkpoints'],
+  },
+  videoFaceSwap: {
+    swapModel: ['insightface'],
+    alternateSwapModel: ['hyperswap'],
+    faceModel: ['reactorFaces'],
+    restoreModel: ['facerestoreModels'],
+    detectorModel: ['ultralytics'],
+  },
+};
 
 export const FLOW_MODEL_SLOTS = {
   imageCaptioning: [

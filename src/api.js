@@ -3,6 +3,12 @@ import {
   createEmptyScannedModels,
   normalizeExecutionConfig,
 } from './lib/flowRuntime';
+import {
+  validateConfigUpdatePayload,
+  validateModelCatalog,
+  validateWorkflowPayload,
+  validateWorkflowUpdatePayload,
+} from './validation';
 
 const configuredBase = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
 
@@ -265,13 +271,15 @@ async function scanModelsViaLocalBridge(config) {
     throw new Error('Local bridge URL is not configured.');
   }
 
-  return fetchJson(`${bridgeUrl}/models/scan`, {
+  const result = await fetchJson(`${bridgeUrl}/models/scan`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       modelsDir: config.modelsDir || '',
     }),
   });
+
+  return validateModelCatalog(result, 'Local bridge returned an invalid model catalog');
 }
 
 async function scanModelsViaComfy(config) {
@@ -304,7 +312,7 @@ async function scanModelsViaComfy(config) {
     }),
   );
 
-  return {
+  return validateModelCatalog({
     source: 'comfyui',
     scannedAt: new Date().toISOString(),
     modelsDir: config.modelsDir || '',
@@ -312,7 +320,7 @@ async function scanModelsViaComfy(config) {
       ? ['Saved ReActor face models require the local bridge scanner because ComfyUI does not expose that nested folder directly.']
       : [],
     categories,
-  };
+  }, 'ComfyUI returned an invalid model catalog');
 }
 
 export async function fetchWorkflows() {
@@ -320,16 +328,18 @@ export async function fetchWorkflows() {
 }
 
 export async function createWorkflow({ name, category, description = '' }) {
+  const payload = validateWorkflowPayload({ name, category, description });
+
   return requestWithFallback(
     '/workflows',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, category, description }),
+      body: JSON.stringify(payload),
     },
     () => {
       const workflows = getWorkflows();
-      const workflow = normalizeWorkflow({ name, category, description });
+      const workflow = normalizeWorkflow(payload);
       saveWorkflows([workflow, ...workflows]);
       return workflow;
     },
@@ -337,19 +347,21 @@ export async function createWorkflow({ name, category, description = '' }) {
 }
 
 export async function updateWorkflow(id, data) {
+  const payload = validateWorkflowUpdatePayload(data);
+
   return requestWithFallback(
     `/workflows/${id}`,
     {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     },
     () => {
       const workflows = getWorkflows();
       let updated;
       const updatedWorkflows = workflows.map((workflow) => {
         if (workflow.id === id) {
-          updated = normalizeWorkflow({ ...workflow, ...data, id });
+          updated = normalizeWorkflow({ ...workflow, ...payload, id });
           return updated;
         }
         return workflow;
@@ -548,17 +560,19 @@ export async function fetchConfig() {
 }
 
 export async function updateConfig(data) {
+  const currentConfig = getConfigState();
+  const payload = validateConfigUpdatePayload(data, currentConfig);
   const result = await requestWithFallback(
     '/config',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     },
     () => {
       const config = {
-        ...getConfigState(),
-        ...data,
+        ...currentConfig,
+        ...payload,
         updatedAt: new Date().toISOString(),
       };
       saveConfigState(config);
@@ -567,9 +581,9 @@ export async function updateConfig(data) {
   );
 
   return saveConfigState({
-    ...getConfigState(),
+    ...currentConfig,
     ...extractConfigObject(result),
-    ...data,
+    ...payload,
     updatedAt: new Date().toISOString(),
   });
 }
