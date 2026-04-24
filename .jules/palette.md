@@ -1,3 +1,3 @@
-## 2025-04-19 - Improved Modal Accessibility and UX
-**Learning:** Adding the appropriate ARIA attributes `role="dialog"`, `aria-modal="true"`, and `aria-labelledby` combined with keyboard navigation (e.g. listening for the `Escape` key) makes standard React modals much more accessible to screen readers and keyboard users. React's `useEffect` hook correctly manages adding and removing the keydown event listener.
-**Action:** When creating or modifying modals or dialogs, ensure they include semantic ARIA roles and proper keyboard accessibility for dismissing them.
+## 2024-04-22 - [Edit Workflow Modal Accessibility & UX Polish]
+**Learning:** Adding dynamic disabled tooltips (e.g., explaining why a button is disabled) paired with visual `disabled:opacity-60` cues significantly clarifies form states for users who might otherwise struggle to identify missing required fields.
+**Action:** Always conditionally render the `title` attribute for disabled buttons so the error tooltip doesn't persist inappropriately when the button becomes active again.

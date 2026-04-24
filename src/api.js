@@ -54,6 +54,15 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-nerf-automation',
+    name: 'NeRF Automation Pipeline',
+    category: 'ML',
+    description: 'Automated generation of NeRF models from a folder of images, including point cloud extraction and texture baking. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 
 const DEFAULT_CONFIG = normalizeExecutionConfig({
