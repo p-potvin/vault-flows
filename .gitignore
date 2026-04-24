@@ -31,3 +31,4 @@ test-results/
 package-lock.json
 .vercel
 vault-flows.db
+.certs/
