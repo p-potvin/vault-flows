@@ -70,7 +70,10 @@ function pickRuntimeForm(config = {}) {
   };
 }
 
-export function ConfigPanel() {
+// ⚡ Bolt: Wrap ConfigPanel in React.memo() to prevent unnecessary re-renders
+// when parent component (App.jsx) state updates frequently (e.g. typing in modal).
+// This ensures a smooth typing experience and reduces CPU overhead.
+export const ConfigPanel = React.memo(function ConfigPanel() {
   const { theme } = useVaultTheme();
   const [edit, setEdit] = useState('');
   const [initialValue, setInitialValue] = useState('');
@@ -482,4 +485,4 @@ export function ConfigPanel() {
       )}
     </div>
   );
-}
+});
