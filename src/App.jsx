@@ -136,7 +136,7 @@ function App() {
                 ) : (
                   <WorkflowList workflows={filtered} onUpdated={loadWorkflows} />
                 )}
-                {featureComponents}
+                <HeavyFeatures />
               </main>
             </>
           )}
