@@ -11,6 +11,7 @@ import { BackupRestorePanel } from './components/ui/BackupRestorePanel';
 import { ExportPanel } from './components/ui/ExportPanel';
 import { StoragePanel } from './components/ui/StoragePanel';
 import { ConfigPanel } from './components/ui/ConfigPanel';
+import { CoordinationPanel } from './components/ui/CoordinationPanel';
 
 import { useEffect, useCallback, useMemo, useState } from 'react';
 import { fetchWorkflows, createWorkflow } from './api';
@@ -113,6 +114,7 @@ function App() {
             <button className={`px-3 py-1 rounded font-semibold ${panel === 'export' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('export')}>Export</button>
             <button className={`px-3 py-1 rounded font-semibold ${panel === 'storage' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('storage')}>Storage</button>
             <button className={`px-3 py-1 rounded font-semibold ${panel === 'config' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('config')}>Config</button>
+            <button className={`px-3 py-1 rounded font-semibold ${panel === 'coordination' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('coordination')}>Coordination</button>
           </nav>
         </header>
         <div className="flex flex-col md:flex-row max-w-5xl mx-auto">
@@ -136,7 +138,7 @@ function App() {
                 ) : (
                   <WorkflowList workflows={filtered} onUpdated={loadWorkflows} />
                 )}
-                {featureComponents}
+                <HeavyFeatures />
               </main>
             </>
           )}
@@ -151,6 +153,9 @@ function App() {
           )}
           {panel === 'config' && (
             <main className="flex-1 py-4 md:py-8"><ConfigPanel /></main>
+          )}
+          {panel === 'coordination' && (
+            <CoordinationPanel />
           )}
         </div>
         <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Create Workflow">

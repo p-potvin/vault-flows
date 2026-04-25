@@ -75,10 +75,7 @@ class ExtrovertAgent(AgentBase):
             "agent_left",
             {
                 "agent": self.agent_id,
-                "message": (
-                    f"Agent {self.agent_id} is leaving the team. "
-                    "I hope to reconnect soon. Stay on track!"
-                ),
+                "message": f"Agent {self.agent_id} is leaving the team. Stay on track!",
             },
         )
         super().stop()
@@ -199,14 +196,14 @@ class ExtrovertAgent(AgentBase):
 
     def _on_assignment_received(self, task: str, details: dict):
         """React to a task assignment from the manager or a peer."""
-        print(f"\n📢 [{self.agent_id}] Assignment Received: {task}")
-        print(f"📝 Details: {details.get('description', 'No description')}")
+        print(f"\n[ASSIGNMENT] [{self.agent_id}] Received: {task}")
+        print(f"[DETAILS] {details.get('description', 'No description')}")
 
         def _execute():
             self.update_status(AgentStatus.WORKING)
             self._perform_task(task, details)
             self._update_tasks_md_finished(task)
-            print(f"✅ [{self.agent_id}] Task {task} complete.")
+            print(f"[DONE] [{self.agent_id}] Task {task} complete.")
             self.update_status(AgentStatus.WAITING_FOR_INPUT)
 
         threading.Thread(target=_execute, daemon=True).start()
@@ -216,7 +213,7 @@ class ExtrovertAgent(AgentBase):
         Execute the assigned task. Subclasses should override this method
         with domain-specific logic. Default implementation is a placeholder.
         """
-        print(f"⚙️  [{self.agent_id}] Processing task: {task}")
+        print(f"[WORK] [{self.agent_id}] Processing task: {task}")
         time.sleep(2)  # Placeholder: subclasses implement real processing
 
     def _update_tasks_md_finished(self, task_id):
@@ -328,7 +325,7 @@ class ExtrovertAgent(AgentBase):
 
         if not self._peer_registry:
             lines.append(
-                "  (No other agents detected on the network — "
+                "  (No other agents detected on the network - "
                 "this silence is unsettling. Awaiting peers.)"
             )
 

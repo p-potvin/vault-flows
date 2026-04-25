@@ -77,7 +77,9 @@ export function WorkflowList({ workflows, onUpdated }) {
   // ⚡ Bolt: Memoize the rendered list of workflows to prevent recreating hundreds
   // of <li> elements on every keystroke when typing in the "Edit Workflow" modal.
   const renderedWorkflows = useMemo(() => {
-    if (!workflows || workflows.length === 0) {
+    const workflowItems = Array.isArray(workflows) ? workflows : [];
+
+    if (workflowItems.length === 0) {
       return (
         <li className="p-8 text-center text-gray-500 border border-dashed border-gray-300 dark:border-gray-700 rounded">
           No workflows found. Click "+ Create Workflow" to get started.
@@ -85,7 +87,7 @@ export function WorkflowList({ workflows, onUpdated }) {
       );
     }
 
-    return workflows.map((wf, i) => (
+    return workflowItems.map((wf, i) => (
       <li key={wf.id || i} className="bg-white dark:bg-gray-800 rounded shadow p-3 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
         <div>
           <span className="font-medium text-gray-900 dark:text-gray-100">{wf.name}</span>

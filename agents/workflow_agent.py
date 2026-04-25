@@ -48,7 +48,7 @@ class WorkflowAgent(ExtrovertAgent):
 
     def _perform_task(self, task: str, details: dict):
         """Execute a workflow processing task based on the task identifier."""
-        print(f"⚙️  [{self.agent_id}] Executing workflow task: {task}")
+        print(f"[WORKFLOW] [{self.agent_id}] Executing workflow task: {task}")
 
         handlers = {
             "parse_workflow": self._parse_workflow,
@@ -63,14 +63,14 @@ class WorkflowAgent(ExtrovertAgent):
         if handler:
             handler(details)
         else:
-            print(f"⚠️  [{self.agent_id}] Unknown workflow task: {task}. Logging and continuing.")
+            print(f"[WARN] [{self.agent_id}] Unknown workflow task: {task}. Logging and continuing.")
             self._log_unknown_task(task, details)
 
     def _parse_workflow(self, details: dict):
         """Parse a workflow definition and extract its structure."""
         source = details.get("source", "unknown")
         format_ = details.get("format", "python")
-        print(f"📖 [{self.agent_id}] Parsing workflow | source={source} | format={format_}")
+        print(f"[WORKFLOW] [{self.agent_id}] Parsing workflow | source={source} | format={format_}")
         time.sleep(1)
         parsed = {
             "source": source,
@@ -84,7 +84,7 @@ class WorkflowAgent(ExtrovertAgent):
         """Map workflow steps to ComfyUI node types."""
         workflow_name = details.get("workflow_name", "unnamed")
         steps = details.get("steps", [])
-        print(f"🗺️  [{self.agent_id}] Mapping to ComfyUI nodes | workflow={workflow_name} | steps={len(steps)}")
+        print(f"[WORKFLOW] [{self.agent_id}] Mapping to ComfyUI nodes | workflow={workflow_name} | steps={len(steps)}")
         node_map = {}
         for i, step in enumerate(steps):
             node_map[step] = f"ComfyUI_Node_{i}"
@@ -102,14 +102,14 @@ class WorkflowAgent(ExtrovertAgent):
 
         if os.path.commonpath([base_dir, resolved_path]) != base_dir:
             error_msg = "Invalid output path: Path traversal detected."
-            print(f"❌ [{self.agent_id}] Export failed: {error_msg}")
+            print(f"[ERROR] [{self.agent_id}] Export failed: {error_msg}")
             self._publish_result("export_comfyui", f"Export failed: {error_msg}")
             return
 
         output_path = resolved_path
 
         steps = details.get("steps", [])
-        print(f"📦 [{self.agent_id}] Exporting to ComfyUI | workflow={workflow_name} → {output_path}")
+        print(f"[WORKFLOW] [{self.agent_id}] Exporting to ComfyUI | workflow={workflow_name} -> {output_path}")
         time.sleep(1)
 
         comfyui_workflow = {
@@ -128,7 +128,7 @@ class WorkflowAgent(ExtrovertAgent):
                 json.dump(comfyui_workflow, f, indent=2)
             self._publish_result("export_comfyui", f"ComfyUI workflow exported to '{output_path}'")
         except Exception as e:
-            print(f"❌ [{self.agent_id}] Export failed: {e}")
+            print(f"[ERROR] [{self.agent_id}] Export failed: {e}")
             self._publish_result("export_comfyui", f"Export failed: {e}")
 
     def _export_diffusion(self, details: dict):
@@ -142,13 +142,13 @@ class WorkflowAgent(ExtrovertAgent):
 
         if os.path.commonpath([base_dir, resolved_path]) != base_dir:
             error_msg = "Invalid output path: Path traversal detected."
-            print(f"❌ [{self.agent_id}] Export failed: {error_msg}")
+            print(f"[ERROR] [{self.agent_id}] Export failed: {error_msg}")
             self._publish_result("export_diffusion", f"Export failed: {error_msg}")
             return
 
         output_path = resolved_path
 
-        print(f"📦 [{self.agent_id}] Exporting to Diffusion format | workflow={workflow_name} → {output_path}")
+        print(f"[WORKFLOW] [{self.agent_id}] Exporting to Diffusion format | workflow={workflow_name} -> {output_path}")
         time.sleep(1)
         self._publish_result("export_diffusion", f"Diffusion workflow exported to '{output_path}'")
 
@@ -156,7 +156,7 @@ class WorkflowAgent(ExtrovertAgent):
         """Validate a workflow definition for correctness and compatibility."""
         workflow_name = details.get("workflow_name", "unnamed")
         target = details.get("target", "comfyui")
-        print(f"✅ [{self.agent_id}] Validating workflow | name={workflow_name} | target={target}")
+        print(f"[WORKFLOW] [{self.agent_id}] Validating workflow | name={workflow_name} | target={target}")
         time.sleep(1)
 
         errors = []
@@ -180,13 +180,13 @@ class WorkflowAgent(ExtrovertAgent):
         source_format = details.get("source_format", "python")
         target_format = details.get("target_format", "comfyui")
         workflow_name = details.get("workflow_name", "unnamed")
-        print(f"🔄 [{self.agent_id}] Converting workflow | {source_format} → {target_format} | name={workflow_name}")
+        print(f"[WORKFLOW] [{self.agent_id}] Converting workflow | {source_format} -> {target_format} | name={workflow_name}")
         time.sleep(1)
         self._publish_result("convert_workflow", f"Converted '{workflow_name}' from {source_format} to {target_format}")
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""
-        print(f"📋 [{self.agent_id}] Unknown task '{task}' — details: {details}")
+        print(f"[WORKFLOW] [{self.agent_id}] Unknown task '{task}' - details: {details}")
 
     def _publish_result(self, task: str, result: str):
         """Publish a task result back to the Redis channel."""
@@ -199,4 +199,4 @@ class WorkflowAgent(ExtrovertAgent):
                 "result": result,
             },
         )
-        print(f"📤 [{self.agent_id}] Result published for task '{task}'")
+        print(f"[RESULT] [{self.agent_id}] Result published for task '{task}'")
