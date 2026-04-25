@@ -202,7 +202,7 @@ class ExtrovertAgent(AgentBase):
         def _execute():
             self.update_status(AgentStatus.WORKING)
             self._perform_task(task, details)
-            self._update_tasks_md_finished(task)
+            self._update_tasks_md_finished(task, details)
             print(f"[DONE] [{self.agent_id}] Task {task} complete.")
             self.update_status(AgentStatus.WAITING_FOR_INPUT)
 
@@ -214,20 +214,38 @@ class ExtrovertAgent(AgentBase):
         with domain-specific logic. Default implementation is a placeholder.
         """
         print(f"[WORK] [{self.agent_id}] Processing task: {task}")
-        time.sleep(2)  # Placeholder: subclasses implement real processing
+        time.sleep(1)
+        title = details.get("title") or details.get("description") or task
+        self.coordinator.publish(
+            "RESULT",
+            task,
+            {
+                "task_id": details.get("task_id"),
+                "result": f"Accepted project task: {title}",
+                "source": details.get("source"),
+                "repo_path": details.get("repo_path"),
+                "task_file_path": details.get("task_file_path"),
+                "tasks_md_ref": details.get("tasks_md_ref"),
+                "dispatch_run_id": details.get("dispatch_run_id"),
+                "branch_name": details.get("branch_name"),
+                "changed_files": details.get("changed_files") or [],
+            },
+        )
 
-    def _update_tasks_md_finished(self, task_id):
-        """Mark a task as finished ([x]) in TODO.md."""
+    def _update_tasks_md_finished(self, task_id, details=None):
+        """Mark an assigned task as finished ([x]) in TASKS.md when file context is available."""
         try:
-            tasks_path = os.path.join(os.getcwd(), "TODO.md")
+            details = details or {}
+            task_ref = details.get("tasks_md_ref") or task_id
+            tasks_path = details.get("task_file_path") or os.path.join(os.getcwd(), "TASKS.md")
             if not os.path.exists(tasks_path):
                 return
 
             with open(tasks_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
-            pattern = rf"(?m)^(\s*{re.escape(task_id)}\s+\[)[ ~](\].*)$"
-            content = re.sub(pattern, r"\1x\2", content)
+            pattern = rf"(?m)^(\s*{re.escape(task_ref)}\s+\[)[ ~xX](\].*)$"
+            content = re.sub(pattern, lambda match: f"{match.group(1)}x{match.group(2)}", content)
 
             with open(tasks_path, "w", encoding="utf-8") as f:
                 f.write(content)

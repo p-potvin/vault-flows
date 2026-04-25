@@ -68,6 +68,7 @@ class VideoAgent(ExtrovertAgent):
         else:
             print(f"[WARN] [{self.agent_id}] Unknown video task: {task}. Logging and continuing.")
             self._log_unknown_task(task, details)
+            super()._perform_task(task, details)
 
     def _trim_video(self, details: dict):
         """Trim a video to a specified time range."""

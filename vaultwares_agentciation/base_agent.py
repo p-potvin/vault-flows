@@ -6,7 +6,7 @@ from .enums import AgentStatus
 class AgentBase:
     def __init__(self, agent_id, channel='tasks', redis_host='localhost', redis_port=6379, redis_db=0):
         self.agent_id = agent_id
-        self.status = AgentStatus.WAITING_FOR_INPUT
+        self.status = AgentStatus.RELAXING
         self.coordinator = RedisCoordinator(agent_id, channel, redis_host, redis_port, redis_db)
         self.heartbeat_interval = 5
         self._stop_event = threading.Event()

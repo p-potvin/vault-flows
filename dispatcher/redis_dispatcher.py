@@ -197,6 +197,7 @@ class RedisDispatcher:
                 "status": "completed",
                 "completed_at": self._now(),
                 "result": details.get("result"),
+                "result_details": details,
             }
             await self.redis.hset(self.task_index_key, task_id, json.dumps(updated))
             await self.log_task_event(task_id, "completed", {"agent_id": agent_id, "task": task_type, "details": details})

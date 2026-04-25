@@ -69,6 +69,7 @@ class ImageAgent(ExtrovertAgent):
         else:
             print(f"[WARN] [{self.agent_id}] Unknown image task: {task}. Logging and continuing.")
             self._log_unknown_task(task, details)
+            super()._perform_task(task, details)
 
     def _generate_image(self, details: dict):
         """Generate an image from a prompt."""

@@ -1,6 +1,6 @@
 {
-  "last_turn_at": "2026-04-25T23:08:16.360Z",
-  "turn_count": 24,
-  "last_progress_at": "2026-04-25T23:08:16.360Z",
-  "last_agent_output": "The Redis messages GUI is here:\n\nhttp://127.0.0.1:8765/redis\n\nThis is served directly by the coordin"
+  "last_turn_at": "2026-04-25T23:28:14.215Z",
+  "turn_count": 26,
+  "last_progress_at": "2026-04-25T23:28:14.215Z",
+  "last_agent_output": "You were right: the demo path only gave agents a Redis assignment with a task title/ref. It did not "
 }

@@ -65,6 +65,7 @@ class WorkflowAgent(ExtrovertAgent):
         else:
             print(f"[WARN] [{self.agent_id}] Unknown workflow task: {task}. Logging and continuing.")
             self._log_unknown_task(task, details)
+            super()._perform_task(task, details)
 
     def _parse_workflow(self, details: dict):
         """Parse a workflow definition and extract its structure."""

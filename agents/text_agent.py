@@ -66,6 +66,7 @@ class TextAgent(ExtrovertAgent):
         else:
             print(f"[WARN] [{self.agent_id}] Unknown text task: {task}. Logging and continuing.")
             self._log_unknown_task(task, details)
+            super()._perform_task(task, details)
 
     def _generate_text(self, details: dict):
         """Generate text based on a prompt."""

@@ -21,7 +21,10 @@ import os
 import time
 import asyncio
 import json
+import re
+import subprocess
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
@@ -59,6 +62,19 @@ class TaskRequest(BaseModel):
     required_skill: str | None = None
 
 
+class TasksFileDispatchRequest(BaseModel):
+    path: str = "TASKS.md"
+    repo_path: str | None = None
+    repo_url: str | None = None
+    base_branch: str = "main"
+    branch_name: str | None = None
+    create_branch: bool = True
+    create_pr: bool = True
+    include_subtasks: bool = False
+    limit: int = Field(default=1, ge=1, le=50)
+    dispatch_now: bool = True
+
+
 @dataclass
 class AgentProfile:
     agent_id: str
@@ -76,6 +92,195 @@ def parse_redis_endpoint(redis_url: str) -> tuple[str, int, int]:
         parsed.port or 6379,
         int(parsed.path.lstrip("/") or 0),
     )
+
+
+TASK_LINE_RE = re.compile(r"^\s*(?P<ref>\d+[a-z]?)\s+\[(?P<status>[ xX~])\]\s+(?P<title>.+?)\s*$")
+
+
+def slugify_branch_part(value: str) -> str:
+    slug = re.sub(r"[^a-zA-Z0-9._-]+", "-", value.strip()).strip("-").lower()
+    return slug or "tasks"
+
+
+def run_git(repo_path: Path, args: list[str], timeout: int = 30) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", "-C", str(repo_path), *args],
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        check=False,
+    )
+
+
+def resolve_repo_path(repo_path: str | None, repo_url: str | None = None) -> Path:
+    if repo_path:
+        resolved = Path(repo_path).expanduser().resolve()
+    elif repo_url:
+        repo_slug = slugify_branch_part(Path(urlparse(repo_url).path).stem or "repo")
+        resolved = (Path.cwd() / ".omx" / "dispatch-repos" / repo_slug).resolve()
+    else:
+        resolved = Path.cwd().resolve()
+
+    if repo_url and not resolved.exists():
+        resolved.parent.mkdir(parents=True, exist_ok=True)
+        clone = subprocess.run(
+            ["git", "clone", repo_url, str(resolved)],
+            capture_output=True,
+            text=True,
+            timeout=120,
+            check=False,
+        )
+        if clone.returncode != 0:
+            raise HTTPException(status_code=400, detail=f"git clone failed: {clone.stderr.strip() or clone.stdout.strip()}")
+
+    if not resolved.exists():
+        raise HTTPException(status_code=404, detail=f"Repository path not found: {resolved}")
+
+    return resolved
+
+
+def prepare_dispatch_branch(repo_path: Path, branch_name: str | None, base_branch: str, create_branch: bool) -> dict[str, Any]:
+    current = run_git(repo_path, ["branch", "--show-current"])
+    current_branch = current.stdout.strip() if current.returncode == 0 else ""
+    branch = branch_name or f"dispatch/tasks-md-{int(time.time())}"
+
+    result: dict[str, Any] = {
+        "requested": create_branch,
+        "branch": branch,
+        "base_branch": base_branch,
+        "previous_branch": current_branch,
+        "created": False,
+        "checked_out": False,
+        "warning": None,
+    }
+
+    if not create_branch:
+        return result
+
+    inside_work_tree = run_git(repo_path, ["rev-parse", "--is-inside-work-tree"])
+    if inside_work_tree.returncode != 0 or inside_work_tree.stdout.strip() != "true":
+        result["warning"] = "Repository path is not a git work tree."
+        return result
+
+    if current_branch == branch:
+        result["checked_out"] = True
+        return result
+
+    dirty = run_git(repo_path, ["status", "--porcelain"])
+    if dirty.returncode != 0:
+        result["warning"] = dirty.stderr.strip() or "Could not inspect git status."
+        return result
+
+    existing = run_git(repo_path, ["rev-parse", "--verify", branch])
+    if existing.returncode != 0:
+        created = run_git(repo_path, ["branch", branch])
+        result["created"] = created.returncode == 0
+        if created.returncode != 0:
+            result["warning"] = created.stderr.strip() or created.stdout.strip()
+            return result
+
+    if dirty.stdout.strip():
+        result["warning"] = "Branch exists but was not checked out because the work tree has uncommitted changes."
+        return result
+
+    switched = run_git(repo_path, ["switch", branch])
+    result["checked_out"] = switched.returncode == 0
+    if switched.returncode != 0:
+        result["warning"] = switched.stderr.strip() or switched.stdout.strip()
+
+    return result
+
+
+def resolve_project_file(path: str, repo_path: Path | None = None) -> Path:
+    root = (repo_path or Path.cwd()).resolve()
+    resolved = (root / path).resolve()
+    if not resolved.exists():
+        raise HTTPException(status_code=404, detail=f"Task file not found: {path}")
+
+    return resolved
+
+
+def parse_tasks_file(path: Path) -> list[dict[str, Any]]:
+    tasks: list[dict[str, Any]] = []
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        match = TASK_LINE_RE.match(line)
+        if not match:
+            continue
+
+        ref = match.group("ref")
+        status = match.group("status")
+        tasks.append(
+            {
+                "ref": ref,
+                "title": match.group("title").strip(),
+                "status": "finished" if status.lower() == "x" else "in_progress" if status == "~" else "free",
+                "is_subtask": not ref.isdigit(),
+                "line_number": line_number,
+            }
+        )
+
+    return tasks
+
+
+def update_tasks_file_status(path: Path, task_ref: str, marker: str) -> bool:
+    content = path.read_text(encoding="utf-8")
+    pattern = rf"(?m)^(\s*{re.escape(task_ref)}\s+\[)[ xX~](\]\s+.+)$"
+    updated, count = re.subn(pattern, lambda match: f"{match.group(1)}{marker}{match.group(2)}", content, count=1)
+    if not count:
+        return False
+
+    path.write_text(updated, encoding="utf-8")
+    return True
+
+
+def create_pull_request(repo_path: Path, branch_name: str, base_branch: str, title: str, body: str) -> dict[str, Any]:
+    gh = subprocess.run(
+        ["gh", "pr", "create", "--base", base_branch, "--head", branch_name, "--title", title, "--body", body],
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+    return {
+        "created": gh.returncode == 0,
+        "url": gh.stdout.strip() if gh.returncode == 0 else None,
+        "warning": None if gh.returncode == 0 else (gh.stderr.strip() or gh.stdout.strip() or "gh pr create failed"),
+    }
+
+
+def commit_and_push_dispatch_run(repo_path: Path, branch_name: str, paths: list[str], message: str) -> dict[str, Any]:
+    current = run_git(repo_path, ["branch", "--show-current"])
+    current_branch = current.stdout.strip() if current.returncode == 0 else ""
+    if current_branch != branch_name:
+        return {
+            "committed": False,
+            "pushed": False,
+            "warning": f"Refusing to commit from branch '{current_branch}'. Expected dispatch branch '{branch_name}'.",
+        }
+
+    unique_paths = sorted({path for path in paths if path})
+    if not unique_paths:
+        return {"committed": False, "pushed": False, "warning": "No changed files were reported for this dispatch run."}
+
+    added = run_git(repo_path, ["add", "--", *unique_paths])
+    if added.returncode != 0:
+        return {"committed": False, "pushed": False, "warning": added.stderr.strip() or added.stdout.strip()}
+
+    diff = run_git(repo_path, ["diff", "--cached", "--quiet"])
+    if diff.returncode == 0:
+        return {"committed": False, "pushed": False, "warning": "No staged changes to commit."}
+
+    committed = run_git(repo_path, ["commit", "-m", message], timeout=60)
+    if committed.returncode != 0:
+        return {"committed": False, "pushed": False, "warning": committed.stderr.strip() or committed.stdout.strip()}
+
+    pushed = run_git(repo_path, ["push", "-u", "origin", branch_name], timeout=120)
+    return {
+        "committed": True,
+        "pushed": pushed.returncode == 0,
+        "commit_output": committed.stdout.strip(),
+        "warning": None if pushed.returncode == 0 else (pushed.stderr.strip() or pushed.stdout.strip()),
+    }
 
 
 class CoordinationRuntime:
@@ -118,6 +323,162 @@ class CoordinationRuntime:
         task_id = await self.dispatcher.enqueue_task(payload)
         return {"task_id": task_id, "queued": True}
 
+    async def enqueue_tasks_from_file(self, request: TasksFileDispatchRequest):
+        repo_path = resolve_repo_path(request.repo_path, request.repo_url)
+        dispatch_run_id = f"tasks-md-{int(time.time())}"
+        branch = request.branch_name or f"dispatch/tasks-md-{int(time.time())}"
+        branch_status = prepare_dispatch_branch(repo_path, branch, request.base_branch, request.create_branch)
+        if request.create_branch and not branch_status.get("checked_out"):
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "message": "Dispatch branch was not checked out, so TASKS.md was not modified.",
+                    "branch": branch_status,
+                },
+            )
+
+        task_file = resolve_project_file(request.path, repo_path)
+        parsed_tasks = parse_tasks_file(task_file)
+        pending_tasks = [
+            task
+            for task in parsed_tasks
+            if task["status"] == "free" and (request.include_subtasks or not task["is_subtask"])
+        ]
+
+        existing_refs = {
+            (task.get("details") or {}).get("tasks_md_ref")
+            for task in await self.dispatcher.get_tasks()
+            if (task.get("details") or {}).get("source") == task_file.name
+        }
+
+        queued = []
+        skipped_duplicates = []
+        for task in pending_tasks:
+            if task["ref"] in existing_refs:
+                skipped_duplicates.append(task)
+                continue
+
+            update_tasks_file_status(task_file, task["ref"], "~")
+            payload = {
+                "type": "project_task",
+                "description": task["title"],
+                "details": {
+                    "source": task_file.name,
+                    "repo_path": str(repo_path),
+                    "task_file_path": str(task_file),
+                    "task_file_relative_path": str(task_file.relative_to(repo_path)),
+                    "tasks_md_ref": task["ref"],
+                    "line_number": task["line_number"],
+                    "title": task["title"],
+                    "dispatch_run_id": dispatch_run_id,
+                    "branch_name": branch_status["branch"],
+                    "base_branch": request.base_branch,
+                    "pr_requested": request.create_pr,
+                    "dispatch_note": "Read from TASKS.md via Redis dashboard.",
+                },
+            }
+            queued.append({**task, "task_id": await self.dispatcher.enqueue_task(payload)})
+            existing_refs.add(task["ref"])
+
+            if len(queued) >= request.limit:
+                break
+
+        assignments = await self.dispatch_once() if request.dispatch_now else []
+        return {
+            "source": str(task_file),
+            "repo_path": str(repo_path),
+            "dispatch_run_id": dispatch_run_id,
+            "branch": branch_status,
+            "available": len(pending_tasks),
+            "queued": queued,
+            "queued_count": len(queued),
+            "skipped_duplicates": skipped_duplicates[: request.limit],
+            "skipped_duplicate_count": len(skipped_duplicates),
+            "assigned": assignments,
+            "assigned_count": len(assignments),
+        }
+
+    async def finalize_task_lifecycle(self, data: dict[str, Any]):
+        details = data.get("details") or {}
+        task_id = details.get("task_id")
+        if not task_id:
+            return
+
+        tasks = await self.dispatcher.get_tasks()
+        task = next((candidate for candidate in tasks if candidate.get("id") == task_id), None)
+        if not task:
+            return
+
+        task_details = task.get("details") or {}
+        task_file_path = task_details.get("task_file_path")
+        task_ref = task_details.get("tasks_md_ref")
+        if task_file_path and task_ref:
+            update_tasks_file_status(Path(task_file_path), task_ref, "x")
+
+        dispatch_run_id = task_details.get("dispatch_run_id")
+        if not dispatch_run_id:
+            return
+
+        run_tasks = [
+            candidate
+            for candidate in tasks
+            if (candidate.get("details") or {}).get("dispatch_run_id") == dispatch_run_id
+        ]
+        if not run_tasks or any(candidate.get("status") != "completed" for candidate in run_tasks):
+            return
+
+        pr_requested = any((candidate.get("details") or {}).get("pr_requested") for candidate in run_tasks)
+        if not pr_requested:
+            return
+
+        pr_marker_key = f"dispatch_run:{dispatch_run_id}:pr"
+        if await self.dispatcher.redis.get(pr_marker_key):
+            return
+
+        await self.dispatcher.redis.set(pr_marker_key, "attempted")
+        repo_path = Path(task_details.get("repo_path") or Path.cwd())
+        branch_name = task_details.get("branch_name") or ""
+        base_branch = task_details.get("base_branch") or "main"
+        title = f"Complete TASKS.md dispatch run {dispatch_run_id}"
+        body = "\n".join(
+            [
+                "Automated dispatcher run completed these TASKS.md items:",
+                "",
+                *[
+                    f"- {(candidate.get('details') or {}).get('tasks_md_ref')}: {candidate.get('description')}"
+                    for candidate in run_tasks
+                ],
+            ]
+        )
+        changed_files = {
+            (candidate.get("details") or {}).get("task_file_relative_path")
+            for candidate in run_tasks
+        }
+        for candidate in run_tasks:
+            result_details = candidate.get("result_details") or {}
+            changed_files.update(result_details.get("changed_files") or [])
+
+        commit_result = commit_and_push_dispatch_run(
+            repo_path,
+            branch_name,
+            [path for path in changed_files if path],
+            title,
+        )
+        if not commit_result.get("committed") or not commit_result.get("pushed"):
+            await self.dispatcher.log_task_event(
+                task_id,
+                "pull_request_blocked",
+                {"dispatch_run_id": dispatch_run_id, **commit_result},
+            )
+            return
+
+        pr_result = create_pull_request(repo_path, branch_name, base_branch, title, body)
+        await self.dispatcher.log_task_event(
+            task_id,
+            "pull_request_attempted",
+            {"dispatch_run_id": dispatch_run_id, "commit": commit_result, **pr_result},
+        )
+
     async def dispatch_once(self):
         agents = await self.dispatcher.get_all_agents()
         assignments = []
@@ -126,7 +487,7 @@ class CoordinationRuntime:
             state = status.get("state")
             current_task = status.get("current_task")
 
-            if current_task or state not in ("WAITING_FOR_INPUT", "RELAXING", "UNKNOWN", None):
+            if current_task or state != "RELAXING":
                 continue
 
             task = await self.dispatcher.assign_next_task(
@@ -173,6 +534,8 @@ class CoordinationRuntime:
                     data.setdefault("action", "ALERT")
 
                 await self.dispatcher.process_message(data)
+                if data.get("action") == "RESULT":
+                    await self.finalize_task_lifecycle(data)
         finally:
             await pubsub.close()
 
@@ -337,6 +700,23 @@ REDIS_DASHBOARD_HTML = """
       </section>
 
       <section>
+        <h2>TASKS.md Dispatcher</h2>
+        <label>
+          Items to queue
+          <input id="tasks-md-limit" type="number" min="1" max="50" value="1" />
+        </label>
+        <label>
+          Task scope
+          <select id="tasks-md-scope">
+            <option value="main">Main tasks only</option>
+            <option value="all">Main tasks and subtasks</option>
+          </select>
+        </label>
+        <button id="dispatch-tasks-md">Read TASKS.md and Dispatch</button>
+        <p id="tasks-md-result" class="muted"></p>
+      </section>
+
+      <section>
         <h2>Queue Test Task</h2>
         <label>
           Target agent
@@ -391,6 +771,10 @@ REDIS_DASHBOARD_HTML = """
       details: document.querySelector("#details"),
       sendTask: document.querySelector("#send-task"),
       taskResult: document.querySelector("#task-result"),
+      tasksMdLimit: document.querySelector("#tasks-md-limit"),
+      tasksMdScope: document.querySelector("#tasks-md-scope"),
+      dispatchTasksMd: document.querySelector("#dispatch-tasks-md"),
+      tasksMdResult: document.querySelector("#tasks-md-result"),
     };
 
     function text(value) {
@@ -436,7 +820,7 @@ REDIS_DASHBOARD_HTML = """
             id,
             status.state || "UNKNOWN",
             `last_updated: ${formatTime(status.last_updated)}\\ncurrent_task: ${status.current_task ? status.current_task.id : "none"}\\nmetadata: ${JSON.stringify(status.metadata || {}, null, 2)}`,
-            status.state === "WAITING_FOR_INPUT" ? "ok" : "",
+            status.state === "RELAXING" ? "ok" : "",
           )).join("")
         : `<p class="muted">No agents reported.</p>`;
 
@@ -495,6 +879,31 @@ REDIS_DASHBOARD_HTML = """
       await loadSnapshot();
     }
 
+    async function dispatchTasksMd() {
+      const limit = Math.max(1, Math.min(50, Number.parseInt(els.tasksMdLimit.value || "1", 10)));
+      els.tasksMdResult.textContent = "Reading TASKS.md...";
+      const response = await fetch("/api/coordination/tasks/from-file", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          path: "TASKS.md",
+          include_subtasks: els.tasksMdScope.value === "all",
+          limit,
+          dispatch_now: true,
+        }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        const refs = (result.queued || []).map((task) => task.ref).join(", ") || "none";
+        const branch = result.branch && result.branch.branch ? ` branch ${result.branch.branch};` : "";
+        els.tasksMdResult.textContent =
+          `Queued ${result.queued_count} (${refs}); assigned ${result.assigned_count};${branch} skipped duplicates ${result.skipped_duplicate_count}.`;
+      } else {
+        els.tasksMdResult.textContent = `Failed: ${JSON.stringify(result)}`;
+      }
+      await loadSnapshot();
+    }
+
     function startTimer() {
       if (state.timer) window.clearInterval(state.timer);
       state.timer = window.setInterval(() => {
@@ -509,6 +918,7 @@ REDIS_DASHBOARD_HTML = """
     els.refresh.addEventListener("click", () => loadSnapshot());
     els.filter.addEventListener("input", render);
     els.sendTask.addEventListener("click", () => sendTask());
+    els.dispatchTasksMd.addEventListener("click", () => dispatchTasksMd());
     els.toggleRefresh.addEventListener("click", () => {
       state.refresh = !state.refresh;
       els.toggleRefresh.textContent = state.refresh ? "Pause" : "Resume";
@@ -569,6 +979,11 @@ async def snapshot():
 @app.post("/api/coordination/tasks")
 async def create_task(request: TaskRequest):
     return await runtime.enqueue_task(request)
+
+
+@app.post("/api/coordination/tasks/from-file")
+async def create_tasks_from_file(request: TasksFileDispatchRequest):
+    return await runtime.enqueue_tasks_from_file(request)
 
 
 @app.post("/api/coordination/dispatch")
