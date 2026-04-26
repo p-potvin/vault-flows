@@ -64,7 +64,10 @@ function getMessageTone(type) {
   return 'text-emerald-700 dark:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800';
 }
 
-export function StoragePanel() {
+// ⚡ Bolt: Wrap StoragePanel in React.memo() to prevent unnecessary re-renders
+// when parent component (App.jsx) state updates frequently (e.g. typing in modal).
+// This ensures a smooth typing experience and reduces CPU overhead.
+export const StoragePanel = React.memo(function StoragePanel() {
   const { theme } = useVaultTheme();
   const inputRef = useRef(null);
   const [file, setFile] = useState(null);
@@ -258,4 +261,4 @@ export function StoragePanel() {
       </div>
     </div>
   );
-}
+});

@@ -42,6 +42,8 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await expect(page.getByText('Workflow Backup Export')).toBeVisible();
     await expect(page.getByText('LoRA Prep Pipeline')).toBeVisible();
     await expect(page.getByText('Video Face Swap', { exact: true })).toBeVisible();
+    await expect(page.getByText('NeRF Automation Pipeline')).toBeVisible();
+    await expect(page.getByText('Comic Book Scene Generator')).toBeVisible();
   });
 
   test('can create and edit a workflow in local fallback mode', async ({ page }) => {

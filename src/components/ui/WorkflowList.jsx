@@ -27,7 +27,10 @@ function ThemeSwitcher({ theme, themeIndex, setThemeIndex, themes }) {
   );
 }
 
-export function WorkflowList({ workflows, onUpdated }) {
+// ⚡ Bolt: Wrap WorkflowList in React.memo() to prevent unnecessary re-renders
+// when fast-updating state (like modal form inputs) changes in App.jsx.
+// This reduces UI lag when creating new workflows.
+export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpdated }) {
   const [editing, setEditing] = useState(null);
   const [editName, setEditName] = useState('');
   const [editCategory, setEditCategory] = useState('');
@@ -77,11 +80,17 @@ export function WorkflowList({ workflows, onUpdated }) {
   // ⚡ Bolt: Memoize the rendered list of workflows to prevent recreating hundreds
   // of <li> elements on every keystroke when typing in the "Edit Workflow" modal.
   const renderedWorkflows = useMemo(() => {
-    if (!workflows || workflows.length === 0) {
-      return <li className="text-gray-500">No workflows found.</li>;
+    const workflowItems = Array.isArray(workflows) ? workflows : [];
+
+    if (workflowItems.length === 0) {
+      return (
+        <li className="p-8 text-center text-gray-500 border border-dashed border-gray-300 dark:border-gray-700 rounded">
+          No workflows found. Click "+ Create Workflow" to get started.
+        </li>
+      );
     }
 
-    return workflows.map((wf, i) => (
+    return workflowItems.map((wf, i) => (
       <li key={wf.id || i} className="bg-white dark:bg-gray-800 rounded shadow p-3 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
         <div>
           <span className="font-medium text-gray-900 dark:text-gray-100">{wf.name}</span>
@@ -120,30 +129,36 @@ export function WorkflowList({ workflows, onUpdated }) {
 
       <Modal open={!!editing} onClose={closeEdit} title="Edit Workflow">
         <div className="mb-4">
-          <label htmlFor="edit-workflow-name" className="block text-sm font-medium mb-1">Name:</label>
+          <label htmlFor="edit-workflow-name" className="block text-sm font-medium mb-1">Name: <span className="text-red-500">*</span></label>
           <input
             id="edit-workflow-name"
-            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
+            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-vault-500"
+            autoFocus
             value={editName}
             onChange={e => setEditName(e.target.value)}
+            required
+            aria-required="true"
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="edit-workflow-category" className="block text-sm font-medium mb-1">Category:</label>
+          <label htmlFor="edit-workflow-category" className="block text-sm font-medium mb-1">Category: <span className="text-red-500">*</span></label>
           <input
             id="edit-workflow-category"
             className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
             value={editCategory}
             onChange={e => setEditCategory(e.target.value)}
+            required
+            aria-required="true"
           />
         </div>
         {saveError ? <div className="mb-2 text-sm text-red-500">{saveError}</div> : null}
         <div className="flex justify-end space-x-2">
           <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={closeEdit}>Cancel</button>
           <button
-            className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold"
+            className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-60 disabled:cursor-not-allowed"
             onClick={saveEdit}
             disabled={isSaving || !editName.trim() || !editCategory.trim()}
+            title={(!editName.trim() || !editCategory.trim()) ? 'Name and category are required' : undefined}
           >
             {isSaving ? 'Saving...' : 'Save'}
           </button>
@@ -151,4 +166,4 @@ export function WorkflowList({ workflows, onUpdated }) {
       </Modal>
     </div>
   );
-}
+});
