@@ -54,8 +54,6 @@ const HeavyFeatures = React.memo(() => (
   </>
 ));
 
-const categories = ['All', 'Data', 'ML', 'Reporting'];
-
 function App() {
   const dispatch = useDispatch();
   const workflows = useSelector((state) => state.workflows.items);
