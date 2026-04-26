@@ -2,9 +2,23 @@ import {
   buildFaceSwapManifest,
   createEmptyScannedModels,
   normalizeExecutionConfig,
-} from './lib/flowRuntime';
+} from './lib/flowRuntime.js';
+import {
+  validateConfigUpdatePayload,
+  validateModelCatalog,
+  validateWorkflowPayload,
+  validateWorkflowUpdatePayload,
+} from './validation.js';
 
-const configuredBase = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
+const viteEnv = import.meta.env || {};
+const browserStorage = typeof window !== 'undefined' ? window.localStorage : null;
+
+const configuredBase = (viteEnv.VITE_API_URL || '').trim().replace(/\/$/, '');
+const defaultCoordinationBase = (
+  viteEnv.VITE_COORDINATION_API_URL
+  || browserStorage?.getItem('vault-flows.coordinationApiUrl')
+  || 'http://127.0.0.1:8765'
+).trim().replace(/\/$/, '');
 
 const WORKFLOWS_KEY = 'vault-flows.workflows';
 const CONFIG_KEY = 'vault-flows.config';
@@ -156,6 +170,54 @@ async function fetchJson(url, options) {
   return parseResponse(response);
 }
 
+async function fetchCoordinationJson(path, options) {
+  const coordinationBase = getCoordinationApiBase();
+  if (!coordinationBase) {
+    throw new Error('Coordination API URL is not configured.');
+  }
+
+  return fetchJson(`${coordinationBase}${path}`, options);
+}
+
+export function getCoordinationApiBase() {
+  return trimTrailingSlash(
+    browserStorage?.getItem('vault-flows.coordinationApiUrl')
+    || defaultCoordinationBase,
+  );
+}
+
+export function saveCoordinationApiBase(url) {
+  const normalized = trimTrailingSlash(url);
+  browserStorage?.setItem('vault-flows.coordinationApiUrl', normalized);
+  return normalized;
+}
+
+export async function fetchCoordinationSnapshot() {
+  return fetchCoordinationJson('/api/coordination/snapshot');
+}
+
+export async function testCoordinationRedis(redisUrl) {
+  return fetchCoordinationJson('/api/coordination/connect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ redis_url: redisUrl }),
+  });
+}
+
+export async function createCoordinationTask(task) {
+  return fetchCoordinationJson('/api/coordination/tasks', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(task),
+  });
+}
+
+export async function dispatchCoordinationTasks() {
+  return fetchCoordinationJson('/api/coordination/dispatch', {
+    method: 'POST',
+  });
+}
+
 function trimTrailingSlash(value) {
   return typeof value === 'string' ? value.trim().replace(/\/$/, '') : '';
 }
@@ -229,6 +291,38 @@ function normalizeWorkflow(workflow) {
   };
 }
 
+export function normalizeWorkflowListResponse(payload) {
+  let candidate = payload;
+
+  if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+    if (Array.isArray(payload.workflows)) {
+      candidate = payload.workflows;
+    } else if (Array.isArray(payload.items)) {
+      candidate = payload.items;
+    } else if (Array.isArray(payload.results)) {
+      candidate = payload.results;
+    } else if (Array.isArray(payload.data)) {
+      candidate = payload.data;
+    } else if (payload.data && typeof payload.data === 'object') {
+      if (Array.isArray(payload.data.workflows)) {
+        candidate = payload.data.workflows;
+      } else if (Array.isArray(payload.data.items)) {
+        candidate = payload.data.items;
+      } else if (Array.isArray(payload.data.results)) {
+        candidate = payload.data.results;
+      }
+    }
+  }
+
+  if (!Array.isArray(candidate)) {
+    return [];
+  }
+
+  return candidate
+    .filter((workflow) => workflow && typeof workflow === 'object' && !Array.isArray(workflow))
+    .map((workflow) => normalizeWorkflow(workflow));
+}
+
 function serializeUpload(provider, payload) {
   const file =
     payload instanceof FormData ? payload.get('file') || payload.get('asset') : payload;
@@ -274,13 +368,15 @@ async function scanModelsViaLocalBridge(config) {
     throw new Error('Local bridge URL is not configured.');
   }
 
-  return fetchJson(`${bridgeUrl}/models/scan`, {
+  const result = await fetchJson(`${bridgeUrl}/models/scan`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       modelsDir: config.modelsDir || '',
     }),
   });
+
+  return validateModelCatalog(result, 'Local bridge returned an invalid model catalog');
 }
 
 async function scanModelsViaComfy(config) {
@@ -313,7 +409,7 @@ async function scanModelsViaComfy(config) {
     }),
   );
 
-  return {
+  return validateModelCatalog({
     source: 'comfyui',
     scannedAt: new Date().toISOString(),
     modelsDir: config.modelsDir || '',
@@ -321,24 +417,28 @@ async function scanModelsViaComfy(config) {
       ? ['Saved ReActor face models require the local bridge scanner because ComfyUI does not expose that nested folder directly.']
       : [],
     categories,
-  };
+  }, 'ComfyUI returned an invalid model catalog');
 }
 
 export async function fetchWorkflows() {
-  return requestWithFallback('/workflows', undefined, () => getWorkflows());
+  const result = await requestWithFallback('/workflows', undefined, () => getWorkflows());
+  const workflows = normalizeWorkflowListResponse(result);
+  return workflows.length ? workflows : getWorkflows();
 }
 
 export async function createWorkflow({ name, category, description = '' }) {
+  const payload = validateWorkflowPayload({ name, category, description });
+
   return requestWithFallback(
     '/workflows',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, category, description }),
+      body: JSON.stringify(payload),
     },
     () => {
       const workflows = getWorkflows();
-      const workflow = normalizeWorkflow({ name, category, description });
+      const workflow = normalizeWorkflow(payload);
       saveWorkflows([workflow, ...workflows]);
       return workflow;
     },
@@ -346,19 +446,21 @@ export async function createWorkflow({ name, category, description = '' }) {
 }
 
 export async function updateWorkflow(id, data) {
+  const payload = validateWorkflowUpdatePayload(data);
+
   return requestWithFallback(
     `/workflows/${id}`,
     {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     },
     () => {
       const workflows = getWorkflows();
       let updated;
       const updatedWorkflows = workflows.map((workflow) => {
         if (workflow.id === id) {
-          updated = normalizeWorkflow({ ...workflow, ...data, id });
+          updated = normalizeWorkflow({ ...workflow, ...payload, id });
           return updated;
         }
         return workflow;
@@ -557,17 +659,19 @@ export async function fetchConfig() {
 }
 
 export async function updateConfig(data) {
+  const currentConfig = getConfigState();
+  const payload = validateConfigUpdatePayload(data, currentConfig);
   const result = await requestWithFallback(
     '/config',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     },
     () => {
       const config = {
-        ...getConfigState(),
-        ...data,
+        ...currentConfig,
+        ...payload,
         updatedAt: new Date().toISOString(),
       };
       saveConfigState(config);
@@ -576,9 +680,9 @@ export async function updateConfig(data) {
   );
 
   return saveConfigState({
-    ...getConfigState(),
+    ...currentConfig,
     ...extractConfigObject(result),
-    ...data,
+    ...payload,
     updatedAt: new Date().toISOString(),
   });
 }
