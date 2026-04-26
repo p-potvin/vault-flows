@@ -31,6 +31,7 @@ class VideoAgent(ExtrovertAgent):
         "video_analysis",
         "workflow_creation",
         "comfyui_export",
+        "video_interpolation",
     ]
 
     def __init__(
@@ -60,6 +61,7 @@ class VideoAgent(ExtrovertAgent):
             "analyze_video": self._analyze_video,
             "create_workflow": self._create_video_workflow,
             "export_comfyui": self._export_comfyui,
+            "interpolate_video": self._interpolate_video,
         }
 
         handler = handlers.get(task)
@@ -154,6 +156,23 @@ class VideoAgent(ExtrovertAgent):
         print(f"[VIDEO] [{self.agent_id}] Exporting to ComfyUI: {workflow_name} -> {output_path}")
         time.sleep(1)
         self._publish_result("export_comfyui", f"ComfyUI export complete: {output_path}")
+
+    def _interpolate_video(self, details: dict):
+        """Interpolate video frames to increase framerate."""
+        source = details.get("source", "unknown")
+        model = details.get("model", "rife-v4.6")
+        model_type = details.get("model_type", "video_models")
+
+        print(f"🔄 [{self.agent_id}] Interpolating video | source={source} | model={model}")
+        print(f"   [Delegating frame extraction to ImageAgent...]")
+        time.sleep(1)
+        print(f"   [Delegating scene analysis to TextAgent...]")
+        time.sleep(1)
+        print(f"   Using local model path: D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}")
+        time.sleep(2)
+
+        result = f"[Video '{source}' interpolated using {model}]"
+        self._publish_result("interpolate_video", result)
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""

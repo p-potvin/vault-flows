@@ -80,6 +80,15 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-video-interpolation',
+    name: 'Video Frame Interpolation',
+    category: 'Video',
+    description: 'Increases the framerate of a video using AI frame interpolation. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 
 const DEFAULT_CONFIG = normalizeExecutionConfig({
