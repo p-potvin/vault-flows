@@ -27,3 +27,8 @@
 **Vulnerability:** The `run_local_runtime_bridge.py` server used the user-provided `saveDirectory` parameter to dynamically create an output path (`Path(requested_save_dir)`). This allowed arbitrary absolute paths or relative traversal strings, enabling remote attackers to overwrite files anywhere on the local filesystem.
 **Learning:** Relying purely on `Path()` composition without bounds checking is dangerous when handling file system writes initiated over an HTTP endpoint, even for local tooling bridges.
 **Prevention:** Apply a robust bounds check. Resolve user-provided paths relative to a strict base directory (`JOB_ROOT`) using `os.path.abspath()` and verify it remains enclosed within that base directory using `os.path.commonpath([base_dir, resolved_path]) == base_dir`.
+
+## 2026-04-26 - Prevent Path Traversal via Filename in `run_local_runtime_bridge.py`
+**Vulnerability:** The `normalize_output_name` function blindly returned the `outputName` string from user-supplied payloads, which was later appended to a directory path. An attacker could supply `../../evil.exe` to overwrite arbitrary system files outside the job directory.
+**Learning:** Unsanitized filenames mixed with directory paths expose local runtime bridges to path traversal attacks, even if the target directory is otherwise checked or isolated.
+**Prevention:** When accepting a raw filename from an external payload to create a local file, extract strictly the base name using `Path(filename).name` before using it in any file path composition.

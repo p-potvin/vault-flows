@@ -160,7 +160,8 @@ def resolve_command(command: str) -> List[str]:
 
 def normalize_output_name(output_name: str, target_name: str) -> str:
     if output_name and output_name.strip():
-        return output_name.strip()
+        # Security: Prevent path traversal by extracting only the base filename
+        return Path(output_name.strip()).name
 
     target_suffix = Path(target_name).suffix or ".mp4"
     return f"vault-faceswap-output{target_suffix}"
