@@ -63,7 +63,7 @@ function App() {
     loadWorkflows();
   }, [loadWorkflows]);
 
-  const categories = ['All', 'Data', 'ML', 'Reporting'];
+  const CATEGORIES = ['All', 'Data', 'ML', 'Reporting', 'Visual & Graphics'];
 
   // ⚡ Bolt: Memoize filtered list to prevent unnecessary re-filtering
   // on every keystroke in the "Create Workflow" modal form.
@@ -106,7 +106,7 @@ function App() {
         <div className="flex flex-col md:flex-row max-w-5xl mx-auto">
           {panel === 'workflows' && (
             <>
-              <Sidebar categories={categories} onSelect={setCategory} selected={category} />
+              <Sidebar categories={CATEGORIES} onSelect={setCategory} selected={category} />
               <main className="flex-1 py-4 md:py-8">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-bold">Workflows</h2>
