@@ -19,6 +19,8 @@ import cgi
 import datetime as dt
 import json
 import mimetypes
+import os
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -123,12 +125,34 @@ def resolve_command(command: str) -> List[str]:
     command = command.strip() if command else "facefusion"
     if not command:
         command = "facefusion"
-    parts = command.split()
+
+    try:
+        parts = shlex.split(command, posix=False)
+    except ValueError:
+        parts = command.split()
+
+    if not parts:
+        parts = ["facefusion"]
+
+    parts = [p.strip('"\'') for p in parts]
     executable = parts[0]
+
+    exe_name = executable.split('\\')[-1].split('/')[-1].lower()
+
+    allowed_binaries = {
+        "facefusion", "facefusion.exe", "facefusion.bat", "facefusion.cmd",
+        "python", "python3", "python.exe", "py", "py.exe"
+    }
+    if exe_name not in allowed_binaries:
+        raise ValueError(f"Security Error: Executable '{exe_name}' is not allowed to prevent arbitrary code execution.")
+
+    if exe_name.startswith("py"):
+        if any(arg in {"-c", "-m"} for arg in parts):
+            raise ValueError("Security Error: Python -c or -m flags are not allowed.")
 
     if not shutil.which(executable) and not Path(executable).exists():
         raise FileNotFoundError(
-            f"Could not resolve FaceFusion command '{command}'. Install FaceFusion or update facefusionCommand."
+            f"Could not resolve command '{command}'. Ensure it is installed and accessible."
         )
 
     return parts
@@ -149,7 +173,16 @@ def run_faceswap_job(job: dict, source_path: Path, target_path: Path, server_hos
 
     output_name = normalize_output_name(job.get("outputName", ""), target_path.name)
     requested_save_dir = job.get("saveDirectory", "")
-    output_dir = Path(requested_save_dir) if requested_save_dir else job_dir
+
+    if requested_save_dir:
+        base_dir = os.path.abspath(JOB_ROOT)
+        resolved_path = os.path.abspath(os.path.join(base_dir, requested_save_dir))
+        if os.path.commonpath([base_dir, resolved_path]) != base_dir:
+            raise ValueError("Security Error: Path traversal detected in saveDirectory.")
+        output_dir = Path(resolved_path)
+    else:
+        output_dir = job_dir
+
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / output_name
 

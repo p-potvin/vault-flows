@@ -225,7 +225,7 @@ class LonelyManager(ExtrovertAgent):
                 "details": details,
             }),
         )
-        print(f"📤 [{self.agent_id}] Assigned task '{task}' → {target_agent_id}")
+        print(f"[ASSIGN] [{self.agent_id}] Assigned task '{task}' -> {target_agent_id}")
 
     # ------------------------------------------------------------------
     # Heartbeat Monitoring
@@ -382,7 +382,7 @@ class LonelyManager(ExtrovertAgent):
 
     def get_project_status_report(self) -> str:
         """Full project + team status report."""
-        lines = ["=== LONELY MANAGER — PROJECT STATUS REPORT ==="]
+        lines = ["=== LONELY MANAGER - PROJECT STATUS REPORT ==="]
         lines.append(f"Manager : {self.agent_id}")
         lines.append(f"Status  : {self.status.value}")
         lines.append("")
@@ -394,10 +394,10 @@ class LonelyManager(ExtrovertAgent):
                 last_hb = info.get("last_heartbeat", 0)
                 elapsed = int(time.time() - last_hb)
                 missed = self._missed_heartbeats.get(agent_id, 0)
-                flag = " ⚠ LOST" if status == AgentStatus.LOST.value else ""
+                flag = " LOST" if status == AgentStatus.LOST.value else ""
                 lines.append(
                     f"  [{status}] {agent_id}"
-                    f" — last heartbeat {elapsed}s ago"
+                    f" - last heartbeat {elapsed}s ago"
                     f" (~{missed} missed){flag}"
                 )
         else:

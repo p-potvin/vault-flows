@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:https": "powershell -ExecutionPolicy Bypass -File .\\start_https_dev.ps1",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "test": "node --test",
     "bridge:local": "python run_local_runtime_bridge.py",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
