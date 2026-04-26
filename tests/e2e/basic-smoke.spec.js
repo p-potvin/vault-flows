@@ -43,6 +43,7 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await expect(page.getByText('LoRA Prep Pipeline')).toBeVisible();
     await expect(page.getByText('Video Face Swap', { exact: true })).toBeVisible();
     await expect(page.getByText('NeRF Automation Pipeline')).toBeVisible();
+    await expect(page.getByText('Comic Book Scene Generator')).toBeVisible();
     await expect(page.getByText('Video Frame Interpolation')).toBeVisible();
   });
 
