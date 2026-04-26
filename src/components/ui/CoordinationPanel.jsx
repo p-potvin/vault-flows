@@ -73,7 +73,9 @@ function getStateTone(state) {
   return 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200';
 }
 
-export function CoordinationPanel() {
+// ⚡ Bolt: Wrap CoordinationPanel in React.memo() to prevent unnecessary
+// re-renders when parent components like App update fast-changing state.
+export const CoordinationPanel = React.memo(function CoordinationPanel() {
   const [apiUrl, setApiUrl] = useState(getCoordinationApiBase());
   const [redisUrl, setRedisUrl] = useState('redis://localhost:6379');
   const [snapshot, setSnapshot] = useState(null);
@@ -403,4 +405,4 @@ export function CoordinationPanel() {
       </section>
     </main>
   );
-}
+});

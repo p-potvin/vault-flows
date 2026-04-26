@@ -78,7 +78,7 @@ function App() {
     loadWorkflows();
   }, [loadWorkflows]);
 
-  const categories = ['All', 'Data', 'ML', 'Reporting', 'Visual & Graphics'];
+  const categories = useMemo(() => ['All', 'Data', 'ML', 'Reporting', 'Visual & Graphics'], []);
 
   // ⚡ Bolt: Memoize filtered list to prevent unnecessary re-filtering
   // on every keystroke in the "Create Workflow" modal form.
