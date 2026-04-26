@@ -71,6 +71,15 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-comic-scene-generator',
+    name: 'Comic Book Scene Generator',
+    category: 'Visual',
+    description: 'Automated generation of comic book scenes from a text script, ensuring multi-frame consistency and character re-targeting. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 
 const DEFAULT_CONFIG = normalizeExecutionConfig({
