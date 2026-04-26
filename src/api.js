@@ -2,15 +2,23 @@ import {
   buildFaceSwapManifest,
   createEmptyScannedModels,
   normalizeExecutionConfig,
-} from './lib/flowRuntime';
+} from './lib/flowRuntime.js';
 import {
   validateConfigUpdatePayload,
   validateModelCatalog,
   validateWorkflowPayload,
   validateWorkflowUpdatePayload,
-} from './validation';
+} from './validation.js';
 
-const configuredBase = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
+const viteEnv = import.meta.env || {};
+const browserStorage = typeof window !== 'undefined' ? window.localStorage : null;
+
+const configuredBase = (viteEnv.VITE_API_URL || '').trim().replace(/\/$/, '');
+const defaultCoordinationBase = (
+  viteEnv.VITE_COORDINATION_API_URL
+  || browserStorage?.getItem('vault-flows.coordinationApiUrl')
+  || 'http://127.0.0.1:8765'
+).trim().replace(/\/$/, '');
 
 const WORKFLOWS_KEY = 'vault-flows.workflows';
 const CONFIG_KEY = 'vault-flows.config';
@@ -59,6 +67,15 @@ const DEFAULT_WORKFLOWS = [
     name: 'NeRF Automation Pipeline',
     category: 'ML',
     description: 'Automated generation of NeRF models from a folder of images, including point cloud extraction and texture baking. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-comic-scene-generator',
+    name: 'Comic Book Scene Generator',
+    category: 'Visual',
+    description: 'Automated generation of comic book scenes from a text script, ensuring multi-frame consistency and character re-targeting. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\{model_name}.',
     favorite: false,
     pin: false,
     lastRun: null,
@@ -162,6 +179,54 @@ async function fetchJson(url, options) {
   return parseResponse(response);
 }
 
+async function fetchCoordinationJson(path, options) {
+  const coordinationBase = getCoordinationApiBase();
+  if (!coordinationBase) {
+    throw new Error('Coordination API URL is not configured.');
+  }
+
+  return fetchJson(`${coordinationBase}${path}`, options);
+}
+
+export function getCoordinationApiBase() {
+  return trimTrailingSlash(
+    browserStorage?.getItem('vault-flows.coordinationApiUrl')
+    || defaultCoordinationBase,
+  );
+}
+
+export function saveCoordinationApiBase(url) {
+  const normalized = trimTrailingSlash(url);
+  browserStorage?.setItem('vault-flows.coordinationApiUrl', normalized);
+  return normalized;
+}
+
+export async function fetchCoordinationSnapshot() {
+  return fetchCoordinationJson('/api/coordination/snapshot');
+}
+
+export async function testCoordinationRedis(redisUrl) {
+  return fetchCoordinationJson('/api/coordination/connect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ redis_url: redisUrl }),
+  });
+}
+
+export async function createCoordinationTask(task) {
+  return fetchCoordinationJson('/api/coordination/tasks', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(task),
+  });
+}
+
+export async function dispatchCoordinationTasks() {
+  return fetchCoordinationJson('/api/coordination/dispatch', {
+    method: 'POST',
+  });
+}
+
 function trimTrailingSlash(value) {
   return typeof value === 'string' ? value.trim().replace(/\/$/, '') : '';
 }
@@ -187,22 +252,24 @@ function extractConfigObject(payload) {
 }
 
 async function requestWithFallback(path, options, fallback) {
-  if (!configuredBase) {
+  const state = getConfigState();
+  const activeBase = state.apiBase || configuredBase;
+
+  if (!activeBase) {
     return fallback({ mode: 'local-demo', remoteAttempted: false });
   }
 
   try {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
-    const state = getConfigState();
-    const headers = options?.headers || {};
+    const headers = { ...(options?.headers || {}) };
     if (state.apiKey) {
       headers['X-Api-Key'] = state.apiKey;
     }
     
     let res;
     try {
-      res = await fetch(`${configuredBase}${path}`, {
+      res = await fetch(`${activeBase}${path}`, {
         ...options,
         headers,
         signal: controller.signal,
@@ -235,6 +302,38 @@ function normalizeWorkflow(workflow) {
   };
 }
 
+export function normalizeWorkflowListResponse(payload) {
+  let candidate = payload;
+
+  if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+    if (Array.isArray(payload.workflows)) {
+      candidate = payload.workflows;
+    } else if (Array.isArray(payload.items)) {
+      candidate = payload.items;
+    } else if (Array.isArray(payload.results)) {
+      candidate = payload.results;
+    } else if (Array.isArray(payload.data)) {
+      candidate = payload.data;
+    } else if (payload.data && typeof payload.data === 'object') {
+      if (Array.isArray(payload.data.workflows)) {
+        candidate = payload.data.workflows;
+      } else if (Array.isArray(payload.data.items)) {
+        candidate = payload.data.items;
+      } else if (Array.isArray(payload.data.results)) {
+        candidate = payload.data.results;
+      }
+    }
+  }
+
+  if (!Array.isArray(candidate)) {
+    return [];
+  }
+
+  return candidate
+    .filter((workflow) => workflow && typeof workflow === 'object' && !Array.isArray(workflow))
+    .map((workflow) => normalizeWorkflow(workflow));
+}
+
 function serializeUpload(provider, payload) {
   const file =
     payload instanceof FormData ? payload.get('file') || payload.get('asset') : payload;
@@ -260,9 +359,11 @@ function serializeUpload(provider, payload) {
 }
 
 export function getApiRuntime() {
+  const state = getConfigState();
+  const activeBase = state.apiBase || configuredBase;
   return {
-    mode: configuredBase ? 'remote-with-local-fallback' : 'local-demo',
-    apiBase: configuredBase || '',
+    mode: activeBase ? 'remote-with-local-fallback' : 'local-demo',
+    apiBase: activeBase || '',
   };
 }
 
@@ -333,7 +434,9 @@ async function scanModelsViaComfy(config) {
 }
 
 export async function fetchWorkflows() {
-  return requestWithFallback('/workflows', undefined, () => getWorkflows());
+  const result = await requestWithFallback('/workflows', undefined, () => getWorkflows());
+  const workflows = normalizeWorkflowListResponse(result);
+  return workflows.length ? workflows : getWorkflows();
 }
 
 export async function createWorkflow({ name, category, description = '' }) {
@@ -425,11 +528,16 @@ export async function backupWorkflows() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
     },
-    () => ({
-      backedUpAt: new Date().toISOString(),
-      count: getWorkflows().length,
-      data: getWorkflows(),
-    }),
+    () => {
+      // ⚡ Bolt: Cache getWorkflows() result to avoid executing the expensive
+      // synchronous local storage read and JSON parse operations multiple times.
+      const workflows = getWorkflows();
+      return {
+        backedUpAt: new Date().toISOString(),
+        count: workflows.length,
+        data: workflows,
+      };
+    },
   );
 }
 

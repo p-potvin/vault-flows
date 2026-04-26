@@ -49,7 +49,7 @@ class TextAgent(ExtrovertAgent):
 
     def _perform_task(self, task: str, details: dict):
         """Execute a text processing task based on the task identifier."""
-        print(f"📝 [{self.agent_id}] Executing text task: {task}")
+        print(f"[TEXT] [{self.agent_id}] Executing text task: {task}")
 
         handlers = {
             "generate_text": self._generate_text,
@@ -64,14 +64,15 @@ class TextAgent(ExtrovertAgent):
         if handler:
             handler(details)
         else:
-            print(f"⚠️  [{self.agent_id}] Unknown text task: {task}. Logging and continuing.")
+            print(f"[WARN] [{self.agent_id}] Unknown text task: {task}. Logging and continuing.")
             self._log_unknown_task(task, details)
+            super()._perform_task(task, details)
 
     def _generate_text(self, details: dict):
         """Generate text based on a prompt."""
         prompt = details.get("prompt", "")
         style = details.get("style", "default")
-        print(f"✍️  [{self.agent_id}] Generating text | style={style} | prompt='{prompt[:80]}'")
+        print(f"[TEXT] [{self.agent_id}] Generating text | style={style} | prompt='{prompt[:80]}'")
         time.sleep(1)
         result = f"[Generated text for prompt: '{prompt}' in style: '{style}']"
         self._publish_result("generate_text", result)
@@ -80,7 +81,7 @@ class TextAgent(ExtrovertAgent):
         """Generate a caption for an image or video."""
         source = details.get("source", "unknown")
         caption_style = details.get("caption_style", "detailed")
-        print(f"🖼️  [{self.agent_id}] Generating caption | source={source} | style={caption_style}")
+        print(f"[TEXT] [{self.agent_id}] Generating caption | source={source} | style={caption_style}")
         time.sleep(1)
         result = f"[Caption for '{source}' in style '{caption_style}']"
         self._publish_result("generate_caption", result)
@@ -89,7 +90,7 @@ class TextAgent(ExtrovertAgent):
         """Enhance a prompt for use with diffusion models."""
         original_prompt = details.get("prompt", "")
         target_model = details.get("target_model", "sdxl")
-        print(f"✨ [{self.agent_id}] Enhancing prompt for {target_model}")
+        print(f"[TEXT] [{self.agent_id}] Enhancing prompt for {target_model}")
         time.sleep(1)
         enhanced = f"[Enhanced for {target_model}]: {original_prompt}, photorealistic, high quality, 8k"
         self._publish_result("enhance_prompt", enhanced)
@@ -98,7 +99,7 @@ class TextAgent(ExtrovertAgent):
         """Answer a question about an image or video."""
         question = details.get("question", "")
         source = details.get("source", "unknown")
-        print(f"❓ [{self.agent_id}] VQA | source={source} | question='{question}'")
+        print(f"[TEXT] [{self.agent_id}] VQA | source={source} | question='{question}'")
         time.sleep(1)
         answer = f"[VQA answer for '{question}' about '{source}']"
         self._publish_result("vqa", answer)
@@ -107,23 +108,23 @@ class TextAgent(ExtrovertAgent):
         """Perform VQA on a batch of images/videos."""
         sources = details.get("sources", [])
         question = details.get("question", "")
-        print(f"📋 [{self.agent_id}] Batch VQA | {len(sources)} sources | question='{question}'")
+        print(f"[TEXT] [{self.agent_id}] Batch VQA | {len(sources)} sources | question='{question}'")
         for source in sources:
             time.sleep(0.5)
-            print(f"  ✅ VQA completed for: {source}")
+            print(f"  [DONE] VQA completed for: {source}")
         self._publish_result("batch_vqa", f"Batch VQA complete for {len(sources)} sources")
 
     def _create_text_workflow(self, details: dict):
         """Create a text-based workflow definition."""
         workflow_name = details.get("name", "unnamed_workflow")
         steps = details.get("steps", [])
-        print(f"🔧 [{self.agent_id}] Creating text workflow: {workflow_name} ({len(steps)} steps)")
+        print(f"[TEXT] [{self.agent_id}] Creating text workflow: {workflow_name} ({len(steps)} steps)")
         time.sleep(1)
         self._publish_result("create_workflow", f"Workflow '{workflow_name}' created with {len(steps)} steps")
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""
-        print(f"📋 [{self.agent_id}] Unknown task '{task}' — details: {details}")
+        print(f"[TEXT] [{self.agent_id}] Unknown task '{task}' - details: {details}")
 
     def _publish_result(self, task: str, result: str):
         """Publish a task result back to the Redis channel."""
@@ -136,4 +137,4 @@ class TextAgent(ExtrovertAgent):
                 "result": result,
             },
         )
-        print(f"📤 [{self.agent_id}] Result published for task '{task}'")
+        print(f"[RESULT] [{self.agent_id}] Result published for task '{task}'")
