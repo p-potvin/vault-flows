@@ -183,6 +183,7 @@ export function normalizeExecutionConfig(config = {}) {
         : 'other',
     apiMode: typeof next.apiMode === 'string' && next.apiMode ? next.apiMode : 'local-demo',
     apiBase: typeof next.apiBase === 'string' ? next.apiBase : '',
+    apiKey: typeof next.apiKey === 'string' ? next.apiKey : '',
     themeIndex: Number.isFinite(next.themeIndex) ? next.themeIndex : 0,
     runtimeProvider,
     localBridgeUrl:
