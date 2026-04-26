@@ -252,22 +252,24 @@ function extractConfigObject(payload) {
 }
 
 async function requestWithFallback(path, options, fallback) {
-  if (!configuredBase) {
+  const state = getConfigState();
+  const activeBase = state.apiBase || configuredBase;
+
+  if (!activeBase) {
     return fallback({ mode: 'local-demo', remoteAttempted: false });
   }
 
   try {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
-    const state = getConfigState();
-    const headers = options?.headers || {};
+    const headers = { ...(options?.headers || {}) };
     if (state.apiKey) {
       headers['X-Api-Key'] = state.apiKey;
     }
     
     let res;
     try {
-      res = await fetch(`${configuredBase}${path}`, {
+      res = await fetch(`${activeBase}${path}`, {
         ...options,
         headers,
         signal: controller.signal,
@@ -357,9 +359,11 @@ function serializeUpload(provider, payload) {
 }
 
 export function getApiRuntime() {
+  const state = getConfigState();
+  const activeBase = state.apiBase || configuredBase;
   return {
-    mode: configuredBase ? 'remote-with-local-fallback' : 'local-demo',
-    apiBase: configuredBase || '',
+    mode: activeBase ? 'remote-with-local-fallback' : 'local-demo',
+    apiBase: activeBase || '',
   };
 }
 
@@ -524,11 +528,16 @@ export async function backupWorkflows() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
     },
-    () => ({
-      backedUpAt: new Date().toISOString(),
-      count: getWorkflows().length,
-      data: getWorkflows(),
-    }),
+    () => {
+      // ⚡ Bolt: Cache getWorkflows() result to avoid executing the expensive
+      // synchronous local storage read and JSON parse operations multiple times.
+      const workflows = getWorkflows();
+      return {
+        backedUpAt: new Date().toISOString(),
+        count: workflows.length,
+        data: workflows,
+      };
+    },
   );
 }
 

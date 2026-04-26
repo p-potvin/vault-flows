@@ -40,6 +40,8 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+// ⚡ Bolt: Move static categories array outside of the component to prevent
+// unnecessary re-allocation and memory pressure on every render.
 
 // ⚡ Bolt: Memoize heavy feature components to prevent them from re-rendering
 // when fast-updating state (like modal form inputs) changes in App.

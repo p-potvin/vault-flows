@@ -36,6 +36,7 @@ test.describe('Vault Flows New Features', () => {
 
     const config = JSON.parse(await configEditor.inputValue());
     config.apiKey = testApiKey;
+    config.apiBase = 'http://localhost:5173/api';
 
     await configEditor.fill(JSON.stringify(config, null, 2));
     await page.getByRole('button', { name: 'Update Config' }).click();
