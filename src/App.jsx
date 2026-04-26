@@ -54,7 +54,6 @@ const HeavyFeatures = React.memo(() => (
   </>
 ));
 
-
 function App() {
   const dispatch = useDispatch();
   const workflows = useSelector((state) => state.workflows.items);
