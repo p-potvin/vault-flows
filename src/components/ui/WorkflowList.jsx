@@ -27,7 +27,10 @@ function ThemeSwitcher({ theme, themeIndex, setThemeIndex, themes }) {
   );
 }
 
-export function WorkflowList({ workflows, onUpdated }) {
+// ⚡ Bolt: Wrap WorkflowList in React.memo() to prevent unnecessary re-renders
+// when fast-updating state (like modal form inputs) changes in App.jsx.
+// This reduces UI lag when creating new workflows.
+export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpdated }) {
   const [editing, setEditing] = useState(null);
   const [editName, setEditName] = useState('');
   const [editCategory, setEditCategory] = useState('');
@@ -163,4 +166,4 @@ export function WorkflowList({ workflows, onUpdated }) {
       </Modal>
     </div>
   );
-}
+});
