@@ -9,7 +9,7 @@ const workflowsSlice = createSlice({
   },
   reducers: {
     setWorkflows(state, action) {
-      state.items = action.payload;
+      state.items = Array.isArray(action.payload) ? action.payload : [];
     },
     setLoading(state, action) {
       state.loading = action.payload;
