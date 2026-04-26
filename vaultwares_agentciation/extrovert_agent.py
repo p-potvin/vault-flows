@@ -75,10 +75,7 @@ class ExtrovertAgent(AgentBase):
             "agent_left",
             {
                 "agent": self.agent_id,
-                "message": (
-                    f"Agent {self.agent_id} is leaving the team. "
-                    "I hope to reconnect soon. Stay on track!"
-                ),
+                "message": f"Agent {self.agent_id} is leaving the team. Stay on track!",
             },
         )
         super().stop()
@@ -199,14 +196,14 @@ class ExtrovertAgent(AgentBase):
 
     def _on_assignment_received(self, task: str, details: dict):
         """React to a task assignment from the manager or a peer."""
-        print(f"\n📢 [{self.agent_id}] Assignment Received: {task}")
-        print(f"📝 Details: {details.get('description', 'No description')}")
+        print(f"\n[ASSIGNMENT] [{self.agent_id}] Received: {task}")
+        print(f"[DETAILS] {details.get('description', 'No description')}")
 
         def _execute():
             self.update_status(AgentStatus.WORKING)
             self._perform_task(task, details)
-            self._update_tasks_md_finished(task)
-            print(f"✅ [{self.agent_id}] Task {task} complete.")
+            self._update_tasks_md_finished(task, details)
+            print(f"[DONE] [{self.agent_id}] Task {task} complete.")
             self.update_status(AgentStatus.WAITING_FOR_INPUT)
 
         threading.Thread(target=_execute, daemon=True).start()
@@ -216,21 +213,39 @@ class ExtrovertAgent(AgentBase):
         Execute the assigned task. Subclasses should override this method
         with domain-specific logic. Default implementation is a placeholder.
         """
-        print(f"⚙️  [{self.agent_id}] Processing task: {task}")
-        time.sleep(2)  # Placeholder: subclasses implement real processing
+        print(f"[WORK] [{self.agent_id}] Processing task: {task}")
+        time.sleep(1)
+        title = details.get("title") or details.get("description") or task
+        self.coordinator.publish(
+            "RESULT",
+            task,
+            {
+                "task_id": details.get("task_id"),
+                "result": f"Accepted project task: {title}",
+                "source": details.get("source"),
+                "repo_path": details.get("repo_path"),
+                "task_file_path": details.get("task_file_path"),
+                "tasks_md_ref": details.get("tasks_md_ref"),
+                "dispatch_run_id": details.get("dispatch_run_id"),
+                "branch_name": details.get("branch_name"),
+                "changed_files": details.get("changed_files") or [],
+            },
+        )
 
-    def _update_tasks_md_finished(self, task_id):
-        """Mark a task as finished ([x]) in TODO.md."""
+    def _update_tasks_md_finished(self, task_id, details=None):
+        """Mark an assigned task as finished ([x]) in TASKS.md when file context is available."""
         try:
-            tasks_path = os.path.join(os.getcwd(), "TODO.md")
+            details = details or {}
+            task_ref = details.get("tasks_md_ref") or task_id
+            tasks_path = details.get("task_file_path") or os.path.join(os.getcwd(), "TASKS.md")
             if not os.path.exists(tasks_path):
                 return
 
             with open(tasks_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
-            pattern = rf"(?m)^(\s*{re.escape(task_id)}\s+\[)[ ~](\].*)$"
-            content = re.sub(pattern, r"\1x\2", content)
+            pattern = rf"(?m)^(\s*{re.escape(task_ref)}\s+\[)[ ~xX](\].*)$"
+            content = re.sub(pattern, lambda match: f"{match.group(1)}x{match.group(2)}", content)
 
             with open(tasks_path, "w", encoding="utf-8") as f:
                 f.write(content)
@@ -328,7 +343,7 @@ class ExtrovertAgent(AgentBase):
 
         if not self._peer_registry:
             lines.append(
-                "  (No other agents detected on the network — "
+                "  (No other agents detected on the network - "
                 "this silence is unsettling. Awaiting peers.)"
             )
 
