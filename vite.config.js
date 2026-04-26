@@ -9,7 +9,6 @@ export default defineConfig(({ mode }) => {
   const apiTarget = env.VITE_API_URL || 'https://localhost:8000'
   const tlsKeyPath = env.VITE_TLS_KEY_FILE || path.resolve('.certs/localhost+127.0.0.1-key.pem')
   const tlsCertPath = env.VITE_TLS_CERT_FILE || path.resolve('.certs/localhost+127.0.0.1.pem')
-  const tlsCaPath = env.VITE_TLS_CA_FILE || ''
   const httpsConfig =
     fs.existsSync(tlsKeyPath) && fs.existsSync(tlsCertPath)
       ? {
