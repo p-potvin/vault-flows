@@ -31,7 +31,10 @@ function prettyProviderLabel(provider) {
   }
 }
 
-export function FlowRuntimePanel({ flowId, title, description, onConfigChange }) {
+// ⚡ Bolt: Wrap FlowRuntimePanel in React.memo() to prevent unnecessary
+// re-renders when parent components (like ImageCaptioning or FaceSwapVideo)
+// update fast-changing state such as text inputs.
+export const FlowRuntimePanel = React.memo(function FlowRuntimePanel({ flowId, title, description, onConfigChange }) {
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -213,4 +216,4 @@ export function FlowRuntimePanel({ flowId, title, description, onConfigChange })
       </div>
     </div>
   );
-}
+});
