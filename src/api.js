@@ -89,6 +89,15 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-audio-reactive-visuals',
+    name: 'Audio-Reactive Visuals Generator',
+    category: 'Video',
+    description: 'Generate audio-reactive visuals from music and speech stems using AI diffusion models. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 
 const DEFAULT_CONFIG = normalizeExecutionConfig({
