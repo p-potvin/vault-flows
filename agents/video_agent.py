@@ -32,6 +32,7 @@ class VideoAgent(ExtrovertAgent):
         "workflow_creation",
         "comfyui_export",
         "video_interpolation",
+        "audio_reactive_visuals",
     ]
 
     def __init__(
@@ -62,13 +63,16 @@ class VideoAgent(ExtrovertAgent):
             "create_workflow": self._create_video_workflow,
             "export_comfyui": self._export_comfyui,
             "interpolate_video": self._interpolate_video,
+            "generate_audio_reactive_visuals": self._generate_audio_reactive_visuals,
         }
 
         handler = handlers.get(task)
         if handler:
             handler(details)
         else:
-            print(f"[WARN] [{self.agent_id}] Unknown video task: {task}. Logging and continuing.")
+            print(
+                f"[WARN] [{self.agent_id}] Unknown video task: {task}. Logging and continuing."
+            )
             self._log_unknown_task(task, details)
             super()._perform_task(task, details)
 
@@ -77,44 +81,63 @@ class VideoAgent(ExtrovertAgent):
         source = details.get("source", "unknown")
         start = details.get("start_time", 0)
         end = details.get("end_time", None)
-        print(f"[VIDEO] [{self.agent_id}] Trimming video | source={source} | {start}s -> {end}s")
+        print(
+            f"[VIDEO] [{self.agent_id}] Trimming video | source={source} | {start}s -> {end}s"
+        )
         time.sleep(1)
-        self._publish_result("trim_video", f"Video '{source}' trimmed from {start}s to {end}s")
+        self._publish_result(
+            "trim_video", f"Video '{source}' trimmed from {start}s to {end}s"
+        )
 
     def _resize_video(self, details: dict):
         """Resize a video to specified dimensions."""
         source = details.get("source", "unknown")
         width = details.get("width", 1280)
         height = details.get("height", 720)
-        print(f"[VIDEO] [{self.agent_id}] Resizing video | source={source} | {width}x{height}")
+        print(
+            f"[VIDEO] [{self.agent_id}] Resizing video | source={source} | {width}x{height}"
+        )
         time.sleep(1)
-        self._publish_result("resize_video", f"Video '{source}' resized to {width}x{height}")
+        self._publish_result(
+            "resize_video", f"Video '{source}' resized to {width}x{height}"
+        )
 
     def _sample_frames(self, details: dict):
         """Extract a set of frames from a video at specified intervals."""
         source = details.get("source", "unknown")
         fps = details.get("fps", 1)
         count = details.get("count", None)
-        print(f"[VIDEO] [{self.agent_id}] Sampling frames | source={source} | fps={fps} | count={count}")
+        print(
+            f"[VIDEO] [{self.agent_id}] Sampling frames | source={source} | fps={fps} | count={count}"
+        )
         time.sleep(1)
         frames_sampled = count if count else "all"
-        self._publish_result("sample_frames", f"Sampled {frames_sampled} frames from '{source}' at {fps} fps")
+        self._publish_result(
+            "sample_frames",
+            f"Sampled {frames_sampled} frames from '{source}' at {fps} fps",
+        )
 
     def _apply_effects(self, details: dict):
         """Apply per-frame effects and overlays to a video."""
         source = details.get("source", "unknown")
         effects = details.get("effects", [])
-        print(f"[VIDEO] [{self.agent_id}] Applying effects | source={source} | effects={effects}")
+        print(
+            f"[VIDEO] [{self.agent_id}] Applying effects | source={source} | effects={effects}"
+        )
         for effect in effects:
             time.sleep(0.3)
             print(f"  [DONE] Applied effect: {effect}")
-        self._publish_result("apply_effects", f"Applied {len(effects)} effects to '{source}'")
+        self._publish_result(
+            "apply_effects", f"Applied {len(effects)} effects to '{source}'"
+        )
 
     def _generate_video_caption(self, details: dict):
         """Generate a caption or summary for a video."""
         source = details.get("source", "unknown")
         caption_style = details.get("caption_style", "detailed")
-        print(f"[VIDEO] [{self.agent_id}] Generating video caption | source={source} | style={caption_style}")
+        print(
+            f"[VIDEO] [{self.agent_id}] Generating video caption | source={source} | style={caption_style}"
+        )
         time.sleep(1)
         result = f"[Video caption for '{source}' in '{caption_style}' style]"
         self._publish_result("generate_caption", result)
@@ -123,7 +146,9 @@ class VideoAgent(ExtrovertAgent):
         """Perform analysis on a video (scene detection, object tracking, etc.)."""
         source = details.get("source", "unknown")
         analysis_type = details.get("analysis_type", "general")
-        print(f"[VIDEO] [{self.agent_id}] Analyzing video | source={source} | type={analysis_type}")
+        print(
+            f"[VIDEO] [{self.agent_id}] Analyzing video | source={source} | type={analysis_type}"
+        )
         time.sleep(2)
         result = f"[Video analysis '{analysis_type}' complete for '{source}']"
         self._publish_result("analyze_video", result)
@@ -132,9 +157,14 @@ class VideoAgent(ExtrovertAgent):
         """Create a video processing workflow definition."""
         workflow_name = details.get("name", "unnamed_workflow")
         steps = details.get("steps", [])
-        print(f"[VIDEO] [{self.agent_id}] Creating video workflow: {workflow_name} ({len(steps)} steps)")
+        print(
+            f"[VIDEO] [{self.agent_id}] Creating video workflow: {workflow_name} ({len(steps)} steps)"
+        )
         time.sleep(1)
-        self._publish_result("create_workflow", f"Video workflow '{workflow_name}' created with {len(steps)} steps")
+        self._publish_result(
+            "create_workflow",
+            f"Video workflow '{workflow_name}' created with {len(steps)} steps",
+        )
 
     def _export_comfyui(self, details: dict):
         """Export a workflow to ComfyUI JSON format."""
@@ -153,9 +183,13 @@ class VideoAgent(ExtrovertAgent):
 
         output_path = resolved_path
 
-        print(f"[VIDEO] [{self.agent_id}] Exporting to ComfyUI: {workflow_name} -> {output_path}")
+        print(
+            f"[VIDEO] [{self.agent_id}] Exporting to ComfyUI: {workflow_name} -> {output_path}"
+        )
         time.sleep(1)
-        self._publish_result("export_comfyui", f"ComfyUI export complete: {output_path}")
+        self._publish_result(
+            "export_comfyui", f"ComfyUI export complete: {output_path}"
+        )
 
     def _interpolate_video(self, details: dict):
         """Interpolate video frames to increase framerate."""
@@ -163,16 +197,41 @@ class VideoAgent(ExtrovertAgent):
         model = details.get("model", "rife-v4.6")
         model_type = details.get("model_type", "video_models")
 
-        print(f"🔄 [{self.agent_id}] Interpolating video | source={source} | model={model}")
+        print(
+            f"🔄 [{self.agent_id}] Interpolating video | source={source} | model={model}"
+        )
         print(f"   [Delegating frame extraction to ImageAgent...]")
         time.sleep(1)
         print(f"   [Delegating scene analysis to TextAgent...]")
         time.sleep(1)
-        print(f"   Using local model path: D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}")
+        print(
+            f"   Using local model path: D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}"
+        )
         time.sleep(2)
 
         result = f"[Video '{source}' interpolated using {model}]"
         self._publish_result("interpolate_video", result)
+
+    def _generate_audio_reactive_visuals(self, details: dict):
+        """Generate audio-reactive visuals."""
+        audio = details.get("audio", "unknown_audio")
+        model = details.get("model", "audio-react-v1")
+        model_type = details.get("model_type", "video_models")
+
+        print(
+            f"🎵 [{self.agent_id}] Generating audio-reactive visuals | audio={audio} | model={model}"
+        )
+        print(f"   [Delegating frame generation to ImageAgent...]")
+        time.sleep(1)
+        print(f"   [Delegating prompt refinement to TextAgent...]")
+        time.sleep(1)
+        print(
+            f"   Using local model path: D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}"
+        )
+        time.sleep(2)
+
+        result = f"[Audio-reactive visuals generated for '{audio}' using {model}]"
+        self._publish_result("generate_audio_reactive_visuals", result)
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""
