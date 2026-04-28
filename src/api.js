@@ -98,6 +98,15 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-procedural-level-generator',
+    name: 'Procedural Level Generator',
+    category: 'Game Dev',
+    description: 'Automated generation of procedural game levels, skyboxes, and NPC dialogue trees for game dev pipelines. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 
 const DEFAULT_CONFIG = normalizeExecutionConfig({
