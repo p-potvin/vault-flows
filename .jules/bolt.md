@@ -16,3 +16,7 @@
 ## 2024-05-18 - Missing Component Memoization in Render-Heavy UI
 **Learning:** `FlowRuntimePanel` was rendered inline within feature components like `ImageCaptioning` and `FaceSwapVideo`. When users typed into text inputs (e.g., `subjectHint`, `prompt`), the parent component re-rendered, taking `FlowRuntimePanel` down with it. Although `FlowRuntimePanel` receives stable props, it wasn't wrapped in `React.memo()`, causing unnecessary CPU overhead and potential typing lag.
 **Action:** Always verify if heavy UI panels or components rendering nested structures are correctly memoized using `React.memo` when they sit inside a parent component handling fast-updating state (like text inputs).
+
+## 2024-04-29 - Memoizing heavy calculations and generations in React feature components
+**Learning:** In the `vault-flows` React architecture, fast-updating state (such as typing in modal forms or input fields) can cause parent components to re-render, trickling down and triggering expensive recalculations (e.g. iterating over datasets in `LoRATraining.jsx` or tokenizing and filtering tags in `ImageCaptioning.jsx`) even when the dependencies for those calculations haven't changed.
+**Action:** Always identify operations that compute derived state from props or slower-updating state, and wrap them in `useMemo()` to prevent unnecessary CPU overhead and UI lag when sibling or parent state updates rapidly.
