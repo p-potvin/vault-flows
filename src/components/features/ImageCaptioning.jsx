@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { FlowRuntimePanel } from '../ui/FlowRuntimePanel';
 import { buildCaptionExecutionManifest } from '../../lib/flowRuntime';
 
@@ -379,7 +379,9 @@ export function ImageCaptioning() {
     URL.revokeObjectURL(url);
   }
 
-  const tags = buildTagList(analysis, subjectHint, contextHint);
+  // ⚡ Bolt: Memoize tag generation to prevent unnecessary array reallocation
+  // and string manipulation on every keystroke when typing hints.
+  const tags = useMemo(() => buildTagList(analysis, subjectHint, contextHint), [analysis, subjectHint, contextHint]);
 
   return (
     <div className="p-4 bg-white dark:bg-gray-900 rounded shadow mb-8">
