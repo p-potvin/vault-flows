@@ -38,6 +38,7 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
 
   test('displays workflow sections', async ({ page }) => {
     await page.goto('/');
+    await expect(page.getByText('Texture Generation Pipeline')).toBeVisible();
     await expect(page.getByText('Image Caption Review')).toBeVisible();
     await expect(page.getByText('Workflow Backup Export')).toBeVisible();
     await expect(page.getByText('LoRA Prep Pipeline')).toBeVisible();
