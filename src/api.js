@@ -107,6 +107,15 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-audio-lipsync-liveportrait',
+    name: 'LivePortrait Lipsync Automation',
+    category: 'Audio-to-Video',
+    description: 'Automated lipsync mapping from audio speech to target video frames using LivePortrait. Ensures stable facial re-targeting and temporal consistency. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: true,
+    pin: true,
+    lastRun: null,
+  },
 ];
 
 const DEFAULT_CONFIG = normalizeExecutionConfig({
