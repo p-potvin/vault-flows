@@ -27,6 +27,15 @@ const REMOTE_TIMEOUT_MS = 1500;
 
 const DEFAULT_WORKFLOWS = [
   {
+    id: 'wf-texture-generation',
+    name: 'Texture Generation Pipeline',
+    category: 'Visual & Graphics',
+    description: 'Generates seamless PBR textures. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
     id: 'wf-demo-caption',
     name: 'Image Caption Review',
     category: 'ML',

@@ -23,6 +23,7 @@ class ImageAgent(ExtrovertAgent):
 
     AGENT_TYPE = "image"
     SKILLS = [
+        "generate_texture",
         "image_generation",
         "image_editing",
         "masking",
@@ -54,6 +55,7 @@ class ImageAgent(ExtrovertAgent):
         print(f"[IMAGE] [{self.agent_id}] Executing image task: {task}")
 
         handlers = {
+            "generate_texture": self._generate_texture,
             "generate_image": self._generate_image,
             "edit_image": self._edit_image,
             "create_mask": self._create_mask,
@@ -171,6 +173,17 @@ class ImageAgent(ExtrovertAgent):
         time.sleep(2)
         result = f"[Comic scene generated from script using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\{model_name}]"
         self._publish_result("generate_comic", result)
+
+    def _generate_texture(self, details: dict):
+        """Automated generation of PBR textures."""
+        material_prompt = details.get("prompt", "unknown")
+        model_type = details.get("model_type", "checkpoints")
+        model_name = details.get("model_name", "texture_model.safetensors")
+        print(f"[IMAGE] [{self.agent_id}] Generating texture for prompt | model={model_name}")
+        print(f"   Prompt: '{material_prompt[:80]}'")
+        time.sleep(2)
+        result = f"[Texture generated from prompt using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}]"
+        self._publish_result("generate_texture", result)
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""
