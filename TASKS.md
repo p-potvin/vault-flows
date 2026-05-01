@@ -10,7 +10,7 @@
 - Agents in `RELAXING` state will be assigned the next available main task.
 - Agents in `WAITING_FOR_INPUT` are locked until PRs are merged by human intervention and are manually reset.
 
-**Project Vision Alignment**  
+**Project Vision Alignment**
 Make vault-flows a **general-purpose node-based workflow builder** (ComfyUI-like but far more diverse) that lets users create *any* workflow, plug in local or server AI models (via local bridge or vaultwares-pipelines API), visualize step-by-step execution, and run them flexibly. Flows are stored/ executed on the backend API; frontend is pure creation + monitoring UI.
 
 ---

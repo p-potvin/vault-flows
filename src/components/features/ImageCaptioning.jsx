@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { FlowRuntimePanel } from '../ui/FlowRuntimePanel';
 import { buildCaptionExecutionManifest } from '../../lib/flowRuntime';
 
@@ -379,7 +379,9 @@ export function ImageCaptioning() {
     URL.revokeObjectURL(url);
   }
 
-  const tags = buildTagList(analysis, subjectHint, contextHint);
+  // ⚡ Bolt: Memoize tag generation to prevent unnecessary array reallocation
+  // and string manipulation on every keystroke when typing hints.
+  const tags = useMemo(() => buildTagList(analysis, subjectHint, contextHint), [analysis, subjectHint, contextHint]);
 
   return (
     <div className="p-4 bg-white dark:bg-gray-900 rounded shadow mb-8">
@@ -401,7 +403,7 @@ export function ImageCaptioning() {
         />
       </div>
 
-      <input type="file" accept="image/*" onChange={handleFileSelection} className="mb-4" />
+      <input type="file" aria-label="Select an image to caption" accept="image/*" onChange={handleFileSelection} className="mb-4" />
 
       {error && (
         <div className="mb-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/30 dark:text-red-200">
