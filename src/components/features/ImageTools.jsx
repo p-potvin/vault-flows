@@ -229,7 +229,7 @@ export function ImageTools() {
 
           <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
             <h3 className="font-semibold mb-2">Import & Export</h3>
-            <input type="file" accept="image/*" onChange={onSelectImage} className="mb-2 text-sm w-full" />
+            <input type="file" aria-label="Select image to import" accept="image/*" onChange={onSelectImage} className="mb-2 text-sm w-full" />
             <button onClick={exportMask} className="w-full py-1 bg-vault-900 text-white rounded hover:bg-vault-800 dark:bg-vault-200 dark:text-vault-900 text-sm font-bold">Export Image</button>
           </div>
 
@@ -251,7 +251,7 @@ export function ImageTools() {
             )}
 
             <button onClick={addText} className="w-full py-1 bg-gray-300 dark:bg-gray-600 rounded text-sm mt-2">Add Text</button>
-            <button onClick={deleteActive} disabled={!activeObject} className="w-full py-1 bg-red-600 text-white rounded text-sm mt-2 disabled:opacity-50">Delete Selected</button>
+            <button onClick={deleteActive} disabled={!activeObject} title={!activeObject ? 'Select an object to delete' : undefined} className="w-full py-1 bg-red-600 text-white rounded text-sm mt-2 disabled:opacity-50">Delete Selected</button>
           </div>
 
           {activeObject && activeObject.type === 'image' && (
