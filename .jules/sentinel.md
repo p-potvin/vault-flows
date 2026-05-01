@@ -32,3 +32,8 @@
 **Vulnerability:** The `normalize_output_name` function blindly returned the `outputName` string from user-supplied payloads, which was later appended to a directory path. An attacker could supply `../../evil.exe` to overwrite arbitrary system files outside the job directory.
 **Learning:** Unsanitized filenames mixed with directory paths expose local runtime bridges to path traversal attacks, even if the target directory is otherwise checked or isolated.
 **Prevention:** When accepting a raw filename from an external payload to create a local file, extract strictly the base name using `Path(filename).name` before using it in any file path composition.
+
+## 2026-05-01 - Prevent Path Traversal in resolve_project_file
+**Vulnerability:** The `resolve_project_file` function in `run_coordinated_system.py` combined user-provided paths with a root directory and resolved them, but failed to ensure the resolved path remained within the intended root directory. This allowed path traversal using `../` components, potentially exposing arbitrary files on the filesystem.
+**Learning:** Resolving a path (e.g. `pathlib.Path.resolve()`) normalizes it and resolves `../` sequences, but does not prevent the resulting path from pointing outside the initial base directory. You must explicitly verify boundaries after resolution.
+**Prevention:** To prevent path traversal vulnerabilities when resolving user-provided file paths with `pathlib.Path`, explicitly verify the boundary using `resolved_path.is_relative_to(base_dir)` after calling `.resolve()`.
