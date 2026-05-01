@@ -403,7 +403,7 @@ export default function LoRATraining() {
             clean names help.
           </div>
 
-          <input type="file" multiple accept="image/*" onChange={handleDatasetUpload} />
+          <input type="file" aria-label="Upload dataset images" multiple accept="image/*" onChange={handleDatasetUpload} />
 
           {status.loading && <div className="text-sm text-vault-700 dark:text-vault-200">Reading image metadata...</div>}
 

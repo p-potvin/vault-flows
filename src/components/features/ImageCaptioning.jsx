@@ -403,7 +403,7 @@ export function ImageCaptioning() {
         />
       </div>
 
-      <input type="file" accept="image/*" onChange={handleFileSelection} className="mb-4" />
+      <input type="file" aria-label="Select an image to caption" accept="image/*" onChange={handleFileSelection} className="mb-4" />
 
       {error && (
         <div className="mb-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/30 dark:text-red-200">
