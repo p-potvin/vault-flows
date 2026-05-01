@@ -125,6 +125,15 @@ const DEFAULT_WORKFLOWS = [
     pin: true,
     lastRun: null,
   },
+  {
+    id: 'wf-agentic-planning-pipeline',
+    name: 'Autonomous Goal Decomposition Pipeline',
+    category: 'Agentic Planning',
+    description: 'Automated goal decomposition, tool-use selection, and self-correction loops for complex tasks. Uses subagents to handle isolated execution steps. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 
 const DEFAULT_CONFIG = normalizeExecutionConfig({
