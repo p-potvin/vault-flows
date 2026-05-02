@@ -27,6 +27,15 @@ const REMOTE_TIMEOUT_MS = 1500;
 
 const DEFAULT_WORKFLOWS = [
   {
+    id: 'wf-audio-foley',
+    name: 'Audio Noise Reduction & Foley Generation',
+    category: 'Audio & Spoken Language',
+    description: 'Reduces noise and generates foley sounds. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
     id: 'wf-texture-generation',
     name: 'Texture Generation Pipeline',
     category: 'Visual & Graphics',
