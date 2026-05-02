@@ -20,3 +20,7 @@
 ## 2024-04-29 - Memoizing heavy calculations and generations in React feature components
 **Learning:** In the `vault-flows` React architecture, fast-updating state (such as typing in modal forms or input fields) can cause parent components to re-render, trickling down and triggering expensive recalculations (e.g. iterating over datasets in `LoRATraining.jsx` or tokenizing and filtering tags in `ImageCaptioning.jsx`) even when the dependencies for those calculations haven't changed.
 **Action:** Always identify operations that compute derived state from props or slower-updating state, and wrap them in `useMemo()` to prevent unnecessary CPU overhead and UI lag when sibling or parent state updates rapidly.
+
+## 2024-05-18 - LocalStorage Read Bottleneck
+**Learning:** The `getWorkflows()` function was reading from `localStorage` (`JSON.parse`) every time it was called. Because it was used internally across multiple API fallback handlers (e.g. `backupWorkflows`, `requestWithFallback`), this synchronous storage access became a measurable bottleneck.
+**Action:** Always introduce an in-memory cache variable (e.g. `cachedWorkflows`) for frequently accessed `localStorage` data within API or utility modules, updating the cache synchronously during write operations to avoid redundant reads.
