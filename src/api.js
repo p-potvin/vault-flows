@@ -173,25 +173,37 @@ function writeJson(key, value) {
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
+// ⚡ Bolt: Cache workflows in memory to avoid repeated expensive synchronous localStorage reads and JSON.parse() calls.
+let cachedWorkflows = null;
+
 function getWorkflows() {
+  if (cachedWorkflows) {
+    return cachedWorkflows;
+  }
+
   const workflows = readJson(WORKFLOWS_KEY, DEFAULT_WORKFLOWS);
   if (!Array.isArray(workflows) || workflows.length === 0) {
     writeJson(WORKFLOWS_KEY, DEFAULT_WORKFLOWS);
-    return clone(DEFAULT_WORKFLOWS);
+    cachedWorkflows = clone(DEFAULT_WORKFLOWS);
+    return cachedWorkflows;
   }
 
   const byId = new Map(workflows.map((workflow) => [workflow.id, workflow]));
-  const merged = [
-    ...DEFAULT_WORKFLOWS.filter((workflow) => !byId.has(workflow.id)),
-    ...workflows,
-  ];
+  const toAdd = DEFAULT_WORKFLOWS.filter((workflow) => !byId.has(workflow.id));
 
-  writeJson(WORKFLOWS_KEY, merged);
+  let merged = workflows;
+  if (toAdd.length > 0) {
+    merged = [...toAdd, ...workflows];
+    writeJson(WORKFLOWS_KEY, merged);
+  }
+
+  cachedWorkflows = merged;
   return merged;
 }
 
 function saveWorkflows(workflows) {
   writeJson(WORKFLOWS_KEY, workflows);
+  cachedWorkflows = workflows;
   return workflows;
 }
 
