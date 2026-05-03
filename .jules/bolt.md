@@ -24,3 +24,6 @@
 ## 2024-05-18 - LocalStorage Read Bottleneck
 **Learning:** The `getWorkflows()` function was reading from `localStorage` (`JSON.parse`) every time it was called. Because it was used internally across multiple API fallback handlers (e.g. `backupWorkflows`, `requestWithFallback`), this synchronous storage access became a measurable bottleneck.
 **Action:** Always introduce an in-memory cache variable (e.g. `cachedWorkflows`) for frequently accessed `localStorage` data within API or utility modules, updating the cache synchronously during write operations to avoid redundant reads.
+## 2024-05-18 - LocalStorage Read Bottleneck for Config and Uploads
+**Learning:** `getConfigState()` and `getUploads()` were reading from `localStorage` (`JSON.parse`) every time they were called. This was problematic since they could be accessed frequently when the app executes operations that rely on config values.
+**Action:** Extend the caching pattern previously applied to `getWorkflows()` to other frequently read storage keys (`CONFIG_KEY`, `UPLOADS_KEY`). Always use an in-memory cache variable for frequently accessed `localStorage` data, updating it synchronously during write operations to avoid redundant reads.
