@@ -33,6 +33,7 @@ class VideoAgent(ExtrovertAgent):
         "comfyui_export",
         "video_interpolation",
         "audio_reactive_visuals",
+        "generate_foley",
     ]
 
     def __init__(
@@ -64,6 +65,7 @@ class VideoAgent(ExtrovertAgent):
             "export_comfyui": self._export_comfyui,
             "interpolate_video": self._interpolate_video,
             "generate_audio_reactive_visuals": self._generate_audio_reactive_visuals,
+            "generate_foley": self._generate_foley,
         }
 
         handler = handlers.get(task)
@@ -232,6 +234,24 @@ class VideoAgent(ExtrovertAgent):
 
         result = f"[Audio-reactive visuals generated for '{audio}' using {model}]"
         self._publish_result("generate_audio_reactive_visuals", result)
+
+    def _generate_foley(self, details: dict):
+        """Generate foley sounds and reduce noise."""
+        source = details.get("source", "unknown_audio")
+        model = details.get("model", "foley-gen-v1")
+        model_type = details.get("model_type", "audio_models")
+
+        print(
+            f"🔊 [{self.agent_id}] Reducing noise & generating foley | source={source} | model={model}"
+        )
+        time.sleep(1)
+        print(
+            f"   Using local model path: D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}"
+        )
+        time.sleep(2)
+
+        result = f"[Foley generated & noise reduced for '{source}' using {model}]"
+        self._publish_result("generate_foley", result)
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""

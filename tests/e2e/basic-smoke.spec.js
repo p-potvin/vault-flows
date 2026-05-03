@@ -49,6 +49,7 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await expect(page.getByText('Audio-Reactive Visuals Generator')).toBeVisible();
     await expect(page.getByText('Procedural Level Generator')).toBeVisible();
     await expect(page.getByText('Autonomous Goal Decomposition Pipeline')).toBeVisible();
+    await expect(page.getByText('Audio Noise Reduction & Foley Generation')).toBeVisible();
   });
 
   test('can create and edit a workflow in local fallback mode', async ({ page }) => {
