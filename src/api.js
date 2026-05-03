@@ -27,6 +27,24 @@ const REMOTE_TIMEOUT_MS = 1500;
 
 const DEFAULT_WORKFLOWS = [
   {
+    id: 'wf-audio-foley',
+    name: 'Audio Noise Reduction & Foley Generation',
+    category: 'Audio & Spoken Language',
+    description: 'Reduces noise and generates foley sounds. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-texture-generation',
+    name: 'Texture Generation Pipeline',
+    category: 'Visual & Graphics',
+    description: 'Generates seamless PBR textures. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
     id: 'wf-demo-caption',
     name: 'Image Caption Review',
     category: 'ML',
@@ -67,6 +85,60 @@ const DEFAULT_WORKFLOWS = [
     name: 'NeRF Automation Pipeline',
     category: 'ML',
     description: 'Automated generation of NeRF models from a folder of images, including point cloud extraction and texture baking. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-comic-scene-generator',
+    name: 'Comic Book Scene Generator',
+    category: 'Visual',
+    description: 'Automated generation of comic book scenes from a text script, ensuring multi-frame consistency and character re-targeting. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-video-interpolation',
+    name: 'Video Frame Interpolation',
+    category: 'Video',
+    description: 'Increases the framerate of a video using AI frame interpolation. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-audio-reactive-visuals',
+    name: 'Audio-Reactive Visuals Generator',
+    category: 'Video',
+    description: 'Generate audio-reactive visuals from music and speech stems using AI diffusion models. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-procedural-level-generator',
+    name: 'Procedural Level Generator',
+    category: 'Game Dev',
+    description: 'Automated generation of procedural game levels, skyboxes, and NPC dialogue trees for game dev pipelines. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-audio-lipsync-liveportrait',
+    name: 'LivePortrait Lipsync Automation',
+    category: 'Audio-to-Video',
+    description: 'Automated lipsync mapping from audio speech to target video frames using LivePortrait. Ensures stable facial re-targeting and temporal consistency. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: true,
+    pin: true,
+    lastRun: null,
+  },
+  {
+    id: 'wf-agentic-planning-pipeline',
+    name: 'Autonomous Goal Decomposition Pipeline',
+    category: 'Agentic Planning',
+    description: 'Automated goal decomposition, tool-use selection, and self-correction loops for complex tasks. Uses subagents to handle isolated execution steps. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
     favorite: false,
     pin: false,
     lastRun: null,
@@ -243,22 +315,24 @@ function extractConfigObject(payload) {
 }
 
 async function requestWithFallback(path, options, fallback) {
-  if (!configuredBase) {
+  const state = getConfigState();
+  const activeBase = state.apiBase || configuredBase;
+
+  if (!activeBase) {
     return fallback({ mode: 'local-demo', remoteAttempted: false });
   }
 
   try {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
-    const state = getConfigState();
-    const headers = options?.headers || {};
+    const headers = { ...(options?.headers || {}) };
     if (state.apiKey) {
       headers['X-Api-Key'] = state.apiKey;
     }
     
     let res;
     try {
-      res = await fetch(`${configuredBase}${path}`, {
+      res = await fetch(`${activeBase}${path}`, {
         ...options,
         headers,
         signal: controller.signal,
@@ -348,9 +422,11 @@ function serializeUpload(provider, payload) {
 }
 
 export function getApiRuntime() {
+  const state = getConfigState();
+  const activeBase = state.apiBase || configuredBase;
   return {
-    mode: configuredBase ? 'remote-with-local-fallback' : 'local-demo',
-    apiBase: configuredBase || '',
+    mode: activeBase ? 'remote-with-local-fallback' : 'local-demo',
+    apiBase: activeBase || '',
   };
 }
 
@@ -515,11 +591,16 @@ export async function backupWorkflows() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
     },
-    () => ({
-      backedUpAt: new Date().toISOString(),
-      count: getWorkflows().length,
-      data: getWorkflows(),
-    }),
+    () => {
+      // ⚡ Bolt: Cache getWorkflows() result to avoid executing the expensive
+      // synchronous local storage read and JSON parse operations multiple times.
+      const workflows = getWorkflows();
+      return {
+        backedUpAt: new Date().toISOString(),
+        count: workflows.length,
+        data: workflows,
+      };
+    },
   );
 }
 

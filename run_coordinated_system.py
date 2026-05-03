@@ -194,6 +194,10 @@ def prepare_dispatch_branch(repo_path: Path, branch_name: str | None, base_branc
 def resolve_project_file(path: str, repo_path: Path | None = None) -> Path:
     root = (repo_path or Path.cwd()).resolve()
     resolved = (root / path).resolve()
+
+    if not resolved.is_relative_to(root):
+        raise HTTPException(status_code=403, detail="Security Error: Path traversal detected")
+
     if not resolved.exists():
         raise HTTPException(status_code=404, detail=f"Task file not found: {path}")
 

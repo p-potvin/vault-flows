@@ -22,3 +22,18 @@
 **Vulnerability:** The `resolve_command` function inside the local runtime bridge took the `facefusionCommand` payload string provided by the user and directly passed it to `subprocess.run()`. This allowed arbitrary execution of commands on the Windows host machine.
 **Learning:** Naively executing external binaries by user-supplied paths without restriction represents an immediate remote code execution vector. Because the command may include Windows-style paths (e.g., `C:\facefusion\facefusion.bat`), one must parse it correctly using `shlex.split(command, posix=False)` to prevent string parsing errors. Furthermore, simply splitting strings doesn't prevent an attacker from swapping `facefusion` with `cmd.exe /c calc` or `python -c "..."`.
 **Prevention:** Always construct command execution with arguments where the executable is strictly checked against a known allow-list (e.g. `['facefusion', 'python']`). Secondary logic flags inside languages that could themselves act as execution environments (like `python -c`) should be rejected if the payload string attempts to run them.
+
+## 2026-04-25 - Prevent Path Traversal in run_local_runtime_bridge.py
+**Vulnerability:** The `run_local_runtime_bridge.py` server used the user-provided `saveDirectory` parameter to dynamically create an output path (`Path(requested_save_dir)`). This allowed arbitrary absolute paths or relative traversal strings, enabling remote attackers to overwrite files anywhere on the local filesystem.
+**Learning:** Relying purely on `Path()` composition without bounds checking is dangerous when handling file system writes initiated over an HTTP endpoint, even for local tooling bridges.
+**Prevention:** Apply a robust bounds check. Resolve user-provided paths relative to a strict base directory (`JOB_ROOT`) using `os.path.abspath()` and verify it remains enclosed within that base directory using `os.path.commonpath([base_dir, resolved_path]) == base_dir`.
+
+## 2026-04-26 - Prevent Path Traversal via Filename in `run_local_runtime_bridge.py`
+**Vulnerability:** The `normalize_output_name` function blindly returned the `outputName` string from user-supplied payloads, which was later appended to a directory path. An attacker could supply `../../evil.exe` to overwrite arbitrary system files outside the job directory.
+**Learning:** Unsanitized filenames mixed with directory paths expose local runtime bridges to path traversal attacks, even if the target directory is otherwise checked or isolated.
+**Prevention:** When accepting a raw filename from an external payload to create a local file, extract strictly the base name using `Path(filename).name` before using it in any file path composition.
+
+## 2026-05-01 - Prevent Path Traversal in resolve_project_file
+**Vulnerability:** The `resolve_project_file` function in `run_coordinated_system.py` combined user-provided paths with a root directory and resolved them, but failed to ensure the resolved path remained within the intended root directory. This allowed path traversal using `../` components, potentially exposing arbitrary files on the filesystem.
+**Learning:** Resolving a path (e.g. `pathlib.Path.resolve()`) normalizes it and resolves `../` sequences, but does not prevent the resulting path from pointing outside the initial base directory. You must explicitly verify boundaries after resolution.
+**Prevention:** To prevent path traversal vulnerabilities when resolving user-provided file paths with `pathlib.Path`, explicitly verify the boundary using `resolved_path.is_relative_to(base_dir)` after calling `.resolve()`.

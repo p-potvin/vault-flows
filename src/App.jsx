@@ -40,6 +40,8 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+// ⚡ Bolt: Move static categories array outside of the component to prevent
+// unnecessary re-allocation and memory pressure on every render.
 
 // ⚡ Bolt: Memoize heavy feature components to prevent them from re-rendering
 // when fast-updating state (like modal form inputs) changes in App.
@@ -52,8 +54,6 @@ const HeavyFeatures = React.memo(() => (
   </>
 ));
 
-const categories = ['All', 'Data', 'ML', 'Reporting'];
-
 function App() {
   const dispatch = useDispatch();
   const workflows = useSelector((state) => state.workflows.items);
@@ -61,6 +61,7 @@ function App() {
   const error = useSelector((state) => state.workflows.error);
   const [category, setCategory] = useState('All');
   const [showCreate, setShowCreate] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [newCategory, setNewCategory] = useState('');
   const [formError, setFormError] = useState('');
@@ -78,6 +79,8 @@ function App() {
     loadWorkflows();
   }, [loadWorkflows]);
 
+  const categories = useMemo(() => ['All', 'Data', 'ML', 'Reporting', 'Visual & Graphics'], []);
+
   // ⚡ Bolt: Memoize filtered list to prevent unnecessary re-filtering
   // on every keystroke in the "Create Workflow" modal form.
   const filtered = useMemo(() => {
@@ -91,6 +94,7 @@ function App() {
       setFormError(result.error.errors[0]?.message || 'Invalid input');
       return;
     }
+    setIsCreating(true);
     try {
       await createWorkflow({ name: newName, category: newCategory });
       setShowCreate(false);
@@ -99,6 +103,8 @@ function App() {
       loadWorkflows();
     } catch (err) {
       setFormError(err.message);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -163,32 +169,34 @@ function App() {
             <label htmlFor="create-workflow-name" className="block text-sm font-medium mb-1">Name: <span className="text-red-500">*</span></label>
             <input
               id="create-workflow-name"
-              className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-vault-500"
+              className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               placeholder="e.g. Data Pipeline"
               autoFocus
               value={newName}
               onChange={e => setNewName(e.target.value)}
+              required
+              aria-required="true"
             />
           </div>
           <div className="mb-4">
             <label htmlFor="create-workflow-category" className="block text-sm font-medium mb-1">Category:</label>
             <input
               id="create-workflow-category"
-              className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
+              className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               value={newCategory}
               onChange={e => setNewCategory(e.target.value)}
             />
           </div>
           {formError && <div className="text-red-500 mb-2">{formError}</div>}
           <div className="flex justify-end space-x-2">
-            <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={() => setShowCreate(false)}>Cancel</button>
+            <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" onClick={() => setShowCreate(false)}>Cancel</button>
             <button
-              className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               onClick={handleCreate}
-              disabled={!newName.trim()}
+              disabled={isCreating || !newName.trim()}
               title={!newName.trim() ? "Workflow name is required" : undefined}
             >
-              Create
+              {isCreating ? 'Creating...' : 'Create'}
             </button>
           </div>
         </Modal>

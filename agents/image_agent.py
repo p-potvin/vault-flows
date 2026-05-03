@@ -23,6 +23,7 @@ class ImageAgent(ExtrovertAgent):
 
     AGENT_TYPE = "image"
     SKILLS = [
+        "generate_texture",
         "image_generation",
         "image_editing",
         "masking",
@@ -32,6 +33,7 @@ class ImageAgent(ExtrovertAgent):
         "workflow_creation",
         "comfyui_export",
         "nerf_generation",
+        "comic_generation",
     ]
 
     def __init__(
@@ -53,6 +55,7 @@ class ImageAgent(ExtrovertAgent):
         print(f"[IMAGE] [{self.agent_id}] Executing image task: {task}")
 
         handlers = {
+            "generate_texture": self._generate_texture,
             "generate_image": self._generate_image,
             "edit_image": self._edit_image,
             "create_mask": self._create_mask,
@@ -61,6 +64,7 @@ class ImageAgent(ExtrovertAgent):
             "create_workflow": self._create_image_workflow,
             "export_comfyui": self._export_comfyui,
             "generate_nerf": self._generate_nerf,
+            "generate_comic": self._generate_comic,
         }
 
         handler = handlers.get(task)
@@ -158,6 +162,28 @@ class ImageAgent(ExtrovertAgent):
         time.sleep(2)
         result = f"[NeRF model generated using {model} from '{images_dir}']"
         self._publish_result("generate_nerf", result)
+
+    def _generate_comic(self, details: dict):
+        """Automated generation of comic book scenes."""
+        script = details.get("script", "unknown")
+        model_type = details.get("model_type", "checkpoints")
+        model_name = details.get("model_name", "comic_model.safetensors")
+        print(f"[IMAGE] [{self.agent_id}] Generating comic from script | model={model_name}")
+        print(f"   Script: '{script[:80]}'")
+        time.sleep(2)
+        result = f"[Comic scene generated from script using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\{model_name}]"
+        self._publish_result("generate_comic", result)
+
+    def _generate_texture(self, details: dict):
+        """Automated generation of PBR textures."""
+        material_prompt = details.get("prompt", "unknown")
+        model_type = details.get("model_type", "checkpoints")
+        model_name = details.get("model_name", "texture_model.safetensors")
+        print(f"[IMAGE] [{self.agent_id}] Generating texture for prompt | model={model_name}")
+        print(f"   Prompt: '{material_prompt[:80]}'")
+        time.sleep(2)
+        result = f"[Texture generated from prompt using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}]"
+        self._publish_result("generate_texture", result)
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""

@@ -320,9 +320,10 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
         </div>
 
         <form ref={runtimeFormElementRef} className="grid gap-4 md:grid-cols-2">
-          <label className="block">
+          <label htmlFor="runtimeProvider" className="block">
             <span className="mb-1 block text-sm font-medium">Runtime Provider</span>
             <select
+              id="runtimeProvider"
               name="runtimeProvider"
               value={runtimeForm.runtimeProvider}
               onChange={(event) => handleRuntimeFieldChange('runtimeProvider', event.target.value)}
@@ -335,9 +336,10 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
             </select>
           </label>
 
-          <label className="block">
+          <label htmlFor="modelsDir" className="block">
             <span className="mb-1 block text-sm font-medium">Model Directory</span>
             <input
+              id="modelsDir"
               name="modelsDir"
               value={runtimeForm.modelsDir}
               onChange={(event) => handleRuntimeFieldChange('modelsDir', event.target.value)}
@@ -346,9 +348,10 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
             />
           </label>
 
-          <label className="block">
+          <label htmlFor="localBridgeUrl" className="block">
             <span className="mb-1 block text-sm font-medium">Local Bridge URL</span>
             <input
+              id="localBridgeUrl"
               name="localBridgeUrl"
               value={runtimeForm.localBridgeUrl}
               onChange={(event) => handleRuntimeFieldChange('localBridgeUrl', event.target.value)}
@@ -356,9 +359,10 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
             />
           </label>
 
-          <label className="block">
+          <label htmlFor="localComfyUrl" className="block">
             <span className="mb-1 block text-sm font-medium">Local ComfyUI URL</span>
             <input
+              id="localComfyUrl"
               name="localComfyUrl"
               value={runtimeForm.localComfyUrl}
               onChange={(event) => handleRuntimeFieldChange('localComfyUrl', event.target.value)}
@@ -366,9 +370,10 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
             />
           </label>
 
-          <label className="block">
+          <label htmlFor="saveDirectory" className="block">
             <span className="mb-1 block text-sm font-medium">Save Directory</span>
             <input
+              id="saveDirectory"
               name="saveDirectory"
               value={runtimeForm.saveDirectory}
               onChange={(event) => handleRuntimeFieldChange('saveDirectory', event.target.value)}
@@ -377,9 +382,10 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
             />
           </label>
 
-          <label className="block">
+          <label htmlFor="facefusionCommand" className="block">
             <span className="mb-1 block text-sm font-medium">FaceFusion Command</span>
             <input
+              id="facefusionCommand"
               name="facefusionCommand"
               value={runtimeForm.facefusionCommand}
               onChange={(event) => handleRuntimeFieldChange('facefusionCommand', event.target.value)}

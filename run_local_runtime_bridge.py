@@ -19,6 +19,7 @@ import cgi
 import datetime as dt
 import json
 import mimetypes
+import os
 import shlex
 import shutil
 import subprocess
@@ -159,7 +160,8 @@ def resolve_command(command: str) -> List[str]:
 
 def normalize_output_name(output_name: str, target_name: str) -> str:
     if output_name and output_name.strip():
-        return output_name.strip()
+        # Security: Prevent path traversal by extracting only the base filename
+        return Path(output_name.strip()).name
 
     target_suffix = Path(target_name).suffix or ".mp4"
     return f"vault-faceswap-output{target_suffix}"
@@ -172,7 +174,16 @@ def run_faceswap_job(job: dict, source_path: Path, target_path: Path, server_hos
 
     output_name = normalize_output_name(job.get("outputName", ""), target_path.name)
     requested_save_dir = job.get("saveDirectory", "")
-    output_dir = Path(requested_save_dir) if requested_save_dir else job_dir
+
+    if requested_save_dir:
+        base_dir = os.path.abspath(JOB_ROOT)
+        resolved_path = os.path.abspath(os.path.join(base_dir, requested_save_dir))
+        if os.path.commonpath([base_dir, resolved_path]) != base_dir:
+            raise ValueError("Security Error: Path traversal detected in saveDirectory.")
+        output_dir = Path(resolved_path)
+    else:
+        output_dir = job_dir
+
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / output_name
 
