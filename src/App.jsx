@@ -115,12 +115,12 @@ function App() {
           <VaultwaresBranding />
           <h1 className="text-3xl font-bold text-vault-900 dark:text-vault-100 font-vault mb-2">Vaultwares Workflow Manager</h1>
           <nav className="flex gap-4 mt-2">
-            <button className={`px-3 py-1 rounded font-semibold ${panel === 'workflows' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('workflows')}>Workflows</button>
-            <button className={`px-3 py-1 rounded font-semibold ${panel === 'backup' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('backup')}>Backup/Restore</button>
-            <button className={`px-3 py-1 rounded font-semibold ${panel === 'export' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('export')}>Export</button>
-            <button className={`px-3 py-1 rounded font-semibold ${panel === 'storage' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('storage')}>Storage</button>
-            <button className={`px-3 py-1 rounded font-semibold ${panel === 'config' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('config')}>Config</button>
-            <button className={`px-3 py-1 rounded font-semibold ${panel === 'coordination' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('coordination')}>Coordination</button>
+            <button className={`px-3 py-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${panel === 'workflows' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('workflows')}>Workflows</button>
+            <button className={`px-3 py-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${panel === 'backup' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('backup')}>Backup/Restore</button>
+            <button className={`px-3 py-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${panel === 'export' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('export')}>Export</button>
+            <button className={`px-3 py-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${panel === 'storage' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('storage')}>Storage</button>
+            <button className={`px-3 py-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${panel === 'config' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('config')}>Config</button>
+            <button className={`px-3 py-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${panel === 'coordination' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('coordination')}>Coordination</button>
           </nav>
         </header>
         <div className="flex flex-col md:flex-row max-w-5xl mx-auto">
@@ -131,7 +131,7 @@ function App() {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-bold">Workflows</h2>
                   <button
-                    className="px-4 py-2 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold shadow hover:bg-vault-800 dark:hover:bg-vault-200"
+                    className="px-4 py-2 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold shadow hover:bg-vault-800 dark:hover:bg-vault-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
                     onClick={() => setShowCreate(true)}
                   >
                     + Create Workflow
