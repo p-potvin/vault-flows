@@ -143,6 +143,15 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-trend-analysis-ad-generator',
+    name: 'Trend Analysis to Ad-Copy Generator',
+    category: 'Social & Marketing',
+    description: 'Analyzes social trends, decomposes tasks to create compelling ad-copy, and generates tailored image variants. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 
 const DEFAULT_CONFIG = normalizeExecutionConfig({
