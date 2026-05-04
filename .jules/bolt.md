@@ -20,3 +20,6 @@
 ## 2024-04-29 - Memoizing heavy calculations and generations in React feature components
 **Learning:** In the `vault-flows` React architecture, fast-updating state (such as typing in modal forms or input fields) can cause parent components to re-render, trickling down and triggering expensive recalculations (e.g. iterating over datasets in `LoRATraining.jsx` or tokenizing and filtering tags in `ImageCaptioning.jsx`) even when the dependencies for those calculations haven't changed.
 **Action:** Always identify operations that compute derived state from props or slower-updating state, and wrap them in `useMemo()` to prevent unnecessary CPU overhead and UI lag when sibling or parent state updates rapidly.
+## 2024-05-03 - SQLite in-memory database with FastAPI TestClient
+**Learning:** When testing FastAPI applications using `TestClient` with SQLAlchemy and SQLite, avoid using in-memory databases (`sqlite:///:memory:`) as `TestClient` requests run in separate threads, causing `sqlite3.ProgrammingError` or `OperationalError` (table missing). Use a temporary file-based database (e.g., `tempfile.mktemp(suffix='.db')`) instead.
+**Action:** Use `tempfile.mktemp()` to generate a file-based sqlite database for tests and remove it during test teardown.
