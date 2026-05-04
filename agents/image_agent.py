@@ -35,6 +35,7 @@ class ImageAgent(ExtrovertAgent):
         "nerf_generation",
         "comic_generation",
         "generate_skybox",
+        "medical_segmentation",
     ]
 
     def __init__(
@@ -67,6 +68,7 @@ class ImageAgent(ExtrovertAgent):
             "generate_nerf": self._generate_nerf,
             "generate_comic": self._generate_comic,
             "generate_skybox": self._generate_skybox,
+            "medical_segmentation": self._medical_segmentation,
         }
 
         handler = handlers.get(task)
@@ -197,6 +199,15 @@ class ImageAgent(ExtrovertAgent):
         time.sleep(2)
         result = f"[Texture generated from prompt using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}]"
         self._publish_result("generate_texture", result)
+
+    def _medical_segmentation(self, details: dict):
+        """Execute a medical imaging segmentation task."""
+        model_type = details.get("model_type", "segmentation")
+        model_name = details.get("model_name", "medical_seg_v1.pth")
+        print(f"[IMAGE] [{self.agent_id}] Starting medical segmentation using model {model_name}...")
+        time.sleep(2)
+        result = f"[Medical imaging segmentation completed using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}]"
+        self._publish_result("medical_segmentation", result)
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""

@@ -152,6 +152,15 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-medical-segmentation',
+    name: 'Medical Imaging Segmentation',
+    category: 'Specialized & Niche',
+    description: 'Automated extraction and segmentation of medical imagery using specialized subagents. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 
 const DEFAULT_CONFIG = normalizeExecutionConfig({
