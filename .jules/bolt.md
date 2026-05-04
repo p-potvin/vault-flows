@@ -23,3 +23,10 @@
 ## 2024-05-03 - SQLite in-memory database with FastAPI TestClient
 **Learning:** When testing FastAPI applications using `TestClient` with SQLAlchemy and SQLite, avoid using in-memory databases (`sqlite:///:memory:`) as `TestClient` requests run in separate threads, causing `sqlite3.ProgrammingError` or `OperationalError` (table missing). Use a temporary file-based database (e.g., `tempfile.mktemp(suffix='.db')`) instead.
 **Action:** Use `tempfile.mktemp()` to generate a file-based sqlite database for tests and remove it during test teardown.
+
+## 2024-05-18 - LocalStorage Read Bottleneck
+**Learning:** The `getWorkflows()` function was reading from `localStorage` (`JSON.parse`) every time it was called. Because it was used internally across multiple API fallback handlers (e.g. `backupWorkflows`, `requestWithFallback`), this synchronous storage access became a measurable bottleneck.
+**Action:** Always introduce an in-memory cache variable (e.g. `cachedWorkflows`) for frequently accessed `localStorage` data within API or utility modules, updating the cache synchronously during write operations to avoid redundant reads.
+## 2024-05-18 - LocalStorage Read Bottleneck for Config and Uploads
+**Learning:** `getConfigState()` and `getUploads()` were reading from `localStorage` (`JSON.parse`) every time they were called. This was problematic since they could be accessed frequently when the app executes operations that rely on config values.
+**Action:** Extend the caching pattern previously applied to `getWorkflows()` to other frequently read storage keys (`CONFIG_KEY`, `UPLOADS_KEY`). Always use an in-memory cache variable for frequently accessed `localStorage` data, updating it synchronously during write operations to avoid redundant reads.
