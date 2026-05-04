@@ -152,6 +152,15 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-medical-segmentation',
+    name: 'Medical Imaging Segmentation',
+    category: 'Specialized & Niche',
+    description: 'Automated extraction and segmentation of medical imagery using specialized subagents. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 
 const DEFAULT_CONFIG = normalizeExecutionConfig({
@@ -216,24 +225,41 @@ function saveWorkflows(workflows) {
   return workflows;
 }
 
+// ⚡ Bolt: Cache config in memory to avoid repeated expensive synchronous localStorage reads and JSON.parse() calls.
+let cachedConfig = null;
+
 function getConfigState() {
+  if (cachedConfig) {
+    return cachedConfig;
+  }
   const config = normalizeExecutionConfig(readJson(CONFIG_KEY, DEFAULT_CONFIG));
   writeJson(CONFIG_KEY, config);
+  cachedConfig = config;
   return config;
 }
 
 function saveConfigState(config) {
   const normalized = normalizeExecutionConfig(config);
   writeJson(CONFIG_KEY, normalized);
+  cachedConfig = normalized;
   return normalized;
 }
 
+// ⚡ Bolt: Cache uploads in memory to avoid repeated expensive synchronous localStorage reads and JSON.parse() calls.
+let cachedUploads = null;
+
 function getUploads() {
-  return readJson(UPLOADS_KEY, []);
+  if (cachedUploads) {
+    return cachedUploads;
+  }
+  const uploads = readJson(UPLOADS_KEY, []);
+  cachedUploads = uploads;
+  return uploads;
 }
 
 function saveUploads(uploads) {
   writeJson(UPLOADS_KEY, uploads);
+  cachedUploads = uploads;
   return uploads;
 }
 

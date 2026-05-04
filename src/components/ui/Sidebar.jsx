@@ -8,7 +8,7 @@ export const Sidebar = React.memo(function Sidebar({ categories, onSelect, selec
         {categories.map((cat) => (
           <li key={cat} className="mr-2 md:mr-0">
             <button
-              className={`w-full text-left px-2 py-1 rounded ${selected === cat ? 'bg-vault-200 dark:bg-vault-800 font-semibold text-vault-900 dark:text-vault-100' : 'text-vault-700 dark:text-vault-300'}`}
+              className={`w-full text-left px-2 py-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${selected === cat ? 'bg-vault-200 dark:bg-vault-800 font-semibold text-vault-900 dark:text-vault-100' : 'text-vault-700 dark:text-vault-300'}`}
               onClick={() => onSelect(cat)}
             >
               {cat}
