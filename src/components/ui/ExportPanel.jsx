@@ -23,7 +23,7 @@ export const ExportPanel = React.memo(function ExportPanel() {
     <div className="p-4 rounded shadow bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700" style={{ borderColor: theme.accent }}>
       <h2 className="text-xl font-bold mb-4" style={{ color: theme.accent }}>Export Workflows</h2>
       <button
-        className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+        className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
         style={{ background: theme.accent, color: theme.primary }}
         onClick={handleExport}
         disabled={loading}
