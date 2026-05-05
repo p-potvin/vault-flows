@@ -124,7 +124,7 @@ def resolve_repo_path(repo_path: str | None, repo_url: str | None = None) -> Pat
     if repo_url and not resolved.exists():
         resolved.parent.mkdir(parents=True, exist_ok=True)
         clone = subprocess.run(
-            ["git", "clone", repo_url, str(resolved)],
+            ["git", "clone", "--", repo_url, str(resolved)],
             capture_output=True,
             text=True,
             timeout=120,
