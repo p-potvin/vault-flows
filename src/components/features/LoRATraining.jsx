@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
+// ⚡ Bolt: Wrap LoRATraining in React.memo() to prevent unnecessary re-renders
+// when fast-updating state changes in App.jsx.
 import { FlowRuntimePanel } from '../ui/FlowRuntimePanel';
 import { buildLoRAPlanManifest } from '../../lib/flowRuntime';
 
@@ -269,7 +271,7 @@ function buildExportPayload(items, params) {
   };
 }
 
-export default function LoRATraining() {
+const LoRATraining = React.memo(function LoRATraining() {
   const [step, setStep] = useState(0);
   const [datasetItems, setDatasetItems] = useState([]);
   const [params, setParams] = useState(defaultParams);
@@ -704,4 +706,6 @@ export default function LoRATraining() {
       )}
     </div>
   );
-}
+});
+
+export default LoRATraining;

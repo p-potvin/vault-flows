@@ -38,7 +38,7 @@ export const BackupRestorePanel = React.memo(function BackupRestorePanel() {
     <div className="p-4 rounded shadow bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700" style={{ borderColor: theme.accent }}>
       <h2 className="text-xl font-bold mb-4" style={{ color: theme.accent }}>Backup & Restore Workflows</h2>
       <button
-        className="px-4 py-2 rounded font-bold mb-4 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="px-4 py-2 rounded font-bold mb-4 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
         style={{ background: theme.accent, color: theme.primary }}
         onClick={handleBackup}
         disabled={loading}
@@ -52,13 +52,13 @@ export const BackupRestorePanel = React.memo(function BackupRestorePanel() {
         <label htmlFor="restore-data-textarea" className="block mb-2 font-semibold">Restore Data (JSON):</label>
         <textarea
           id="restore-data-textarea"
-          className="w-full p-2 border rounded dark:bg-gray-900 dark:text-gray-100"
+          className="w-full p-2 border rounded dark:bg-gray-900 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
           rows={5}
           value={restoreData}
           onChange={e => setRestoreData(e.target.value)}
         />
         <button
-          className="px-4 py-2 rounded font-bold mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded font-bold mt-2 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
           style={{ background: theme.accent, color: theme.primary }}
           onClick={handleRestore}
           disabled={loading || !restoreData.trim()}

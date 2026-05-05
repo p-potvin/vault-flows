@@ -104,12 +104,12 @@ export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpda
         <div className="flex items-center gap-2 ml-4">
           <Link
             to={`/workflows/${wf.id}`}
-            className="px-3 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 hover:bg-vault-800 dark:hover:bg-vault-200 font-semibold"
+            className="px-3 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 hover:bg-vault-800 dark:hover:bg-vault-200 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
           >
             Design
           </Link>
           <button
-            className="px-3 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600 font-semibold"
+            className="px-3 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             onClick={() => openEdit(wf)}
           >
             Edit
@@ -132,7 +132,7 @@ export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpda
           <label htmlFor="edit-workflow-name" className="block text-sm font-medium mb-1">Name: <span className="text-red-500">*</span></label>
           <input
             id="edit-workflow-name"
-            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-vault-500"
+            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             autoFocus
             value={editName}
             onChange={e => setEditName(e.target.value)}
@@ -144,7 +144,7 @@ export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpda
           <label htmlFor="edit-workflow-category" className="block text-sm font-medium mb-1">Category: <span className="text-red-500">*</span></label>
           <input
             id="edit-workflow-category"
-            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
+            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             value={editCategory}
             onChange={e => setEditCategory(e.target.value)}
             required
@@ -153,9 +153,9 @@ export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpda
         </div>
         {saveError ? <div className="mb-2 text-sm text-red-500">{saveError}</div> : null}
         <div className="flex justify-end space-x-2">
-          <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={closeEdit}>Cancel</button>
+          <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" onClick={closeEdit}>Cancel</button>
           <button
-            className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             onClick={saveEdit}
             disabled={isSaving || !editName.trim() || !editCategory.trim()}
             title={(!editName.trim() || !editCategory.trim()) ? 'Name and category are required' : undefined}

@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+// ⚡ Bolt: Wrap FaceSwapVideo in React.memo() to prevent unnecessary re-renders
+// when fast-updating state changes in App.jsx.
 import { FlowRuntimePanel } from '../ui/FlowRuntimePanel';
 import { buildFaceSwapManifest } from '../../lib/flowRuntime';
 import { runFaceSwapVideo } from '../../api';
@@ -17,7 +19,7 @@ function formatBytes(value) {
   return `${(value / (1024 * 1024)).toFixed(2)} MB`;
 }
 
-export function FaceSwapVideo() {
+export const FaceSwapVideo = React.memo(function FaceSwapVideo() {
   const [runtimeConfig, setRuntimeConfig] = useState(null);
   const [sourceFile, setSourceFile] = useState(null);
   const [sourcePreview, setSourcePreview] = useState('');
@@ -239,4 +241,4 @@ export function FaceSwapVideo() {
       )}
     </div>
   );
-}
+});
