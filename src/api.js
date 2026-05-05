@@ -27,6 +27,15 @@ const REMOTE_TIMEOUT_MS = 1500;
 
 const DEFAULT_WORKFLOWS = [
   {
+    id: 'wf-cultural-adaptation',
+    name: 'Cultural Adaptation Translation',
+    category: 'Natural Language & Intelligence',
+    description: 'Translates and culturally adapts text for different localizations. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
     id: 'wf-audio-foley',
     name: 'Audio Noise Reduction & Foley Generation',
     category: 'Audio & Spoken Language',
