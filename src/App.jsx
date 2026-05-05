@@ -17,6 +17,7 @@ import { useEffect, useCallback, useMemo, useState } from 'react';
 import { fetchWorkflows, createWorkflow } from './api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setWorkflows, setLoading, setError } from './store';
+import { useNavigate } from 'react-router-dom';
 
 import { workflowSchema } from './validation';
 import React from 'react';
@@ -56,6 +57,7 @@ const HeavyFeatures = React.memo(() => (
 
 function App() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const workflows = useSelector((state) => state.workflows.items);
   const loading = useSelector((state) => state.workflows.loading);
   const error = useSelector((state) => state.workflows.error);
@@ -94,15 +96,33 @@ function App() {
       return;
     }
     try {
-      await createWorkflow({ name: newName, category: newCategory });
+      const workflow = await createWorkflow({ name: newName, category: newCategory });
       setShowCreate(false);
       setNewName('');
       setNewCategory('');
       loadWorkflows();
+      navigate(`/workflows/${workflow.id}`);
     } catch (err) {
       setFormError(err.message);
     }
   };
+
+  const handleModifyWorkflow = useCallback(async (workflow) => {
+    setFormError('');
+
+    try {
+      const copy = await createWorkflow({
+        name: `${workflow.name} Copy`,
+        category: workflow.category || 'Uncategorized',
+        description: workflow.description || '',
+        graph: workflow.graph,
+      });
+      loadWorkflows();
+      navigate(`/workflows/${copy.id}`);
+    } catch (err) {
+      setFormError(err.message);
+    }
+  }, [loadWorkflows, navigate]);
 
   return (
     <ErrorBoundary>
@@ -138,7 +158,7 @@ function App() {
                 ) : error ? (
                   <div className="text-red-500">Error: {error}</div>
                 ) : (
-                  <WorkflowList workflows={filtered} onUpdated={loadWorkflows} />
+                  <WorkflowList workflows={filtered} onUpdated={loadWorkflows} onModifyWorkflow={handleModifyWorkflow} />
                 )}
                 <HeavyFeatures />
               </main>

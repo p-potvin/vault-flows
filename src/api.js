@@ -9,6 +9,10 @@ import {
   validateWorkflowPayload,
   validateWorkflowUpdatePayload,
 } from './validation.js';
+import {
+  createDefaultWorkflowGraph,
+  normalizeWorkflowGraph,
+} from './lib/workflowGraph.js';
 
 const viteEnv = import.meta.env || {};
 const browserStorage = typeof window !== 'undefined' ? window.localStorage : null;
@@ -135,6 +139,7 @@ const DEFAULT_WORKFLOWS = [
     lastRun: null,
   },
 ];
+const PRESET_WORKFLOW_IDS = new Set(DEFAULT_WORKFLOWS.map((workflow) => workflow.id));
 
 const DEFAULT_CONFIG = normalizeExecutionConfig({
   modelsDir: '',
@@ -345,14 +350,18 @@ async function requestWithFallback(path, options, fallback) {
 }
 
 function normalizeWorkflow(workflow) {
+  const id = workflow.id || createId('wf');
+
   return {
-    id: workflow.id || createId('wf'),
+    id,
     name: workflow.name || 'Untitled workflow',
     category: workflow.category || 'Uncategorized',
     description: workflow.description || '',
     favorite: Boolean(workflow.favorite),
     pin: Boolean(workflow.pin),
     lastRun: workflow.lastRun || null,
+    source: workflow.source || (PRESET_WORKFLOW_IDS.has(id) ? 'preset' : 'personal'),
+    graph: normalizeWorkflowGraph(workflow.graph || createDefaultWorkflowGraph(id), id),
   };
 }
 
@@ -493,6 +502,17 @@ export async function fetchWorkflows() {
   return workflows.length ? workflows : getWorkflows();
 }
 
+export async function fetchWorkflow(id) {
+  const workflows = await fetchWorkflows();
+  const workflow = workflows.find((item) => item.id === id);
+
+  if (!workflow) {
+    throw new Error('Workflow not found.');
+  }
+
+  return normalizeWorkflow(workflow);
+}
+
 export async function createWorkflow({ name, category, description = '' }) {
   const payload = validateWorkflowPayload({ name, category, description });
 
@@ -536,6 +556,11 @@ export async function updateWorkflow(id, data) {
       return updated;
     },
   );
+}
+
+export async function saveWorkflowGraph(id, graph) {
+  const normalizedGraph = normalizeWorkflowGraph(graph, id);
+  return updateWorkflow(id, { graph: normalizedGraph });
 }
 
 export async function deleteWorkflow(id) {

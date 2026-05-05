@@ -59,6 +59,8 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await page.getByLabel('Category:').fill('ML');
     await page.getByRole('button', { name: 'Create', exact: true }).click();
 
+    await expect(page.getByRole('heading', { name: 'Workflow Editor' })).toBeVisible();
+    await page.getByText('Back to workflows').click();
     await expect(page.getByText('Smoke Test Workflow').first()).toBeVisible();
 
     await page.getByRole('button', { name: 'Edit' }).first().click();

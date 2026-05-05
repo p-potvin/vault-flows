@@ -15,6 +15,8 @@ test('normalizeWorkflowListResponse accepts a direct workflow array', () => {
   assert.equal(workflows.length, 1);
   assert.equal(workflows[0].id, 'wf-one');
   assert.equal(workflows[0].description, '');
+  assert.equal(workflows[0].source, 'personal');
+  assert.equal(workflows[0].graph.nodes[0].type, 'input.asset');
 });
 
 test('normalizeWorkflowListResponse unwraps workflow API envelopes', () => {
