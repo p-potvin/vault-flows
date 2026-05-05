@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
+// ⚡ Bolt: Wrap ImageCaptioning in React.memo() to prevent unnecessary re-renders
+// when fast-updating state changes in App.jsx.
 import { FlowRuntimePanel } from '../ui/FlowRuntimePanel';
 import { buildCaptionExecutionManifest } from '../../lib/flowRuntime';
 
@@ -290,7 +292,7 @@ async function analyzeImage(file, imageUrl) {
   });
 }
 
-export function ImageCaptioning() {
+export const ImageCaptioning = React.memo(function ImageCaptioning() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [analysis, setAnalysis] = useState(null);
@@ -573,4 +575,4 @@ export function ImageCaptioning() {
       )}
     </div>
   );
-}
+});

@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+// ⚡ Bolt: Wrap ImageTools in React.memo() to prevent unnecessary re-renders
+// when fast-updating state changes in App.jsx.
 import { fabric } from 'fabric';
 
-export function ImageTools() {
+export const ImageTools = React.memo(function ImageTools() {
   const canvasRef = useRef(null);
   const [fabricCanvas, setFabricCanvas] = useState(null);
   const [activeObject, setActiveObject] = useState(null);
@@ -333,4 +335,4 @@ export function ImageTools() {
       </div>
     </div>
   );
-}
+});
