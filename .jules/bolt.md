@@ -30,3 +30,6 @@
 ## 2024-05-18 - LocalStorage Read Bottleneck for Config and Uploads
 **Learning:** `getConfigState()` and `getUploads()` were reading from `localStorage` (`JSON.parse`) every time they were called. This was problematic since they could be accessed frequently when the app executes operations that rely on config values.
 **Action:** Extend the caching pattern previously applied to `getWorkflows()` to other frequently read storage keys (`CONFIG_KEY`, `UPLOADS_KEY`). Always use an in-memory cache variable for frequently accessed `localStorage` data, updating it synchronously during write operations to avoid redundant reads.
+## 2026-05-04 - Prevent UI Lag with React.memo on Heavy Feature Components
+**Learning:** In the `App.jsx` architecture of this codebase, combining fast-updating state (like typing into a "Create Workflow" modal form) with heavy feature components (like `ImageTools`, `ImageCaptioning`, `LoRATraining`, `FaceSwapVideo`) causes severe input lag and re-rendering bottlenecks because the modal form's keystrokes trigger full tree re-renders.
+**Action:** Always wrap heavy feature components in `React.memo` (e.g. `export const FeatureName = React.memo(function FeatureName() { ... });`) to prevent them from re-rendering unless their props change. Use named exports to preserve project conventions.
