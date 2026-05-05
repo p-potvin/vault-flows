@@ -4,7 +4,6 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from vaultwares_agentciation.extrovert_agent import ExtrovertAgent
-from vaultwares_agentciation.enums import AgentStatus
 
 
 class TextAgent(ExtrovertAgent):
@@ -31,6 +30,8 @@ class TextAgent(ExtrovertAgent):
         "prompt_enhancement",
         "workflow_creation",
         "comfyui_export",
+        "generate_npc_dialogue",
+        "cultural_adaptation",
     ]
 
     def __init__(
@@ -58,6 +59,8 @@ class TextAgent(ExtrovertAgent):
             "vqa": self._visual_question_answering,
             "batch_vqa": self._batch_vqa,
             "create_workflow": self._create_text_workflow,
+            "generate_npc_dialogue": self._generate_npc_dialogue,
+            "cultural_adaptation": self._cultural_adaptation,
         }
 
         handler = handlers.get(task)
@@ -121,6 +124,28 @@ class TextAgent(ExtrovertAgent):
         print(f"[TEXT] [{self.agent_id}] Creating text workflow: {workflow_name} ({len(steps)} steps)")
         time.sleep(1)
         self._publish_result("create_workflow", f"Workflow '{workflow_name}' created with {len(steps)} steps")
+
+    def _generate_npc_dialogue(self, details: dict):
+        """Generate NPC dialogue trees."""
+        character_persona = details.get("character_persona", "unknown")
+        scene_context = details.get("scene_context", "unknown")
+        print(f"[TEXT] [{self.agent_id}] Generating NPC dialogue tree | persona={character_persona}")
+        print(f"   Context: '{scene_context[:80]}'")
+        time.sleep(2)
+        result = f"[NPC dialogue tree generated for persona: '{character_persona}']"
+        self._publish_result("generate_npc_dialogue", result)
+
+    def _cultural_adaptation(self, details: dict):
+        """Culturally adapt text for localization."""
+        text = details.get("text", "unknown")
+        target_culture = details.get("target_culture", "unknown")
+        model_type = details.get("model_type", "translation")
+        model_name = details.get("model_name", "adaptation_model.safetensors")
+        print(f"[TEXT] [{self.agent_id}] Culturally adapting text to {target_culture} | model={model_name}")
+        print(f"   Text: '{text[:80]}'")
+        time.sleep(2)
+        result = f"[Text culturally adapted to {target_culture} using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}]"
+        self._publish_result("cultural_adaptation", result)
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""

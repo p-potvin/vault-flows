@@ -38,6 +38,7 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
 
   test('displays workflow sections', async ({ page }) => {
     await page.goto('/');
+    await expect(page.getByText('Cultural Adaptation Translation')).toBeVisible();
     await expect(page.getByText('Texture Generation Pipeline')).toBeVisible();
     await expect(page.getByText('Image Caption Review')).toBeVisible();
     await expect(page.getByText('Workflow Backup Export')).toBeVisible();
@@ -49,6 +50,8 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await expect(page.getByText('Audio-Reactive Visuals Generator')).toBeVisible();
     await expect(page.getByText('Procedural Level Generator')).toBeVisible();
     await expect(page.getByText('Autonomous Goal Decomposition Pipeline')).toBeVisible();
+    await expect(page.getByText('Audio Noise Reduction & Foley Generation')).toBeVisible();
+    await expect(page.getByText('Medical Imaging Segmentation')).toBeVisible();
   });
 
   test('can create and edit a workflow in local fallback mode', async ({ page }) => {

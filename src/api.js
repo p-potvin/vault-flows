@@ -31,6 +31,24 @@ const REMOTE_TIMEOUT_MS = 1500;
 
 const DEFAULT_WORKFLOWS = [
   {
+    id: 'wf-cultural-adaptation',
+    name: 'Cultural Adaptation Translation',
+    category: 'Natural Language & Intelligence',
+    description: 'Translates and culturally adapts text for different localizations. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-audio-foley',
+    name: 'Audio Noise Reduction & Foley Generation',
+    category: 'Audio & Spoken Language',
+    description: 'Reduces noise and generates foley sounds. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
     id: 'wf-texture-generation',
     name: 'Texture Generation Pipeline',
     category: 'Visual & Graphics',
@@ -138,6 +156,24 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-trend-analysis-ad-generator',
+    name: 'Trend Analysis to Ad-Copy Generator',
+    category: 'Social & Marketing',
+    description: 'Analyzes social trends, decomposes tasks to create compelling ad-copy, and generates tailored image variants. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-medical-segmentation',
+    name: 'Medical Imaging Segmentation',
+    category: 'Specialized & Niche',
+    description: 'Automated extraction and segmentation of medical imagery using specialized subagents. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 const PRESET_WORKFLOW_IDS = new Set(DEFAULT_WORKFLOWS.map((workflow) => workflow.id));
 
@@ -169,46 +205,75 @@ function writeJson(key, value) {
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
+// ⚡ Bolt: Cache workflows in memory to avoid repeated expensive synchronous localStorage reads and JSON.parse() calls.
+let cachedWorkflows = null;
+
 function getWorkflows() {
+  if (cachedWorkflows) {
+    return cachedWorkflows;
+  }
+
   const workflows = readJson(WORKFLOWS_KEY, DEFAULT_WORKFLOWS);
   if (!Array.isArray(workflows) || workflows.length === 0) {
     writeJson(WORKFLOWS_KEY, DEFAULT_WORKFLOWS);
-    return clone(DEFAULT_WORKFLOWS);
+    cachedWorkflows = clone(DEFAULT_WORKFLOWS);
+    return cachedWorkflows;
   }
 
   const byId = new Map(workflows.map((workflow) => [workflow.id, workflow]));
-  const merged = [
-    ...DEFAULT_WORKFLOWS.filter((workflow) => !byId.has(workflow.id)),
-    ...workflows,
-  ];
+  const toAdd = DEFAULT_WORKFLOWS.filter((workflow) => !byId.has(workflow.id));
 
-  writeJson(WORKFLOWS_KEY, merged);
+  let merged = workflows;
+  if (toAdd.length > 0) {
+    merged = [...toAdd, ...workflows];
+    writeJson(WORKFLOWS_KEY, merged);
+  }
+
+  cachedWorkflows = merged;
   return merged;
 }
 
 function saveWorkflows(workflows) {
   writeJson(WORKFLOWS_KEY, workflows);
+  cachedWorkflows = workflows;
   return workflows;
 }
 
+// ⚡ Bolt: Cache config in memory to avoid repeated expensive synchronous localStorage reads and JSON.parse() calls.
+let cachedConfig = null;
+
 function getConfigState() {
+  if (cachedConfig) {
+    return cachedConfig;
+  }
   const config = normalizeExecutionConfig(readJson(CONFIG_KEY, DEFAULT_CONFIG));
   writeJson(CONFIG_KEY, config);
+  cachedConfig = config;
   return config;
 }
 
 function saveConfigState(config) {
   const normalized = normalizeExecutionConfig(config);
   writeJson(CONFIG_KEY, normalized);
+  cachedConfig = normalized;
   return normalized;
 }
 
+// ⚡ Bolt: Cache uploads in memory to avoid repeated expensive synchronous localStorage reads and JSON.parse() calls.
+let cachedUploads = null;
+
 function getUploads() {
-  return readJson(UPLOADS_KEY, []);
+  if (cachedUploads) {
+    return cachedUploads;
+  }
+  const uploads = readJson(UPLOADS_KEY, []);
+  cachedUploads = uploads;
+  return uploads;
 }
 
 function saveUploads(uploads) {
   writeJson(UPLOADS_KEY, uploads);
+  cachedUploads = uploads;
   return uploads;
 }
 

@@ -63,6 +63,7 @@ function App() {
   const error = useSelector((state) => state.workflows.error);
   const [category, setCategory] = useState('All');
   const [showCreate, setShowCreate] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [newCategory, setNewCategory] = useState('');
   const [formError, setFormError] = useState('');
@@ -95,6 +96,7 @@ function App() {
       setFormError(result.error.errors[0]?.message || 'Invalid input');
       return;
     }
+    setIsCreating(true);
     try {
       const workflow = await createWorkflow({ name: newName, category: newCategory });
       setShowCreate(false);
@@ -104,6 +106,8 @@ function App() {
       navigate(`/workflows/${workflow.id}`);
     } catch (err) {
       setFormError(err.message);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -131,12 +135,12 @@ function App() {
           <VaultwaresBranding />
           <h1 className="text-3xl font-bold text-vault-900 dark:text-vault-100 font-vault mb-2">Vaultwares Workflow Manager</h1>
           <nav className="flex gap-4 mt-2">
-            <button className={`px-3 py-1 rounded font-semibold ${panel === 'workflows' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('workflows')}>Workflows</button>
-            <button className={`px-3 py-1 rounded font-semibold ${panel === 'backup' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('backup')}>Backup/Restore</button>
-            <button className={`px-3 py-1 rounded font-semibold ${panel === 'export' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('export')}>Export</button>
-            <button className={`px-3 py-1 rounded font-semibold ${panel === 'storage' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('storage')}>Storage</button>
-            <button className={`px-3 py-1 rounded font-semibold ${panel === 'config' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('config')}>Config</button>
-            <button className={`px-3 py-1 rounded font-semibold ${panel === 'coordination' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('coordination')}>Coordination</button>
+            <button className={`px-3 py-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${panel === 'workflows' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('workflows')}>Workflows</button>
+            <button className={`px-3 py-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${panel === 'backup' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('backup')}>Backup/Restore</button>
+            <button className={`px-3 py-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${panel === 'export' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('export')}>Export</button>
+            <button className={`px-3 py-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${panel === 'storage' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('storage')}>Storage</button>
+            <button className={`px-3 py-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${panel === 'config' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('config')}>Config</button>
+            <button className={`px-3 py-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${panel === 'coordination' ? 'bg-vault-300 dark:bg-vault-600' : 'bg-vault-200 dark:bg-vault-700'} text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600`} onClick={() => setPanel('coordination')}>Coordination</button>
           </nav>
         </header>
         <div className="flex flex-col md:flex-row max-w-5xl mx-auto">
@@ -147,7 +151,7 @@ function App() {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-bold">Workflows</h2>
                   <button
-                    className="px-4 py-2 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold shadow hover:bg-vault-800 dark:hover:bg-vault-200"
+                    className="px-4 py-2 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold shadow hover:bg-vault-800 dark:hover:bg-vault-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
                     onClick={() => setShowCreate(true)}
                   >
                     + Create Workflow
@@ -185,32 +189,34 @@ function App() {
             <label htmlFor="create-workflow-name" className="block text-sm font-medium mb-1">Name: <span className="text-red-500">*</span></label>
             <input
               id="create-workflow-name"
-              className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-vault-500"
+              className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               placeholder="e.g. Data Pipeline"
               autoFocus
               value={newName}
               onChange={e => setNewName(e.target.value)}
+              required
+              aria-required="true"
             />
           </div>
           <div className="mb-4">
             <label htmlFor="create-workflow-category" className="block text-sm font-medium mb-1">Category:</label>
             <input
               id="create-workflow-category"
-              className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
+              className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               value={newCategory}
               onChange={e => setNewCategory(e.target.value)}
             />
           </div>
           {formError && <div className="text-red-500 mb-2">{formError}</div>}
           <div className="flex justify-end space-x-2">
-            <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={() => setShowCreate(false)}>Cancel</button>
+            <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" onClick={() => setShowCreate(false)}>Cancel</button>
             <button
-              className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               onClick={handleCreate}
-              disabled={!newName.trim()}
+              disabled={isCreating || !newName.trim()}
               title={!newName.trim() ? "Workflow name is required" : undefined}
             >
-              Create
+              {isCreating ? 'Creating...' : 'Create'}
             </button>
           </div>
         </Modal>
