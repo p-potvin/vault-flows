@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { fetchWorkflow, saveWorkflowGraph } from '../../api';
-import AdvancedWorkflowCreator from '../features/AdvancedWorkflowCreator';
+import { AdvancedWorkflowCreator } from '../features/AdvancedWorkflowCreator';
 
 export default function WorkflowPage() {
   const { id } = useParams();
@@ -38,7 +38,7 @@ export default function WorkflowPage() {
     };
   }, [id]);
 
-  const handleSave = async (graph) => {
+  const handleSave = useCallback(async (graph) => {
     setSaveState('saving');
     setSaveMessage('');
 
@@ -51,7 +51,7 @@ export default function WorkflowPage() {
       setSaveState('error');
       setSaveMessage(err.message || 'Unable to save graph.');
     }
-  };
+  }, [id]);
 
   return (
     <div className="min-h-screen bg-vault-50 text-vault-900 dark:bg-vault-950 dark:text-vault-50">

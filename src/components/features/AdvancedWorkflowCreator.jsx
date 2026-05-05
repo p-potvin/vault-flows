@@ -30,7 +30,8 @@ function getEdgePath(sourceNode, targetNode) {
   return `M ${sourceX} ${sourceY} C ${midX} ${sourceY}, ${midX} ${targetY}, ${targetX} ${targetY}`;
 }
 
-export default function AdvancedWorkflowCreator({
+// ⚡ Bolt: Wrap AdvancedWorkflowCreator in React.memo() to prevent unnecessary re-renders
+export const AdvancedWorkflowCreator = React.memo(function AdvancedWorkflowCreator({
   workflow,
   graph: initialGraph,
   onSave,
@@ -421,4 +422,4 @@ export default function AdvancedWorkflowCreator({
       </aside>
     </div>
   );
-}
+});
