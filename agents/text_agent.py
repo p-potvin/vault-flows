@@ -32,6 +32,7 @@ class TextAgent(ExtrovertAgent):
         "comfyui_export",
         "generate_npc_dialogue",
         "cultural_adaptation",
+        "emotional_audio_translation",
     ]
 
     def __init__(
@@ -61,6 +62,7 @@ class TextAgent(ExtrovertAgent):
             "create_workflow": self._create_text_workflow,
             "generate_npc_dialogue": self._generate_npc_dialogue,
             "cultural_adaptation": self._cultural_adaptation,
+            "emotional_audio_translation": self._emotional_audio_translation,
         }
 
         handler = handlers.get(task)
@@ -146,6 +148,18 @@ class TextAgent(ExtrovertAgent):
         time.sleep(2)
         result = f"[Text culturally adapted to {target_culture} using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}]"
         self._publish_result("cultural_adaptation", result)
+
+    def _emotional_audio_translation(self, details: dict):
+        """Translate audio while preserving emotional prosody."""
+        audio_source = details.get("source", "unknown")
+        target_language = details.get("target_language", "unknown")
+        model_type = details.get("model_type", "translation")
+        model_name = details.get("model_name", "emotional_translation.safetensors")
+        print(f"[TEXT] [{self.agent_id}] Translating audio to {target_language} with emotion | model={model_name}")
+        print(f"   Source: '{audio_source}'")
+        time.sleep(2)
+        result = f"[Emotional audio translation completed using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}]"
+        self._publish_result("emotional_audio_translation", result)
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""
