@@ -174,6 +174,15 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-emotional-audio-translation',
+    name: 'Emotional Audio Translation',
+    category: 'Audio & Spoken Language',
+    description: 'Translates spoken audio while preserving the original emotional prosody using local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 const PRESET_WORKFLOW_IDS = new Set(DEFAULT_WORKFLOWS.map((workflow) => workflow.id));
 
