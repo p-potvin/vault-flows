@@ -183,6 +183,15 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-hdri-relighting',
+    name: 'HDRI Relighting Pipeline',
+    category: 'Visual & Graphics',
+    description: 'Automated light estimation and HDRI generation for dynamic relighting of 3D scenes. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 const PRESET_WORKFLOW_IDS = new Set(DEFAULT_WORKFLOWS.map((workflow) => workflow.id));
 
