@@ -7,3 +7,6 @@
 ## 2024-05-24 - Keyboard Navigation Visibility on Custom Tabs
 **Learning:** Custom navigation buttons, such as those used in sidebars or header tab bars, often suppress default browser focus outlines due to custom background colors or border styling, making keyboard navigation invisible and inaccessible to users.
 **Action:** Always apply explicit `focus-visible` utility classes (e.g., `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500`) to custom navigation buttons and tabs to ensure a clear focus indicator is present for keyboard users.
+## 2024-05-24 - Interactive Component Focus Indicators
+**Learning:** Config panels and deeply nested form buttons sometimes rely strictly on standard border outlines, which may conflict with container borders or background colors, making keyboard tab-navigation confusing. Adding `focus-visible` styles enhances usability without impacting mouse hover states. Furthermore, disabled buttons that omit dynamic context via `title` tags confuse users regarding the state they need to resolve to progress.
+**Action:** Consistently append `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500` to form buttons and configure conditional tooltips (`title`) on dynamically disabled controls explaining their disabled state.
