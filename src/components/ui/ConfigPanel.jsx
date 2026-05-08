@@ -396,7 +396,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
 
         <div className="mt-4 flex flex-wrap gap-2">
           <button
-            className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             style={{ background: theme.accent, color: theme.primary }}
             onClick={handleRuntimeSave}
             disabled={loading || saving}
@@ -404,7 +404,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
             {saving ? 'Saving...' : 'Save Runtime Settings'}
           </button>
           <button
-            className="px-4 py-2 rounded font-bold border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded font-bold border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             onClick={handleModelRefresh}
             disabled={loading || saving}
           >
@@ -425,7 +425,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
 
       <div className="flex gap-2 mb-3">
         <button
-          className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
           style={{ background: theme.accent, color: theme.primary }}
           onClick={loadConfig}
           disabled={loading || saving}
@@ -433,7 +433,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
           {loading ? 'Loading...' : 'Reload'}
         </button>
         <button
-          className="px-4 py-2 rounded font-bold border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded font-bold border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
           onClick={() => {
             setEdit(initialValue);
             const nextRuntimeForm = pickRuntimeForm(configSnapshot || {});
@@ -442,6 +442,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
             setBanner(null);
           }}
           disabled={loading || saving || !isDirty}
+          title={(!isDirty && !loading && !saving) ? 'No unsaved changes' : undefined}
         >
           Reset Changes
         </button>
@@ -479,10 +480,11 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
               {isDirty ? 'Unsaved changes in editor.' : 'Editor matches the last saved snapshot.'}
             </div>
             <button
-              className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               style={{ background: theme.accent, color: theme.primary }}
               onClick={handleUpdate}
               disabled={saving || loading}
+              title={saving ? 'Saving...' : loading ? 'Loading...' : undefined}
             >
               {saving ? 'Saving...' : 'Update Config'}
             </button>

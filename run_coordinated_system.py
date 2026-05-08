@@ -124,7 +124,7 @@ def resolve_repo_path(repo_path: str | None, repo_url: str | None = None) -> Pat
     if repo_url and not resolved.exists():
         resolved.parent.mkdir(parents=True, exist_ok=True)
         clone = subprocess.run(
-            ["git", "clone", repo_url, str(resolved)],
+            ["git", "clone", "--", repo_url, str(resolved)],
             capture_output=True,
             text=True,
             timeout=120,
@@ -171,9 +171,9 @@ def prepare_dispatch_branch(repo_path: Path, branch_name: str | None, base_branc
         result["warning"] = dirty.stderr.strip() or "Could not inspect git status."
         return result
 
-    existing = run_git(repo_path, ["rev-parse", "--verify", branch])
+    existing = run_git(repo_path, ["rev-parse", "--verify", f"refs/heads/{branch}"])
     if existing.returncode != 0:
-        created = run_git(repo_path, ["branch", branch])
+        created = run_git(repo_path, ["branch", "--", branch])
         result["created"] = created.returncode == 0
         if created.returncode != 0:
             result["warning"] = created.stderr.strip() or created.stdout.strip()
@@ -183,7 +183,7 @@ def prepare_dispatch_branch(repo_path: Path, branch_name: str | None, base_branc
         result["warning"] = "Branch exists but was not checked out because the work tree has uncommitted changes."
         return result
 
-    switched = run_git(repo_path, ["switch", branch])
+    switched = run_git(repo_path, ["switch", "--", branch])
     result["checked_out"] = switched.returncode == 0
     if switched.returncode != 0:
         result["warning"] = switched.stderr.strip() or switched.stdout.strip()
@@ -194,6 +194,10 @@ def prepare_dispatch_branch(repo_path: Path, branch_name: str | None, base_branc
 def resolve_project_file(path: str, repo_path: Path | None = None) -> Path:
     root = (repo_path or Path.cwd()).resolve()
     resolved = (root / path).resolve()
+
+    if not resolved.is_relative_to(root):
+        raise HTTPException(status_code=403, detail="Security Error: Path traversal detected")
+
     if not resolved.exists():
         raise HTTPException(status_code=404, detail=f"Task file not found: {path}")
 
@@ -274,7 +278,7 @@ def commit_and_push_dispatch_run(repo_path: Path, branch_name: str, paths: list[
     if committed.returncode != 0:
         return {"committed": False, "pushed": False, "warning": committed.stderr.strip() or committed.stdout.strip()}
 
-    pushed = run_git(repo_path, ["push", "-u", "origin", branch_name], timeout=120)
+    pushed = run_git(repo_path, ["push", "-u", "origin", "--", branch_name], timeout=120)
     return {
         "committed": True,
         "pushed": pushed.returncode == 0,

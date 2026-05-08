@@ -9,6 +9,10 @@ import {
   validateWorkflowPayload,
   validateWorkflowUpdatePayload,
 } from './validation.js';
+import {
+  createDefaultWorkflowGraph,
+  normalizeWorkflowGraph,
+} from './lib/workflowGraph.js';
 
 const viteEnv = import.meta.env || {};
 const browserStorage = typeof window !== 'undefined' ? window.localStorage : null;
@@ -26,6 +30,33 @@ const UPLOADS_KEY = 'vault-flows.uploads';
 const REMOTE_TIMEOUT_MS = 1500;
 
 const DEFAULT_WORKFLOWS = [
+  {
+    id: 'wf-cultural-adaptation',
+    name: 'Cultural Adaptation Translation',
+    category: 'Natural Language & Intelligence',
+    description: 'Translates and culturally adapts text for different localizations. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-audio-foley',
+    name: 'Audio Noise Reduction & Foley Generation',
+    category: 'Audio & Spoken Language',
+    description: 'Reduces noise and generates foley sounds. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-texture-generation',
+    name: 'Texture Generation Pipeline',
+    category: 'Visual & Graphics',
+    description: 'Generates seamless PBR textures. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
   {
     id: 'wf-demo-caption',
     name: 'Image Caption Review',
@@ -107,7 +138,71 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-audio-lipsync-liveportrait',
+    name: 'LivePortrait Lipsync Automation',
+    category: 'Audio-to-Video',
+    description: 'Automated lipsync mapping from audio speech to target video frames using LivePortrait. Ensures stable facial re-targeting and temporal consistency. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: true,
+    pin: true,
+    lastRun: null,
+  },
+  {
+    id: 'wf-agentic-planning-pipeline',
+    name: 'Autonomous Goal Decomposition Pipeline',
+    category: 'Agentic Planning',
+    description: 'Automated goal decomposition, tool-use selection, and self-correction loops for complex tasks. Uses subagents to handle isolated execution steps. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-trend-analysis-ad-generator',
+    name: 'Trend Analysis to Ad-Copy Generator',
+    category: 'Social & Marketing',
+    description: 'Analyzes social trends, decomposes tasks to create compelling ad-copy, and generates tailored image variants. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-medical-segmentation',
+    name: 'Medical Imaging Segmentation',
+    category: 'Specialized & Niche',
+    description: 'Automated extraction and segmentation of medical imagery using specialized subagents. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-emotional-audio-translation',
+    name: 'Emotional Audio Translation',
+    category: 'Audio & Spoken Language',
+    description: 'Translates spoken audio while preserving the original emotional prosody using local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-hdri-relighting',
+    name: 'HDRI Relighting Pipeline',
+    category: 'Visual & Graphics',
+    description: 'Automated light estimation and HDRI generation for dynamic relighting of 3D scenes. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-audio-stem-separation',
+    name: 'Audio Stem Separation Pipeline',
+    category: 'Audio & Spoken Language',
+    description: 'Automated stem separation (vocal/instrumental) for audio tracks. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
+const PRESET_WORKFLOW_IDS = new Set(DEFAULT_WORKFLOWS.map((workflow) => workflow.id));
 
 const DEFAULT_CONFIG = normalizeExecutionConfig({
   modelsDir: '',
@@ -137,46 +232,75 @@ function writeJson(key, value) {
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
+// ⚡ Bolt: Cache workflows in memory to avoid repeated expensive synchronous localStorage reads and JSON.parse() calls.
+let cachedWorkflows = null;
+
 function getWorkflows() {
+  if (cachedWorkflows) {
+    return cachedWorkflows;
+  }
+
   const workflows = readJson(WORKFLOWS_KEY, DEFAULT_WORKFLOWS);
   if (!Array.isArray(workflows) || workflows.length === 0) {
     writeJson(WORKFLOWS_KEY, DEFAULT_WORKFLOWS);
-    return clone(DEFAULT_WORKFLOWS);
+    cachedWorkflows = clone(DEFAULT_WORKFLOWS);
+    return cachedWorkflows;
   }
 
   const byId = new Map(workflows.map((workflow) => [workflow.id, workflow]));
-  const merged = [
-    ...DEFAULT_WORKFLOWS.filter((workflow) => !byId.has(workflow.id)),
-    ...workflows,
-  ];
+  const toAdd = DEFAULT_WORKFLOWS.filter((workflow) => !byId.has(workflow.id));
 
-  writeJson(WORKFLOWS_KEY, merged);
+  let merged = workflows;
+  if (toAdd.length > 0) {
+    merged = [...toAdd, ...workflows];
+    writeJson(WORKFLOWS_KEY, merged);
+  }
+
+  cachedWorkflows = merged;
   return merged;
 }
 
 function saveWorkflows(workflows) {
   writeJson(WORKFLOWS_KEY, workflows);
+  cachedWorkflows = workflows;
   return workflows;
 }
 
+// ⚡ Bolt: Cache config in memory to avoid repeated expensive synchronous localStorage reads and JSON.parse() calls.
+let cachedConfig = null;
+
 function getConfigState() {
+  if (cachedConfig) {
+    return cachedConfig;
+  }
   const config = normalizeExecutionConfig(readJson(CONFIG_KEY, DEFAULT_CONFIG));
   writeJson(CONFIG_KEY, config);
+  cachedConfig = config;
   return config;
 }
 
 function saveConfigState(config) {
   const normalized = normalizeExecutionConfig(config);
   writeJson(CONFIG_KEY, normalized);
+  cachedConfig = normalized;
   return normalized;
 }
 
+// ⚡ Bolt: Cache uploads in memory to avoid repeated expensive synchronous localStorage reads and JSON.parse() calls.
+let cachedUploads = null;
+
 function getUploads() {
-  return readJson(UPLOADS_KEY, []);
+  if (cachedUploads) {
+    return cachedUploads;
+  }
+  const uploads = readJson(UPLOADS_KEY, []);
+  cachedUploads = uploads;
+  return uploads;
 }
 
 function saveUploads(uploads) {
   writeJson(UPLOADS_KEY, uploads);
+  cachedUploads = uploads;
   return uploads;
 }
 
@@ -318,14 +442,18 @@ async function requestWithFallback(path, options, fallback) {
 }
 
 function normalizeWorkflow(workflow) {
+  const id = workflow.id || createId('wf');
+
   return {
-    id: workflow.id || createId('wf'),
+    id,
     name: workflow.name || 'Untitled workflow',
     category: workflow.category || 'Uncategorized',
     description: workflow.description || '',
     favorite: Boolean(workflow.favorite),
     pin: Boolean(workflow.pin),
     lastRun: workflow.lastRun || null,
+    source: workflow.source || (PRESET_WORKFLOW_IDS.has(id) ? 'preset' : 'personal'),
+    graph: normalizeWorkflowGraph(workflow.graph || createDefaultWorkflowGraph(id), id),
   };
 }
 
@@ -466,6 +594,17 @@ export async function fetchWorkflows() {
   return workflows.length ? workflows : getWorkflows();
 }
 
+export async function fetchWorkflow(id) {
+  const workflows = await fetchWorkflows();
+  const workflow = workflows.find((item) => item.id === id);
+
+  if (!workflow) {
+    throw new Error('Workflow not found.');
+  }
+
+  return normalizeWorkflow(workflow);
+}
+
 export async function createWorkflow({ name, category, description = '' }) {
   const payload = validateWorkflowPayload({ name, category, description });
 
@@ -509,6 +648,11 @@ export async function updateWorkflow(id, data) {
       return updated;
     },
   );
+}
+
+export async function saveWorkflowGraph(id, graph) {
+  const normalizedGraph = normalizeWorkflowGraph(graph, id);
+  return updateWorkflow(id, { graph: normalizedGraph });
 }
 
 export async function deleteWorkflow(id) {

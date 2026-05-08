@@ -38,6 +38,8 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
 
   test('displays workflow sections', async ({ page }) => {
     await page.goto('/');
+    await expect(page.getByText('Cultural Adaptation Translation')).toBeVisible();
+    await expect(page.getByText('Texture Generation Pipeline')).toBeVisible();
     await expect(page.getByText('Image Caption Review')).toBeVisible();
     await expect(page.getByText('Workflow Backup Export')).toBeVisible();
     await expect(page.getByText('LoRA Prep Pipeline')).toBeVisible();
@@ -47,6 +49,12 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await expect(page.getByText('Video Frame Interpolation')).toBeVisible();
     await expect(page.getByText('Audio-Reactive Visuals Generator')).toBeVisible();
     await expect(page.getByText('Procedural Level Generator')).toBeVisible();
+    await expect(page.getByText('Autonomous Goal Decomposition Pipeline')).toBeVisible();
+    await expect(page.getByText('Audio Noise Reduction & Foley Generation')).toBeVisible();
+    await expect(page.getByText('Medical Imaging Segmentation')).toBeVisible();
+    await expect(page.getByText('Emotional Audio Translation')).toBeVisible();
+    await expect(page.getByText('HDRI Relighting Pipeline')).toBeVisible();
+    await expect(page.getByText('Audio Stem Separation Pipeline')).toBeVisible();
   });
 
   test('can create and edit a workflow in local fallback mode', async ({ page }) => {
@@ -57,6 +65,8 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await page.getByLabel('Category:').fill('ML');
     await page.getByRole('button', { name: 'Create', exact: true }).click();
 
+    await expect(page.getByRole('heading', { name: 'Workflow Editor' })).toBeVisible();
+    await page.getByText('Back to workflows').click();
     await expect(page.getByText('Smoke Test Workflow').first()).toBeVisible();
 
     await page.getByRole('button', { name: 'Edit' }).first().click();

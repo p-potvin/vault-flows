@@ -32,3 +32,18 @@
 **Vulnerability:** The `normalize_output_name` function blindly returned the `outputName` string from user-supplied payloads, which was later appended to a directory path. An attacker could supply `../../evil.exe` to overwrite arbitrary system files outside the job directory.
 **Learning:** Unsanitized filenames mixed with directory paths expose local runtime bridges to path traversal attacks, even if the target directory is otherwise checked or isolated.
 **Prevention:** When accepting a raw filename from an external payload to create a local file, extract strictly the base name using `Path(filename).name` before using it in any file path composition.
+
+## 2026-05-01 - Prevent Path Traversal in resolve_project_file
+**Vulnerability:** The `resolve_project_file` function in `run_coordinated_system.py` combined user-provided paths with a root directory and resolved them, but failed to ensure the resolved path remained within the intended root directory. This allowed path traversal using `../` components, potentially exposing arbitrary files on the filesystem.
+**Learning:** Resolving a path (e.g. `pathlib.Path.resolve()`) normalizes it and resolves `../` sequences, but does not prevent the resulting path from pointing outside the initial base directory. You must explicitly verify boundaries after resolution.
+**Prevention:** To prevent path traversal vulnerabilities when resolving user-provided file paths with `pathlib.Path`, explicitly verify the boundary using `resolved_path.is_relative_to(base_dir)` after calling `.resolve()`.
+
+## 2026-05-02 - Prevent Git Options Injection in `git clone`
+**Vulnerability:** The `resolve_repo_path` function in `run_coordinated_system.py` directly passed an unsanitized `repo_url` to `git clone` without a `--` separator. An attacker could supply a URL starting with a hyphen (e.g., `--upload-pack=...` or `--config`) to inject arbitrary Git options, potentially leading to arbitrary command execution on the host system.
+**Learning:** Functions that invoke command-line tools like `git` with user-supplied arguments are vulnerable to options injection if they don't explicitly separate flags from positional arguments. Even if the argument is intended to be a URL or path, if it starts with `-`, the tool may interpret it as a command-line flag.
+**Prevention:** Always use the `--` double-dash separator to signify the end of command options when passing variable data to command-line tools like `git`. For example: `["git", "clone", "--", repo_url, target_path]`.
+
+## 2024-05-08 - Prevent Git Options Injection via Branch Names
+**Vulnerability:** The `run_git` calls in `run_coordinated_system.py` directly appended user-supplied `branch` names (e.g., in `git rev-parse --verify`, `git branch`, `git switch`, and `git push`). An attacker could supply a branch name starting with `-` (e.g. `-h` or other git options), potentially bypassing validations or leading to options injection.
+**Learning:** Even internal Git subcommands can interpret user-supplied branch names as options if they start with a hyphen.
+**Prevention:** Always include the `--` separator to explicitly delineate flags from positional arguments when passing variables such as branch names, paths, or URLs to Git commands (e.g., `git push origin -- branch_name`, `git switch -- branch_name`).

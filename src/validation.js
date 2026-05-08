@@ -9,6 +9,7 @@ export const workflowSchema = z.object({
   name: z.string().trim().min(2, 'Name must be at least 2 characters'),
   category: z.string().trim().min(2, 'Category must be at least 2 characters'),
   description: z.string().trim().optional().default(''),
+  graph: z.unknown().optional(),
 });
 
 const workflowUpdateSchema = z
@@ -16,6 +17,7 @@ const workflowUpdateSchema = z
     name: z.string().trim().min(2, 'Name must be at least 2 characters').optional(),
     category: z.string().trim().min(2, 'Category must be at least 2 characters').optional(),
     description: z.string().trim().optional(),
+    graph: z.unknown().optional(),
   })
   .refine(
     (payload) => Object.values(payload).some((value) => value !== undefined),

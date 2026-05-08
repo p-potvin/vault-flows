@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
+// ⚡ Bolt: Wrap LoRATraining in React.memo() to prevent unnecessary re-renders
+// when fast-updating state changes in App.jsx.
 import { FlowRuntimePanel } from '../ui/FlowRuntimePanel';
 import { buildLoRAPlanManifest } from '../../lib/flowRuntime';
 
@@ -269,7 +271,7 @@ function buildExportPayload(items, params) {
   };
 }
 
-export default function LoRATraining() {
+const LoRATraining = React.memo(function LoRATraining() {
   const [step, setStep] = useState(0);
   const [datasetItems, setDatasetItems] = useState([]);
   const [params, setParams] = useState(defaultParams);
@@ -348,9 +350,11 @@ export default function LoRATraining() {
     }));
   }
 
-  const plan = buildPlan(datasetItems, params);
-  const payload = buildExportPayload(datasetItems, params);
-  const datasetSummary = datasetItems.length ? buildDatasetSummary(datasetItems) : null;
+  // ⚡ Bolt: Memoize expensive dataset calculations to prevent redundant looping
+  // over dataset items on every render (e.g., when switching UI tabs).
+  const plan = useMemo(() => buildPlan(datasetItems, params), [datasetItems, params]);
+  const payload = useMemo(() => buildExportPayload(datasetItems, params), [datasetItems, params]);
+  const datasetSummary = useMemo(() => datasetItems.length ? buildDatasetSummary(datasetItems) : null, [datasetItems]);
 
   return (
     <div className="p-4 bg-white dark:bg-gray-900 rounded shadow mt-4">
@@ -401,7 +405,7 @@ export default function LoRATraining() {
             clean names help.
           </div>
 
-          <input type="file" multiple accept="image/*" onChange={handleDatasetUpload} />
+          <input type="file" aria-label="Upload dataset images" multiple accept="image/*" onChange={handleDatasetUpload} />
 
           {status.loading && <div className="text-sm text-vault-700 dark:text-vault-200">Reading image metadata...</div>}
 
@@ -702,4 +706,6 @@ export default function LoRATraining() {
       )}
     </div>
   );
-}
+});
+
+export default LoRATraining;

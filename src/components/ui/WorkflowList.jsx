@@ -30,7 +30,7 @@ function ThemeSwitcher({ theme, themeIndex, setThemeIndex, themes }) {
 // ⚡ Bolt: Wrap WorkflowList in React.memo() to prevent unnecessary re-renders
 // when fast-updating state (like modal form inputs) changes in App.jsx.
 // This reduces UI lag when creating new workflows.
-export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpdated }) {
+export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpdated, onModifyWorkflow }) {
   const [editing, setEditing] = useState(null);
   const [editName, setEditName] = useState('');
   const [editCategory, setEditCategory] = useState('');
@@ -90,10 +90,20 @@ export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpda
       );
     }
 
-    return workflowItems.map((wf, i) => (
+    return workflowItems.map((wf, i) => {
+      const isPreset = wf.source === 'preset';
+
+      return (
       <li key={wf.id || i} className="bg-white dark:bg-gray-800 rounded shadow p-3 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
         <div>
           <span className="font-medium text-gray-900 dark:text-gray-100">{wf.name}</span>
+          <span className={`ml-2 px-2 py-0.5 text-xs rounded border ${
+            isPreset
+              ? 'bg-vault-100 dark:bg-vault-800 text-vault-800 dark:text-vault-100 border-vault-200 dark:border-vault-700'
+              : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700'
+          }`}>
+            {isPreset ? 'Preset' : 'Personal'}
+          </span>
           {wf.category && (
             <span className="ml-2 px-2 py-0.5 text-xs rounded bg-vault-100 dark:bg-vault-800 text-vault-700 dark:text-vault-200 border border-vault-200 dark:border-vault-700">{wf.category}</span>
           )}
@@ -102,22 +112,35 @@ export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpda
           )}
         </div>
         <div className="flex items-center gap-2 ml-4">
-          <Link
-            to={`/workflows/${wf.id}`}
-            className="px-3 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 hover:bg-vault-800 dark:hover:bg-vault-200 font-semibold"
-          >
-            Design
-          </Link>
-          <button
-            className="px-3 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600 font-semibold"
-            onClick={() => openEdit(wf)}
-          >
-            Edit
-          </button>
+          {isPreset ? (
+            <button
+              type="button"
+              className="px-3 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 hover:bg-vault-800 dark:hover:bg-vault-200 font-semibold"
+              onClick={() => onModifyWorkflow?.(wf)}
+            >
+              Modify Copy
+            </button>
+          ) : (
+            <Link
+              to={`/workflows/${wf.id}`}
+              className="px-3 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 hover:bg-vault-800 dark:hover:bg-vault-200 font-semibold"
+            >
+              Design
+            </Link>
+          )}
+          {!isPreset ? (
+            <button
+              className="px-3 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600 font-semibold"
+              onClick={() => openEdit(wf)}
+            >
+              Edit
+            </button>
+          ) : null}
         </div>
       </li>
-    ));
-  }, [workflows, openEdit]);
+      );
+    });
+  }, [workflows, openEdit, onModifyWorkflow]);
 
   return (
     <div className="p-4">
@@ -132,7 +155,7 @@ export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpda
           <label htmlFor="edit-workflow-name" className="block text-sm font-medium mb-1">Name: <span className="text-red-500">*</span></label>
           <input
             id="edit-workflow-name"
-            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:ring-2 focus-visible:ring-vault-500"
+            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             autoFocus
             value={editName}
             onChange={e => setEditName(e.target.value)}
@@ -144,7 +167,7 @@ export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpda
           <label htmlFor="edit-workflow-category" className="block text-sm font-medium mb-1">Category: <span className="text-red-500">*</span></label>
           <input
             id="edit-workflow-category"
-            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100"
+            className="w-full border rounded px-2 py-1 dark:bg-gray-900 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             value={editCategory}
             onChange={e => setEditCategory(e.target.value)}
             required
@@ -153,9 +176,9 @@ export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpda
         </div>
         {saveError ? <div className="mb-2 text-sm text-red-500">{saveError}</div> : null}
         <div className="flex justify-end space-x-2">
-          <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={closeEdit}>Cancel</button>
+          <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" onClick={closeEdit}>Cancel</button>
           <button
-            className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             onClick={saveEdit}
             disabled={isSaving || !editName.trim() || !editCategory.trim()}
             title={(!editName.trim() || !editCategory.trim()) ? 'Name and category are required' : undefined}

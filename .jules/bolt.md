@@ -16,3 +16,20 @@
 ## 2024-05-18 - Missing Component Memoization in Render-Heavy UI
 **Learning:** `FlowRuntimePanel` was rendered inline within feature components like `ImageCaptioning` and `FaceSwapVideo`. When users typed into text inputs (e.g., `subjectHint`, `prompt`), the parent component re-rendered, taking `FlowRuntimePanel` down with it. Although `FlowRuntimePanel` receives stable props, it wasn't wrapped in `React.memo()`, causing unnecessary CPU overhead and potential typing lag.
 **Action:** Always verify if heavy UI panels or components rendering nested structures are correctly memoized using `React.memo` when they sit inside a parent component handling fast-updating state (like text inputs).
+
+## 2024-04-29 - Memoizing heavy calculations and generations in React feature components
+**Learning:** In the `vault-flows` React architecture, fast-updating state (such as typing in modal forms or input fields) can cause parent components to re-render, trickling down and triggering expensive recalculations (e.g. iterating over datasets in `LoRATraining.jsx` or tokenizing and filtering tags in `ImageCaptioning.jsx`) even when the dependencies for those calculations haven't changed.
+**Action:** Always identify operations that compute derived state from props or slower-updating state, and wrap them in `useMemo()` to prevent unnecessary CPU overhead and UI lag when sibling or parent state updates rapidly.
+## 2024-05-03 - SQLite in-memory database with FastAPI TestClient
+**Learning:** When testing FastAPI applications using `TestClient` with SQLAlchemy and SQLite, avoid using in-memory databases (`sqlite:///:memory:`) as `TestClient` requests run in separate threads, causing `sqlite3.ProgrammingError` or `OperationalError` (table missing). Use a temporary file-based database (e.g., `tempfile.mktemp(suffix='.db')`) instead.
+**Action:** Use `tempfile.mktemp()` to generate a file-based sqlite database for tests and remove it during test teardown.
+
+## 2024-05-18 - LocalStorage Read Bottleneck
+**Learning:** The `getWorkflows()` function was reading from `localStorage` (`JSON.parse`) every time it was called. Because it was used internally across multiple API fallback handlers (e.g. `backupWorkflows`, `requestWithFallback`), this synchronous storage access became a measurable bottleneck.
+**Action:** Always introduce an in-memory cache variable (e.g. `cachedWorkflows`) for frequently accessed `localStorage` data within API or utility modules, updating the cache synchronously during write operations to avoid redundant reads.
+## 2024-05-18 - LocalStorage Read Bottleneck for Config and Uploads
+**Learning:** `getConfigState()` and `getUploads()` were reading from `localStorage` (`JSON.parse`) every time they were called. This was problematic since they could be accessed frequently when the app executes operations that rely on config values.
+**Action:** Extend the caching pattern previously applied to `getWorkflows()` to other frequently read storage keys (`CONFIG_KEY`, `UPLOADS_KEY`). Always use an in-memory cache variable for frequently accessed `localStorage` data, updating it synchronously during write operations to avoid redundant reads.
+## 2026-05-04 - Prevent UI Lag with React.memo on Heavy Feature Components
+**Learning:** In the `App.jsx` architecture of this codebase, combining fast-updating state (like typing into a "Create Workflow" modal form) with heavy feature components (like `ImageTools`, `ImageCaptioning`, `LoRATraining`, `FaceSwapVideo`) causes severe input lag and re-rendering bottlenecks because the modal form's keystrokes trigger full tree re-renders.
+**Action:** Always wrap heavy feature components in `React.memo` (e.g. `export const FeatureName = React.memo(function FeatureName() { ... });`) to prevent them from re-rendering unless their props change. Use named exports to preserve project conventions.
