@@ -192,6 +192,15 @@ const DEFAULT_WORKFLOWS = [
     pin: false,
     lastRun: null,
   },
+  {
+    id: 'wf-audio-stem-separation',
+    name: 'Audio Stem Separation Pipeline',
+    category: 'Audio & Spoken Language',
+    description: 'Automated stem separation (vocal/instrumental) for audio tracks. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
 ];
 const PRESET_WORKFLOW_IDS = new Set(DEFAULT_WORKFLOWS.map((workflow) => workflow.id));
 
