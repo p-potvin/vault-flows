@@ -1,7 +1,8 @@
 import React from 'react';
 import { useVaultTheme } from '../../lib/vaultTheme';
 
-export function VaultwaresBranding() {
+// ⚡ Bolt: Wrap VaultwaresBranding in React.memo() to prevent unnecessary re-renders
+export const VaultwaresBranding = React.memo(function VaultwaresBranding() {
   const { theme } = useVaultTheme();
   return (
     <div className="flex items-center space-x-2 mb-6" style={{ color: theme.accent }}>
@@ -15,4 +16,4 @@ export function VaultwaresBranding() {
       </span>
     </div>
   );
-}
+});

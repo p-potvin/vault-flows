@@ -3,13 +3,12 @@
 
 import React from 'react';
 
-const CaptioningUI = () => {
+// ⚡ Bolt: Wrap CaptioningUI in React.memo() to prevent unnecessary re-renders
+export const CaptioningUI = React.memo(function CaptioningUI() {
   return (
     <div>
       {/* TODO: Add structural tags, natural language, auto-tagger integration */}
       <p>Advanced captioning UI coming soon...</p>
     </div>
   );
-};
-
-export default CaptioningUI;
+});
