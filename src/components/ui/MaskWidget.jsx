@@ -3,13 +3,12 @@
 
 import React from 'react';
 
-const MaskWidget = () => {
+// ⚡ Bolt: Wrap MaskWidget in React.memo() to prevent unnecessary re-renders
+export const MaskWidget = React.memo(function MaskWidget() {
   return (
     <div>
       {/* TODO: Integrate fabric.js for brush and polygon lasso tools */}
       <p>Mask creation widget coming soon...</p>
     </div>
   );
-};
-
-export default MaskWidget;
+});

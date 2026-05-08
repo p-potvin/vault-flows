@@ -33,3 +33,7 @@
 ## 2026-05-04 - Prevent UI Lag with React.memo on Heavy Feature Components
 **Learning:** In the `App.jsx` architecture of this codebase, combining fast-updating state (like typing into a "Create Workflow" modal form) with heavy feature components (like `ImageTools`, `ImageCaptioning`, `LoRATraining`, `FaceSwapVideo`) causes severe input lag and re-rendering bottlenecks because the modal form's keystrokes trigger full tree re-renders.
 **Action:** Always wrap heavy feature components in `React.memo` (e.g. `export const FeatureName = React.memo(function FeatureName() { ... });`) to prevent them from re-rendering unless their props change. Use named exports to preserve project conventions.
+
+## 2024-05-19 - Generic UI Container and Branding Bottlenecks
+**Learning:** `Modal` and `VaultwaresBranding` were functional components that were re-rendering unnecessarily when the parent `App` component state changed (like typing in a text input inside the `Modal` itself).
+**Action:** Always wrap generic UI wrappers, static branding components, and other visually static functional UI elements in `React.memo` (using the `export const ComponentName = React.memo(...)` pattern) when they are rendered inside a component with fast-updating state.

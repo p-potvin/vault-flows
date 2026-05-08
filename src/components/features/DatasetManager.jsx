@@ -3,13 +3,12 @@
 
 import React from 'react';
 
-const DatasetManager = () => {
+// ⚡ Bolt: Wrap DatasetManager in React.memo() to prevent unnecessary re-renders
+export const DatasetManager = React.memo(function DatasetManager() {
   return (
     <div>
       {/* TODO: Implement dataset save/load, batch edit, bulk crop/resize */}
       <p>Dataset manager UI coming soon...</p>
     </div>
   );
-};
-
-export default DatasetManager;
+});
