@@ -223,16 +223,18 @@ export const CoordinationPanel = React.memo(function CoordinationPanel() {
           </label>
           <div className="flex items-end gap-2">
             <button
-              className="rounded bg-vault-900 px-4 py-2 text-sm font-bold text-white disabled:opacity-60 dark:bg-vault-100 dark:text-vault-900"
+              className="rounded bg-vault-900 px-4 py-2 text-sm font-bold text-white disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 dark:bg-vault-100 dark:text-vault-900"
               onClick={handleSaveApiUrl}
               disabled={loading}
+              title={loading ? 'Loading...' : undefined}
             >
               Connect
             </button>
             <button
-              className="rounded border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700 disabled:opacity-60 dark:border-gray-700 dark:text-gray-200"
+              className="rounded border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 dark:border-gray-700 dark:text-gray-200"
               onClick={loadSnapshot}
               disabled={loading}
+              title={loading ? 'Loading...' : undefined}
             >
               Refresh
             </button>
@@ -250,9 +252,10 @@ export const CoordinationPanel = React.memo(function CoordinationPanel() {
           </label>
           <div className="flex items-end">
             <button
-              className="rounded border border-vault-300 px-4 py-2 text-sm font-bold text-vault-900 disabled:opacity-60 dark:border-vault-600 dark:text-vault-100"
+              className="rounded border border-vault-300 px-4 py-2 text-sm font-bold text-vault-900 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 dark:border-vault-600 dark:text-vault-100"
               onClick={handleRedisTest}
               disabled={loading}
+              title={loading ? 'Loading...' : undefined}
             >
               Test Redis
             </button>
@@ -325,9 +328,10 @@ export const CoordinationPanel = React.memo(function CoordinationPanel() {
               </label>
 
               <button
-                className="rounded bg-vault-900 px-4 py-2 text-sm font-bold text-white disabled:opacity-60 dark:bg-vault-100 dark:text-vault-900"
+                className="rounded bg-vault-900 px-4 py-2 text-sm font-bold text-white disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 dark:bg-vault-100 dark:text-vault-900"
                 onClick={handleCreateTask}
                 disabled={loading}
+                title={loading ? 'Loading...' : undefined}
               >
                 Queue and Dispatch
               </button>
