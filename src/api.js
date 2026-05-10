@@ -202,6 +202,15 @@ const DEFAULT_WORKFLOWS = [
     lastRun: null,
   },
   {
+    id: 'wf-semantic-knowledge-ingestion',
+    name: 'Semantic Knowledge Ingestion Pipeline',
+    category: 'Natural Language & Intelligence',
+    description: 'Vector DB ingestion and semantic search pipeline for structured and unstructured documents. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
     id: 'wf-legal-clause-comparison',
     name: 'Legal Clause Comparison',
     category: 'Specialized & Niche',
@@ -209,7 +218,7 @@ const DEFAULT_WORKFLOWS = [
     favorite: false,
     pin: false,
     lastRun: null,
-  },
+  }
 ];
 const PRESET_WORKFLOW_IDS = new Set(DEFAULT_WORKFLOWS.map((workflow) => workflow.id));
 
