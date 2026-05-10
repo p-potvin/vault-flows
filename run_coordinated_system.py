@@ -786,6 +786,15 @@ REDIS_DASHBOARD_HTML = """
       return String(value);
     }
 
+    function escapeHTML(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     function formatTime(value) {
       if (!value) return "not reported";
       const parsed = new Date(value);
@@ -800,10 +809,10 @@ REDIS_DASHBOARD_HTML = """
     function renderItem(head, meta, details, extraClass = "") {
       return `<div class="item ${extraClass}">
         <div class="item-head">
-          <span class="name">${head}</span>
-          <span class="muted">${meta}</span>
+          <span class="name">${escapeHTML(head)}</span>
+          <span class="muted">${escapeHTML(meta)}</span>
         </div>
-        ${details ? `<pre>${details}</pre>` : ""}
+        ${details ? `<pre>${escapeHTML(details)}</pre>` : ""}
       </div>`;
     }
 
