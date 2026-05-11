@@ -211,6 +211,15 @@ const DEFAULT_WORKFLOWS = [
     lastRun: null,
   },
   {
+    id: 'wf-multimodal-vqa',
+    name: 'Multimodal Video Interrogation Pipeline',
+    category: 'Natural Language & Intelligence',
+    description: 'Detailed image and video interrogation (captioning + logic). Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
     id: 'wf-legal-clause-comparison',
     name: 'Legal Clause Comparison',
     category: 'Specialized & Niche',
