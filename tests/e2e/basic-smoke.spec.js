@@ -56,6 +56,7 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await expect(page.getByText('HDRI Relighting Pipeline')).toBeVisible();
     await expect(page.getByText('Audio Stem Separation Pipeline')).toBeVisible();
     await expect(page.getByText('Semantic Knowledge Ingestion Pipeline')).toBeVisible();
+    await expect(page.getByText('Multimodal Video Interrogation Pipeline')).toBeVisible();
     await expect(page.getByText('Legal Clause Comparison')).toBeVisible();
   });
 
