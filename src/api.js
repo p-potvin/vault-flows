@@ -227,6 +227,15 @@ const DEFAULT_WORKFLOWS = [
     favorite: false,
     pin: false,
     lastRun: null,
+  },
+  {
+    id: 'wf-motion-capture-transfer',
+    name: 'Motion Capture & Pose Transfer Pipeline',
+    category: 'Visual & Graphics',
+    description: 'Automated human pose transfer, hand-tracking refinement, and facial re-targeting across video sequences. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
   }
 ];
 const PRESET_WORKFLOW_IDS = new Set(DEFAULT_WORKFLOWS.map((workflow) => workflow.id));
