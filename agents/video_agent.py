@@ -4,7 +4,6 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from vaultwares_agentciation.extrovert_agent import ExtrovertAgent
-from vaultwares_agentciation.enums import AgentStatus
 
 
 class VideoAgent(ExtrovertAgent):
@@ -34,6 +33,7 @@ class VideoAgent(ExtrovertAgent):
         "video_interpolation",
         "audio_reactive_visuals",
         "generate_foley",
+        "motion_capture_transfer",
     ]
 
     def __init__(
@@ -66,6 +66,7 @@ class VideoAgent(ExtrovertAgent):
             "interpolate_video": self._interpolate_video,
             "generate_audio_reactive_visuals": self._generate_audio_reactive_visuals,
             "generate_foley": self._generate_foley,
+            "motion_capture_transfer": self._motion_capture_transfer,
         }
 
         handler = handlers.get(task)
@@ -202,9 +203,9 @@ class VideoAgent(ExtrovertAgent):
         print(
             f"🔄 [{self.agent_id}] Interpolating video | source={source} | model={model}"
         )
-        print(f"   [Delegating frame extraction to ImageAgent...]")
+        print("   [Delegating frame extraction to ImageAgent...]")
         time.sleep(1)
-        print(f"   [Delegating scene analysis to TextAgent...]")
+        print("   [Delegating scene analysis to TextAgent...]")
         time.sleep(1)
         print(
             f"   Using local model path: D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}"
@@ -223,9 +224,9 @@ class VideoAgent(ExtrovertAgent):
         print(
             f"🎵 [{self.agent_id}] Generating audio-reactive visuals | audio={audio} | model={model}"
         )
-        print(f"   [Delegating frame generation to ImageAgent...]")
+        print("   [Delegating frame generation to ImageAgent...]")
         time.sleep(1)
-        print(f"   [Delegating prompt refinement to TextAgent...]")
+        print("   [Delegating prompt refinement to TextAgent...]")
         time.sleep(1)
         print(
             f"   Using local model path: D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}"
@@ -252,6 +253,24 @@ class VideoAgent(ExtrovertAgent):
 
         result = f"[Foley generated & noise reduced for '{source}' using {model}]"
         self._publish_result("generate_foley", result)
+
+    def _motion_capture_transfer(self, details: dict):
+        """Automated human pose transfer, hand-tracking refinement, and facial re-targeting."""
+        source = details.get("source", "unknown_video")
+        model = details.get("model", "pose-transfer-v1.safetensors")
+        model_type = details.get("model_type", "motion_capture")
+
+        print(
+            f"🏃 [{self.agent_id}] Transferring motion & pose | source={source} | model={model}"
+        )
+        time.sleep(1)
+        print(
+            f"   Using local model path: D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}"
+        )
+        time.sleep(2)
+
+        result = f"[Motion capture and pose transferred for '{source}' using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}]"
+        self._publish_result("motion_capture_transfer", result)
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""

@@ -58,6 +58,7 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await expect(page.getByText('Semantic Knowledge Ingestion Pipeline')).toBeVisible();
     await expect(page.getByText('Multimodal Video Interrogation Pipeline')).toBeVisible();
     await expect(page.getByText('Legal Clause Comparison')).toBeVisible();
+    await expect(page.getByText('Motion Capture & Pose Transfer Pipeline')).toBeVisible();
   });
 
   test('can create and edit a workflow in local fallback mode', async ({ page }) => {
