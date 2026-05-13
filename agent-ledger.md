@@ -22,6 +22,18 @@ Directive: Ensure any new flows similarly follow the Lore Commit Protocol and sp
 Tested: Verified e2e UI visibility tests pass and SKILL.md was created.
 Not-tested: End-to-end execution of the flow using actual local models.
 
+Intent: Add Layout-Aware Document Intelligence Pipeline flow
+
+Added a new workflow "Layout-Aware Document Intelligence Pipeline" to `vaultwares-pipelines` and `vault-flows` as part of a scheduled daily flow generation task. The flow targets the "Utility & Structural" category, focusing on form extraction and layout-aware PDF analysis using specialized subagents and local models.
+
+Constraint: Must act as the scheduled job itself to fulfill the daily workflow generation task manually instead of automating it.
+Rejected: Automating through CI/CD | Reason: Explicit instruction to act as the scheduled job.
+Confidence: high
+Scope-risk: narrow
+Directive: Ensure new default workflows are mirrored in e2e tests to maintain UI test stability and document the specific subagent constraints in the skill definition.
+Tested: Verified e2e UI visibility tests pass and SKILL.md was created.
+Not-tested: End-to-end execution of the flow using actual local models or parsing real documents.
+
 Intent: Add Multimodal Video Interrogation Pipeline flow
 
 Added a new workflow "Multimodal Video Interrogation Pipeline" to `vaultwares-pipelines` and `vault-flows` as part of a scheduled daily flow generation task. The flow targets the "Natural Language & Intelligence" category, focusing on Multimodal VQA for detailed image/video interrogation (captioning + logic).
