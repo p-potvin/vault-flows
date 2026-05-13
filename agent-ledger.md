@@ -33,3 +33,12 @@ Scope-risk: narrow
 Directive: Ensure new default workflows are mirrored in e2e tests to maintain UI test stability.
 Tested: Verified e2e UI visibility tests pass and SKILL.md was created.
 Not-tested: End-to-end execution of the flow using actual local models.
+Intent: Add semantic label mappings and explicit focus-visible states to interactive components to resolve accessibility issues in WorkflowList and FlowRuntimePanel.
+Narrative: When analyzing components under the "Palette" persona, it was discovered that dynamic select elements and several custom navigation buttons lacked explicitly assigned \`htmlFor\` mappings and visible focus indicators. These issues severely impacted screen reader operability and keyboard navigation. Using existing design tokens (\`focus-visible:ring-vault-500\`), these interactions were normalized.
+Constraint: No custom CSS added, relied purely on existing Tailwind `focus-visible` utility classes and semantic HTML attributes.
+Rejected: Modifying generic element types to native interactive types, as standardizing current patterns required fewer lines of code and lowered regression risk.
+Confidence: 100
+Scope-risk: Low
+Directive: Palette UX focus
+Tested: Yes, via Playwright visual screenshot and `node --test` suite.
+Not-tested: Screen reader manual auditory test.
