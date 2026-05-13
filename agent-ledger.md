@@ -42,3 +42,12 @@ Scope-risk: Low
 Directive: Palette UX focus
 Tested: Yes, via Playwright visual screenshot and `node --test` suite.
 Not-tested: Screen reader manual auditory test.
+Intent: Fix GitHub Actions CI pipeline failing on strict lockfile validation by swapping npm for pnpm.
+Narrative: The GitHub Actions `build-and-test` job failed because it was executing `npm ci` in a repository strictly managed by `pnpm`. `npm ci` choked on missing packages since `package-lock.json` was out of sync with `pnpm-lock.yaml`. I updated the `.github/workflows/ci.yml` pipeline to install `pnpm/action-setup@v3`, set the Node.js action cache to `pnpm`, and replaced all instances of `npm run` and `npx` with their `pnpm` equivalents (`pnpm run`, `pnpm exec`). The tests were then run locally using `pnpm test` to ensure local stability.
+Constraint: Maintain existing Node.js v20 runtime context in CI.
+Rejected: Generating a new `package-lock.json` via `npm install` and committing it, because the repository is clearly standardized around `pnpm` (`pnpm-lock.yaml` is present, `eslint` ran via `pnpm`).
+Confidence: 100
+Scope-risk: Low
+Directive: CI Pipeline Repair
+Tested: Local unit tests via `pnpm test`.
+Not-tested: End-to-end cloud environment deployment triggers.
