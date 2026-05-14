@@ -236,6 +236,15 @@ const DEFAULT_WORKFLOWS = [
     favorite: false,
     pin: false,
     lastRun: null,
+  },
+  {
+    id: 'wf-layout-document-intelligence',
+    name: 'Layout-Aware Document Intelligence Pipeline',
+    category: 'Utility & Structural',
+    description: 'Automated form extraction and layout-aware PDF analysis using specialized subagents. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
   }
 ];
 const PRESET_WORKFLOW_IDS = new Set(DEFAULT_WORKFLOWS.map((workflow) => workflow.id));
