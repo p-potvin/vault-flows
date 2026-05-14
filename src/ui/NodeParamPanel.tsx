@@ -5,16 +5,13 @@ import type { NodeType } from '@/nodes/types'
 
 export function NodeParamPanel() {
   const { t } = useTranslation()
-  const { nodes, selectedNodeId, updateNodeParam, executionStatus, executionResults, executionError, resetExecution } =
-    useFlowStore((s) => ({
-      nodes: s.nodes,
-      selectedNodeId: s.selectedNodeId,
-      updateNodeParam: s.updateNodeParam,
-      executionStatus: s.executionStatus,
-      executionResults: s.executionResults,
-      executionError: s.executionError,
-      resetExecution: s.resetExecution,
-    }))
+  const nodes = useFlowStore((s) => s.nodes)
+  const selectedNodeId = useFlowStore((s) => s.selectedNodeId)
+  const updateNodeParam = useFlowStore((s) => s.updateNodeParam)
+  const executionStatus = useFlowStore((s) => s.executionStatus)
+  const executionResults = useFlowStore((s) => s.executionResults)
+  const executionError = useFlowStore((s) => s.executionError)
+  const resetExecution = useFlowStore((s) => s.resetExecution)
 
   const node = nodes.find((n) => n.id === selectedNodeId)
 

@@ -1,5 +1,5 @@
 import { THEMES } from '../../vault-themes/theme-manager/exports/theme-manager'
-import { applyTheme } from '@/main'
+import { applyTheme } from '@/lib/theme'
 
 export function ThemePicker() {
   const current = localStorage.getItem('vw-theme-id') ?? THEMES[0].id

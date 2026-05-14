@@ -11,15 +11,12 @@ import i18n from '@/i18n/index'
 export default function App() {
   const { t } = useTranslation()
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const { toFlow, setExecutionStatus, setExecutionResults, setExecutionError, executionStatus, activePreset } =
-    useFlowStore((s) => ({
-      toFlow: s.toFlow,
-      setExecutionStatus: s.setExecutionStatus,
-      setExecutionResults: s.setExecutionResults,
-      setExecutionError: s.setExecutionError,
-      executionStatus: s.executionStatus,
-      activePreset: s.activePreset,
-    }))
+  const toFlow = useFlowStore((s) => s.toFlow)
+  const setExecutionStatus = useFlowStore((s) => s.setExecutionStatus)
+  const setExecutionResults = useFlowStore((s) => s.setExecutionResults)
+  const setExecutionError = useFlowStore((s) => s.setExecutionError)
+  const executionStatus = useFlowStore((s) => s.executionStatus)
+  const activePreset = useFlowStore((s) => s.activePreset)
 
   async function handleRun() {
     setExecutionStatus('running')

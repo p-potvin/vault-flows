@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import type { Preset, PresetDomain } from '@/nodes/types'
-import { useFlowStore } from '@/store/flowStore'
 
 const DOMAIN_COLORS: Record<PresetDomain, string> = {
   writing: 'var(--accent)',
@@ -73,8 +72,3 @@ export function PresetCard({ preset, onOpen }: PresetCardProps) {
   )
 }
 
-export function PresetLibraryInline({ onClose }: { onClose: () => void }) {
-  const { t } = useTranslation()
-  const loadPreset = useFlowStore((s) => s.loadPreset)
-  return { t, loadPreset, onClose }
-}
