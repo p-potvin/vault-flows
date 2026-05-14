@@ -54,6 +54,16 @@ const fr = {
     error_network: 'Impossible de joindre le serveur. Vérifiez votre connexion.',
     logged_in_as: 'Connecté en tant que {{user}}',
     login_required: 'Connexion requise pour exécuter les flux.',
+    no_account: 'Pas encore de compte ?',
+    sign_up: 'Créer un compte',
+    have_account: 'Déjà un compte ?',
+    signup_title: 'Créer un compte',
+    email: 'Courriel',
+    optional: '(facultatif)',
+    creating: 'Création du compte…',
+    signup_submit: 'Créer le compte',
+    error_username_taken: 'Ce nom d\'utilisateur est déjà pris.',
+    error_signup: 'Impossible de créer le compte. Veuillez réessayer.',
   },
 } as const
 

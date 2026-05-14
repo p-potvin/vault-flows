@@ -54,6 +54,16 @@ const en = {
     error_network: 'Could not reach the server. Check your connection.',
     logged_in_as: 'Logged in as {{user}}',
     login_required: 'Login required to run flows.',
+    no_account: 'No account yet?',
+    sign_up: 'Sign Up',
+    have_account: 'Already have an account?',
+    signup_title: 'Create Account',
+    email: 'Email',
+    optional: '(optional)',
+    creating: 'Creating account…',
+    signup_submit: 'Create Account',
+    error_username_taken: 'Username already taken.',
+    error_signup: 'Could not create account. Please try again.',
   },
 } as const
 

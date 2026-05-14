@@ -77,6 +77,20 @@ export async function login(username: string, password: string): Promise<void> {
   setToken(data.access_token)
 }
 
+export async function register(
+  username: string,
+  password: string,
+  email?: string,
+): Promise<void> {
+  await apiPost<unknown>('/auth/register', {
+    username,
+    password,
+    ...(email ? { email } : {}),
+  })
+  // Auto-login after successful registration
+  await login(username, password)
+}
+
 export async function getMe(): Promise<{ id: string; username: string; role: string }> {
   return apiGet<{ id: string; username: string; role: string }>('/auth/me')
 }

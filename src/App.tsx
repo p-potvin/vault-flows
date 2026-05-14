@@ -5,6 +5,7 @@ import { PresetLibrary } from '@/ui/PresetLibrary'
 import { NodeParamPanel } from '@/ui/NodeParamPanel'
 import { ThemePicker } from '@/ui/ThemePicker'
 import { LoginModal } from '@/ui/LoginModal'
+import { SignupModal } from '@/ui/SignupModal'
 import { useFlowStore } from '@/store/flowStore'
 import { runFlow } from '@/execution/runner'
 import { getToken } from '@/api/client'
@@ -14,7 +15,7 @@ export default function App() {
   const { t } = useTranslation()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [currentUser, setCurrentUser] = useState<string | null>(null)
-  const [showLogin, setShowLogin] = useState(false)
+  const [authModal, setAuthModal] = useState<'login' | 'signup' | null>(null)
   const [runAfterLogin, setRunAfterLogin] = useState(false)
   const toFlow = useFlowStore((s) => s.toFlow)
   const setExecutionStatus = useFlowStore((s) => s.setExecutionStatus)
@@ -39,15 +40,15 @@ export default function App() {
   function handleRun() {
     if (!getToken()) {
       setRunAfterLogin(true)
-      setShowLogin(true)
+      setAuthModal('login')
       return
     }
     void executeFlow()
   }
 
-  function handleLoginSuccess(username: string) {
+  function handleAuthSuccess(username: string) {
     setCurrentUser(username)
-    setShowLogin(false)
+    setAuthModal(null)
     if (runAfterLogin) {
       setRunAfterLogin(false)
       void executeFlow()
@@ -136,7 +137,7 @@ export default function App() {
             {currentUser}
           </span>
         ) : (
-          <button onClick={() => { setRunAfterLogin(false); setShowLogin(true) }} style={headerBtnStyle}>
+          <button onClick={() => { setRunAfterLogin(false); setAuthModal('login') }} style={headerBtnStyle}>
             {t('auth.login')}
           </button>
         )}
@@ -252,12 +253,20 @@ export default function App() {
         )}
       </div>
 
-      {/* Login modal */}
-      {showLogin && (
+      {/* Auth modals */}
+      {authModal === 'login' && (
         <LoginModal
           runIntent={runAfterLogin}
-          onSuccess={handleLoginSuccess}
-          onCancel={() => { setShowLogin(false); setRunAfterLogin(false) }}
+          onSuccess={handleAuthSuccess}
+          onSwitchToSignup={() => setAuthModal('signup')}
+          onCancel={() => { setAuthModal(null); setRunAfterLogin(false) }}
+        />
+      )}
+      {authModal === 'signup' && (
+        <SignupModal
+          onSuccess={handleAuthSuccess}
+          onSwitchToLogin={() => setAuthModal('login')}
+          onCancel={() => { setAuthModal(null); setRunAfterLogin(false) }}
         />
       )}
     </div>

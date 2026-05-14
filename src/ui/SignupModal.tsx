@@ -1,24 +1,22 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { login } from '@/api/client'
+import { register } from '@/api/client'
 
-interface LoginModalProps {
+interface SignupModalProps {
   onSuccess: (username: string) => void
-  onSwitchToSignup?: () => void
+  onSwitchToLogin: () => void
   onCancel?: () => void
-  /** If true, the user explicitly clicked Run Flow — show a hint */
-  runIntent?: boolean
 }
 
-export function LoginModal({ onSuccess, onSwitchToSignup, onCancel, runIntent }: LoginModalProps) {
+export function SignupModal({ onSuccess, onSwitchToLogin, onCancel }: SignupModalProps) {
   const { t } = useTranslation()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const usernameRef = useRef<HTMLInputElement>(null)
 
-  // Auto-focus username on open
   useEffect(() => {
     usernameRef.current?.focus()
   }, [])
@@ -28,12 +26,17 @@ export function LoginModal({ onSuccess, onSwitchToSignup, onCancel, runIntent }:
     setError(null)
     setLoading(true)
     try {
-      await login(username.trim(), password)
+      await register(username.trim(), password, email.trim() || undefined)
       onSuccess(username.trim())
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      const isNetworkError = msg.includes('fetch') || msg.includes('network') || msg.includes('Failed')
-      setError(isNetworkError ? t('auth.error_network') : t('auth.error_invalid'))
+      if (msg.includes('409') || msg.includes('taken') || msg.includes('exists')) {
+        setError(t('auth.error_username_taken'))
+      } else if (msg.includes('fetch') || msg.includes('network') || msg.includes('Failed')) {
+        setError(t('auth.error_network'))
+      } else {
+        setError(t('auth.error_signup'))
+      }
     } finally {
       setLoading(false)
     }
@@ -72,19 +75,16 @@ export function LoginModal({ onSuccess, onSwitchToSignup, onCancel, runIntent }:
         }}
       >
         {/* Header */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <span style={{ fontWeight: 700, fontSize: '18px', color: 'var(--text)' }}>
-            {t('auth.login')}
-          </span>
-          {runIntent && (
-            <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-              {t('auth.login_required')}
-            </span>
-          )}
-        </div>
+        <span style={{ fontWeight: 700, fontSize: '18px', color: 'var(--text)' }}>
+          {t('auth.signup_title')}
+        </span>
 
         {/* Form */}
-        <form onSubmit={(e) => void handleSubmit(e)} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <form
+          onSubmit={(e) => void handleSubmit(e)}
+          style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
+        >
+          {/* Username */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={labelStyle}>{t('auth.username')}</label>
             <input
@@ -99,16 +99,46 @@ export function LoginModal({ onSuccess, onSwitchToSignup, onCancel, runIntent }:
             />
           </div>
 
+          {/* Password */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={labelStyle}>{t('auth.password')}</label>
             <input
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
               required
               style={inputStyle}
+            />
+          </div>
+
+          {/* Email — visually de-emphasised to signal optional */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+              <label style={labelStyle}>{t('auth.email')}</label>
+              <span
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--text-secondary)',
+                  fontStyle: 'italic',
+                  fontWeight: 400,
+                  textTransform: 'none',
+                  letterSpacing: 'normal',
+                  opacity: 0.65,
+                }}
+              >
+                {t('auth.optional')}
+              </span>
+            </div>
+            <input
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+              placeholder="you@example.com"
+              style={{ ...inputStyle, opacity: 0.85 }}
             />
           </div>
 
@@ -152,37 +182,35 @@ export function LoginModal({ onSuccess, onSwitchToSignup, onCancel, runIntent }:
                 borderRadius: 'var(--radius-md, 8px)',
                 fontWeight: 600,
                 fontSize: '14px',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: (!username || !password) ? 0.5 : 1,
+                cursor: loading || !username || !password ? 'not-allowed' : 'pointer',
+                opacity: !username || !password ? 0.5 : 1,
                 transition: 'opacity 120ms ease-out',
               }}
             >
-              {loading ? t('auth.signing_in') : t('auth.submit')}
+              {loading ? t('auth.creating') : t('auth.signup_submit')}
             </button>
           </div>
         </form>
 
-        {/* Switch to sign up */}
-        {onSwitchToSignup && (
-          <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center' }}>
-            {t('auth.no_account')}{' '}
-            <button
-              type="button"
-              onClick={onSwitchToSignup}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--accent)',
-                fontWeight: 600,
-                fontSize: '13px',
-                cursor: 'pointer',
-                padding: 0,
-              }}
-            >
-              {t('auth.sign_up')}
-            </button>
-          </p>
-        )}
+        {/* Switch to login */}
+        <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center' }}>
+          {t('auth.have_account')}{' '}
+          <button
+            type="button"
+            onClick={onSwitchToLogin}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--accent)',
+              fontWeight: 600,
+              fontSize: '13px',
+              cursor: 'pointer',
+              padding: 0,
+            }}
+          >
+            {t('auth.login')}
+          </button>
+        </p>
       </div>
     </div>
   )
