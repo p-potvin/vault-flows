@@ -43,6 +43,18 @@ const en = {
     title: 'VaultFlows',
     tagline: 'Visual AI Flow Builder',
   },
+  auth: {
+    login: 'Log In',
+    logout: 'Log Out',
+    username: 'Username',
+    password: 'Password',
+    submit: 'Sign In',
+    signing_in: 'Signing in…',
+    error_invalid: 'Invalid credentials. Please try again.',
+    error_network: 'Could not reach the server. Check your connection.',
+    logged_in_as: 'Logged in as {{user}}',
+    login_required: 'Login required to run flows.',
+  },
 } as const
 
 export default en

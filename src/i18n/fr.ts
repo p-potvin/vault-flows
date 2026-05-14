@@ -43,6 +43,18 @@ const fr = {
     title: 'VaultFlows',
     tagline: 'Constructeur de flux IA visuel',
   },
+  auth: {
+    login: 'Se connecter',
+    logout: 'Se déconnecter',
+    username: 'Nom d\'utilisateur',
+    password: 'Mot de passe',
+    submit: 'Connexion',
+    signing_in: 'Connexion en cours…',
+    error_invalid: 'Identifiants invalides. Veuillez réessayer.',
+    error_network: 'Impossible de joindre le serveur. Vérifiez votre connexion.',
+    logged_in_as: 'Connecté en tant que {{user}}',
+    login_required: 'Connexion requise pour exécuter les flux.',
+  },
 } as const
 
 export default fr

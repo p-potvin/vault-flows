@@ -4,13 +4,18 @@ import { FlowCanvas } from '@/canvas/FlowCanvas'
 import { PresetLibrary } from '@/ui/PresetLibrary'
 import { NodeParamPanel } from '@/ui/NodeParamPanel'
 import { ThemePicker } from '@/ui/ThemePicker'
+import { LoginModal } from '@/ui/LoginModal'
 import { useFlowStore } from '@/store/flowStore'
 import { runFlow } from '@/execution/runner'
+import { getToken } from '@/api/client'
 import i18n from '@/i18n/index'
 
 export default function App() {
   const { t } = useTranslation()
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [currentUser, setCurrentUser] = useState<string | null>(null)
+  const [showLogin, setShowLogin] = useState(false)
+  const [runAfterLogin, setRunAfterLogin] = useState(false)
   const toFlow = useFlowStore((s) => s.toFlow)
   const setExecutionStatus = useFlowStore((s) => s.setExecutionStatus)
   const setExecutionResults = useFlowStore((s) => s.setExecutionResults)
@@ -18,7 +23,7 @@ export default function App() {
   const executionStatus = useFlowStore((s) => s.executionStatus)
   const activePreset = useFlowStore((s) => s.activePreset)
 
-  async function handleRun() {
+  async function executeFlow() {
     setExecutionStatus('running')
     setExecutionError(null)
     try {
@@ -28,6 +33,24 @@ export default function App() {
     } catch (err) {
       setExecutionError(err instanceof Error ? err.message : String(err))
       setExecutionStatus('error')
+    }
+  }
+
+  function handleRun() {
+    if (!getToken()) {
+      setRunAfterLogin(true)
+      setShowLogin(true)
+      return
+    }
+    void executeFlow()
+  }
+
+  function handleLoginSuccess(username: string) {
+    setCurrentUser(username)
+    setShowLogin(false)
+    if (runAfterLogin) {
+      setRunAfterLogin(false)
+      void executeFlow()
     }
   }
 
@@ -80,7 +103,7 @@ export default function App() {
 
         {/* Execute */}
         <button
-          onClick={() => void handleRun()}
+          onClick={handleRun}
           disabled={executionStatus === 'running' || !activePreset}
           style={{
             ...headerBtnStyle,
@@ -93,6 +116,30 @@ export default function App() {
         >
           {executionStatus === 'running' ? t('execution.running') : t('execution.run')}
         </button>
+
+        {/* Auth */}
+        {currentUser ? (
+          <span
+            style={{
+              fontSize: '12px',
+              color: 'var(--text-secondary)',
+              padding: '4px 8px',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-md, 8px)',
+              maxWidth: '120px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+            title={t('auth.logged_in_as', { user: currentUser })}
+          >
+            {currentUser}
+          </span>
+        ) : (
+          <button onClick={() => { setRunAfterLogin(false); setShowLogin(true) }} style={headerBtnStyle}>
+            {t('auth.login')}
+          </button>
+        )}
 
         {/* Language toggle */}
         <button onClick={toggleLang} style={headerBtnStyle}>
@@ -204,6 +251,15 @@ export default function App() {
           </aside>
         )}
       </div>
+
+      {/* Login modal */}
+      {showLogin && (
+        <LoginModal
+          runIntent={runAfterLogin}
+          onSuccess={handleLoginSuccess}
+          onCancel={() => { setShowLogin(false); setRunAfterLogin(false) }}
+        />
+      )}
     </div>
   )
 }
