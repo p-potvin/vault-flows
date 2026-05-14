@@ -187,14 +187,15 @@ export const FlowRuntimePanel = React.memo(function FlowRuntimePanel({ flowId, t
           const options = config?.scannedModels?.categories?.[slot.group] || [];
 
           return (
-            <label key={slot.key} className="block">
+            <label key={slot.key} htmlFor={`slot-${slot.key}`} className="block">
               <span className="mb-1 block text-sm font-medium text-gray-900 dark:text-gray-100">
                 {slot.label}
               </span>
               <select
+                id={`slot-${slot.key}`}
                 value={selection[slot.key] || ''}
                 onChange={(event) => handleSelect(slot.key, event.target.value)}
-                className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+                className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               >
                 <option value="">
                   {slot.optional ? 'None selected' : slot.placeholder}
