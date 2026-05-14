@@ -189,21 +189,21 @@ export const ImageTools = React.memo(function ImageTools() {
               <button 
                 onClick={() => runAIPipeline('face_enhance')} 
                 disabled={isProcessing}
-                className="w-full py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-bold disabled:opacity-50"
+                className="w-full py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-bold disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               >
                 {isProcessing ? 'Processing...' : '✨ Enhance (GFPGAN)'}
               </button>
               <button 
                 onClick={() => runAIPipeline('facefusion_swap')} 
                 disabled={isProcessing}
-                className="w-full py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-bold disabled:opacity-50"
+                className="w-full py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-bold disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               >
                 {isProcessing ? 'Processing...' : '🎭 FaceSwap (FaceFusion)'}
               </button>
               <button 
                 onClick={() => runAIPipeline('sd_inpaint')} 
                 disabled={isProcessing}
-                className="w-full py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-bold disabled:opacity-50"
+                className="w-full py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-bold disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               >
                 {isProcessing ? 'Processing...' : '🖌️ Inpaint Canvas'}
               </button>
@@ -220,7 +220,7 @@ export const ImageTools = React.memo(function ImageTools() {
                   id="compare_mode" 
                   checked={showSlider} 
                   onChange={(e) => setShowSlider(e.target.checked)} 
-                  className="cursor-pointer"
+                  className="cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
                 />
                 <label htmlFor="compare_mode" className="text-sm cursor-pointer select-none">
                   Show Before / After Slider
@@ -231,48 +231,48 @@ export const ImageTools = React.memo(function ImageTools() {
 
           <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
             <h3 className="font-semibold mb-2">Import & Export</h3>
-            <input type="file" aria-label="Select image to import" accept="image/*" onChange={onSelectImage} className="mb-2 text-sm w-full" />
-            <button onClick={exportMask} className="w-full py-1 bg-vault-900 text-white rounded hover:bg-vault-800 dark:bg-vault-200 dark:text-vault-900 text-sm font-bold">Export Image</button>
+            <input type="file" aria-label="Select image to import" accept="image/*" onChange={onSelectImage} className="mb-2 text-sm w-full rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" />
+            <button onClick={exportMask} className="w-full py-1 bg-vault-900 text-white rounded hover:bg-vault-800 dark:bg-vault-200 dark:text-vault-900 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500">Export Image</button>
           </div>
 
           <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
             <h3 className="font-semibold mb-2">Tools</h3>
             <div className="flex gap-2 mb-2">
-              <button onClick={() => setMode('select')} className={`px-2 py-1 rounded text-sm ${mode === 'select' ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600'}`}>Select</button>
-              <button onClick={() => setMode('draw')} className={`px-2 py-1 rounded text-sm ${mode === 'draw' ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600'}`}>Draw</button>
+              <button onClick={() => setMode('select')} className={`px-2 py-1 rounded text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${mode === 'select' ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600'}`}>Select</button>
+              <button onClick={() => setMode('draw')} className={`px-2 py-1 rounded text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 ${mode === 'draw' ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600'}`}>Draw</button>
             </div>
             
-            <label className="block text-sm mb-1">Color / Fill</label>
-            <input type="color" value={brushColor} onChange={e => setBrushColor(e.target.value)} className="w-full mb-2" />
+            <label htmlFor="color_picker" className="block text-sm mb-1">Color / Fill</label>
+            <input id="color_picker" type="color" value={brushColor} onChange={e => setBrushColor(e.target.value)} className="w-full mb-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" />
             
             {mode === 'draw' && (
               <>
-                <label className="block text-sm mb-1">Brush Size ({brushSize})</label>
-                <input type="range" min="1" max="100" value={brushSize} onChange={e => setBrushSize(e.target.value)} className="w-full" />
+                <label htmlFor="brush_size" className="block text-sm mb-1">Brush Size ({brushSize})</label>
+                <input id="brush_size" type="range" min="1" max="100" value={brushSize} onChange={e => setBrushSize(e.target.value)} className="w-full rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" />
               </>
             )}
 
-            <button onClick={addText} className="w-full py-1 bg-gray-300 dark:bg-gray-600 rounded text-sm mt-2">Add Text</button>
-            <button onClick={deleteActive} disabled={!activeObject} title={!activeObject ? 'Select an object to delete' : undefined} className="w-full py-1 bg-red-600 text-white rounded text-sm mt-2 disabled:opacity-50">Delete Selected</button>
+            <button onClick={addText} className="w-full py-1 bg-gray-300 dark:bg-gray-600 rounded text-sm mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500">Add Text</button>
+            <button onClick={deleteActive} disabled={!activeObject} title={!activeObject ? 'Select an object to delete' : undefined} className="w-full py-1 bg-red-600 text-white rounded text-sm mt-2 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500">Delete Selected</button>
           </div>
 
           {activeObject && activeObject.type === 'image' && (
             <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
               <h3 className="font-semibold mb-2">Filters</h3>
-              <label className="block text-sm mb-1">Brightness ({brightness})</label>
-              <input type="range" min="-1" max="1" step="0.05" value={brightness} onChange={e => setBrightness(e.target.value)} className="w-full mb-2" />
+              <label htmlFor="brightness_slider" className="block text-sm mb-1">Brightness ({brightness})</label>
+              <input id="brightness_slider" type="range" min="-1" max="1" step="0.05" value={brightness} onChange={e => setBrightness(e.target.value)} className="w-full mb-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" />
               
-              <label className="block text-sm mb-1">Contrast ({contrast})</label>
-              <input type="range" min="-1" max="1" step="0.05" value={contrast} onChange={e => setContrast(e.target.value)} className="w-full mb-2" />
+              <label htmlFor="contrast_slider" className="block text-sm mb-1">Contrast ({contrast})</label>
+              <input id="contrast_slider" type="range" min="-1" max="1" step="0.05" value={contrast} onChange={e => setContrast(e.target.value)} className="w-full mb-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" />
               
-              <label className="block text-sm mb-1">Saturation ({saturation})</label>
-              <input type="range" min="-1" max="1" step="0.05" value={saturation} onChange={e => setSaturation(e.target.value)} className="w-full mb-2" />
+              <label htmlFor="saturation_slider" className="block text-sm mb-1">Saturation ({saturation})</label>
+              <input id="saturation_slider" type="range" min="-1" max="1" step="0.05" value={saturation} onChange={e => setSaturation(e.target.value)} className="w-full mb-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" />
               
-              <label className="block text-sm mb-1">Blur ({blur})</label>
-              <input type="range" min="0" max="1" step="0.01" value={blur} onChange={e => setBlur(e.target.value)} className="w-full mb-2" />
+              <label htmlFor="blur_slider" className="block text-sm mb-1">Blur ({blur})</label>
+              <input id="blur_slider" type="range" min="0" max="1" step="0.01" value={blur} onChange={e => setBlur(e.target.value)} className="w-full mb-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" />
               <button 
                 onClick={() => { setBrightness(0); setContrast(0); setSaturation(0); setBlur(0); }} 
-                className="w-full mt-2 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                className="w-full mt-2 text-xs text-blue-600 dark:text-blue-400 hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               >
                 Reset Filters
               </button>
@@ -306,13 +306,15 @@ export const ImageTools = React.memo(function ImageTools() {
               />
             </div>
             {/* The Invisible Range Input handling the drag */}
+            <label htmlFor="before_after_slider" className="sr-only">Before and After Comparison Slider</label>
             <input 
+              id="before_after_slider"
               type="range"
               min="0"
               max="100"
               value={sliderPosition}
               onChange={(e) => setSliderPosition(e.target.value)}
-              className="absolute inset-y-0 w-full h-full opacity-0 cursor-ew-resize z-20 pointer-events-auto"
+              className="absolute inset-y-0 w-full h-full opacity-0 cursor-ew-resize z-20 pointer-events-auto focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             />
             {/* Visual Slider thumb */}
             <div 
