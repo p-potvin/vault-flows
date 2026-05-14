@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "bridge:local": "python run_local_runtime_bridge.py",
     "test": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
@@ -24,7 +25,9 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "@eslint/js": "^9.24.0",
+    "@eslint/js": "^9.39.4",
+    "@noble/hashes": "^2.2.0",
+    "@noble/post-quantum": "^0.6.1",
     "@playwright/test": "^1.52.0",
     "@tailwindcss/vite": "^4.1.5",
     "@types/react": "^19.0.0",
