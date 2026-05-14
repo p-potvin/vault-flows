@@ -9,7 +9,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node --test",
+    "test": "node --test \"src/**/*.test.js\"",
     "bridge:local": "python run_local_runtime_bridge.py",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
