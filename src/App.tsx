@@ -138,7 +138,7 @@ export default function App() {
         {/* Canvas */}
         <main style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
           {activePreset ? (
-            <FlowCanvas />
+            <FlowCanvas key={activePreset?.id} />
           ) : (
             <div
               style={{

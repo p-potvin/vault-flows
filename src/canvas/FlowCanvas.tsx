@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import {
   ReactFlow,
   Background,
@@ -80,23 +80,18 @@ export function FlowCanvas() {
     storeEdges.map(flowEdgeToRF),
   )
 
-  // Keep RF state in sync when the store is updated externally (e.g. preset load)
-  useEffect(() => {
-    setRfNodes(storeNodes.map(flowNodeToRF))
-  }, [storeNodes, setRfNodes])
-
-  useEffect(() => {
-    setRfEdges(storeEdges.map(flowEdgeToRF))
-  }, [storeEdges, setRfEdges])
-
-  // Push RF changes back into the Zustand store
+  // Push position changes back into the Zustand store.
+  // Dimension/selection changes are RF-internal — syncing them back would
+  // reset nodes before RF finishes measuring, causing permanent visibility:hidden.
   const handleNodesChange: OnNodesChange = useCallback(
     (changes) => {
       onNodesChange(changes)
-      setRfNodes((current) => {
-        setStoreNodes(current.map(rfNodeToFlow))
-        return current
-      })
+      if (changes.some((c) => c.type === 'position')) {
+        setRfNodes((current) => {
+          setStoreNodes(current.map(rfNodeToFlow))
+          return current
+        })
+      }
     },
     [onNodesChange, setRfNodes, setStoreNodes],
   )
