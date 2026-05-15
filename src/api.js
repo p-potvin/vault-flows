@@ -18,6 +18,20 @@ const viteEnv = import.meta.env || {};
 const browserStorage = typeof window !== 'undefined' ? window.localStorage : null;
 
 const configuredBase = (viteEnv.VITE_API_URL || '').trim().replace(/\/$/, '');
+const inferredSameOriginApiBase = (() => {
+  if (typeof window === 'undefined') return '';
+
+  const host = (window.location?.hostname || '').toLowerCase();
+  if (!host) return '';
+
+  // When served from noddit, prefer a same-origin relative API base to avoid mixed-content
+  // warnings and to keep tailnet-only targets out of the browser.
+  if (host === 'noddit.org' || host.endsWith('.noddit.org')) {
+    return '/api';
+  }
+
+  return '';
+})();
 const defaultCoordinationBase = (
   viteEnv.VITE_COORDINATION_API_URL
   || browserStorage?.getItem('vault-flows.coordinationApiUrl')
@@ -252,11 +266,11 @@ const PRESET_WORKFLOW_IDS = new Set(DEFAULT_WORKFLOWS.map((workflow) => workflow
 const DEFAULT_CONFIG = normalizeExecutionConfig({
   modelsDir: '',
   preferredStorageProvider: 'other',
-  apiMode: configuredBase ? 'remote-with-local-fallback' : 'local-demo',
-  apiBase: configuredBase || '',
+  apiMode: (configuredBase || inferredSameOriginApiBase) ? 'remote-with-local-fallback' : 'local-demo',
+  apiBase: configuredBase || inferredSameOriginApiBase || '',
   apiKey: '', // Stub for API Key Auth
   themeIndex: 0,
-  runtimeProvider: configuredBase ? 'remote-api' : 'browser-local',
+  runtimeProvider: (configuredBase || inferredSameOriginApiBase) ? 'remote-api' : 'browser-local',
   scannedModels: createEmptyScannedModels(),
 });
 
