@@ -1,0 +1,82 @@
+{
+  "id": "meeting-summary",
+  "name": "Meeting Summary",
+  "nameKey": "presets.meetingSummary.name",
+  "domain": "business",
+  "description": "Extract action items and produce a professional meeting summary from raw meeting notes.",
+  "descriptionKey": "presets.meetingSummary.description",
+  "flow": {
+    "id": "flow-meeting-summary",
+    "name": "Meeting Summary",
+    "phase": 0,
+    "createdAt": "2026-05-13T00:00:00.000Z",
+    "updatedAt": "2026-05-13T00:00:00.000Z",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "input",
+        "label": "Raw Meeting Notes",
+        "position": { "x": 60, "y": 200 },
+        "params": { "value": "" },
+        "preset": "meeting-summary"
+      },
+      {
+        "id": "n2",
+        "type": "llm",
+        "label": "Extract Action Items",
+        "position": { "x": 320, "y": 200 },
+        "params": {
+          "model": "llama3",
+          "temperature": 0.7,
+          "max_tokens": 1024,
+          "system": "You are a meticulous business analyst. Given raw meeting notes, identify and extract every action item, decision made, and open question. Format each action item as: '- [Owner] Action description (Due: date if mentioned)'. Group under headings: Action Items, Decisions Made, Open Questions. Be comprehensive — do not omit any commitment or follow-up."
+        },
+        "preset": "meeting-summary"
+      },
+      {
+        "id": "n3",
+        "type": "llm",
+        "label": "Format as Summary",
+        "position": { "x": 580, "y": 200 },
+        "params": {
+          "model": "llama3",
+          "temperature": 0.7,
+          "max_tokens": 1024,
+          "system": "You are a professional executive assistant. Given extracted action items, decisions, and open questions from a meeting, produce a polished meeting summary memo. Include: a one-paragraph executive summary, the structured action items and decisions sections, and a next-steps paragraph. Use professional business language suitable for sharing with stakeholders."
+        },
+        "preset": "meeting-summary"
+      },
+      {
+        "id": "n4",
+        "type": "display",
+        "label": "Meeting Summary",
+        "position": { "x": 840, "y": 200 },
+        "params": {},
+        "preset": "meeting-summary"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1-2",
+        "source": "n1",
+        "sourceHandle": "source",
+        "target": "n2",
+        "targetHandle": "target"
+      },
+      {
+        "id": "e2-3",
+        "source": "n2",
+        "sourceHandle": "source",
+        "target": "n3",
+        "targetHandle": "target"
+      },
+      {
+        "id": "e3-4",
+        "source": "n3",
+        "sourceHandle": "source",
+        "target": "n4",
+        "targetHandle": "target"
+      }
+    ]
+  }
+}

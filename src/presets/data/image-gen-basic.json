@@ -1,0 +1,59 @@
+{
+  "id": "image-gen-basic",
+  "name": "Image Gen Basic",
+  "nameKey": "presets.imageGenBasic.name",
+  "domain": "image",
+  "description": "Format a prompt and style description into a ComfyUI-compatible job payload and dispatch it.",
+  "descriptionKey": "presets.imageGenBasic.description",
+  "flow": {
+    "id": "flow-image-gen-basic",
+    "name": "Image Gen Basic",
+    "phase": 0,
+    "createdAt": "2026-05-13T00:00:00.000Z",
+    "updatedAt": "2026-05-13T00:00:00.000Z",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "input",
+        "label": "Prompt + Style",
+        "position": { "x": 60, "y": 200 },
+        "params": { "value": "" },
+        "preset": "image-gen-basic"
+      },
+      {
+        "id": "n2",
+        "type": "transform",
+        "label": "Format ComfyUI Payload",
+        "position": { "x": 320, "y": 200 },
+        "params": {
+          "template": "{\"prompt\": \"{{input}}\", \"style\": \"photorealistic\"}"
+        },
+        "preset": "image-gen-basic"
+      },
+      {
+        "id": "n3",
+        "type": "output",
+        "label": "ComfyUI Job",
+        "position": { "x": 580, "y": 200 },
+        "params": {},
+        "preset": "image-gen-basic"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1-2",
+        "source": "n1",
+        "sourceHandle": "source",
+        "target": "n2",
+        "targetHandle": "target"
+      },
+      {
+        "id": "e2-3",
+        "source": "n2",
+        "sourceHandle": "source",
+        "target": "n3",
+        "targetHandle": "target"
+      }
+    ]
+  }
+}

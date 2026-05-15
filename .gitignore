@@ -34,3 +34,6 @@ vault-flows.db
 .certs/
 .env.example
 .omx
+*.log
+*.logs
+package-lock.json

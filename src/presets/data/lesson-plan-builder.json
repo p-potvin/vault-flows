@@ -1,0 +1,82 @@
+{
+  "id": "lesson-plan-builder",
+  "name": "Lesson Plan Builder",
+  "nameKey": "presets.lessonPlanBuilder.name",
+  "domain": "education",
+  "description": "Generate measurable learning objectives and a complete lesson plan from a subject and grade level.",
+  "descriptionKey": "presets.lessonPlanBuilder.description",
+  "flow": {
+    "id": "flow-lesson-plan-builder",
+    "name": "Lesson Plan Builder",
+    "phase": 0,
+    "createdAt": "2026-05-13T00:00:00.000Z",
+    "updatedAt": "2026-05-13T00:00:00.000Z",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "input",
+        "label": "Subject + Grade Level",
+        "position": { "x": 60, "y": 200 },
+        "params": { "value": "" },
+        "preset": "lesson-plan-builder"
+      },
+      {
+        "id": "n2",
+        "type": "llm",
+        "label": "Generate Learning Objectives",
+        "position": { "x": 320, "y": 200 },
+        "params": {
+          "model": "llama3",
+          "temperature": 0.7,
+          "max_tokens": 1024,
+          "system": "You are a curriculum designer with expertise in Bloom's Taxonomy. Given a subject and grade level, produce 4-6 specific, measurable, achievable, relevant, and time-bound (SMART) learning objectives. Each objective should start with an action verb and be appropriate for the stated grade level. Output only the numbered list of objectives."
+        },
+        "preset": "lesson-plan-builder"
+      },
+      {
+        "id": "n3",
+        "type": "llm",
+        "label": "Build Lesson Plan",
+        "position": { "x": 580, "y": 200 },
+        "params": {
+          "model": "llama3",
+          "temperature": 0.7,
+          "max_tokens": 1024,
+          "system": "You are an experienced educator. Given a set of learning objectives, build a structured lesson plan including: duration estimate, required materials, warm-up activity (5 min), direct instruction (15 min), guided practice (15 min), independent practice (10 min), and a closing assessment strategy. Format each section with a clear heading and concise description."
+        },
+        "preset": "lesson-plan-builder"
+      },
+      {
+        "id": "n4",
+        "type": "display",
+        "label": "Lesson Plan",
+        "position": { "x": 840, "y": 200 },
+        "params": {},
+        "preset": "lesson-plan-builder"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1-2",
+        "source": "n1",
+        "sourceHandle": "source",
+        "target": "n2",
+        "targetHandle": "target"
+      },
+      {
+        "id": "e2-3",
+        "source": "n2",
+        "sourceHandle": "source",
+        "target": "n3",
+        "targetHandle": "target"
+      },
+      {
+        "id": "e3-4",
+        "source": "n3",
+        "sourceHandle": "source",
+        "target": "n4",
+        "targetHandle": "target"
+      }
+    ]
+  }
+}

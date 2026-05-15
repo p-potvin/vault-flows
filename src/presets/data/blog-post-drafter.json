@@ -1,0 +1,82 @@
+{
+  "id": "blog-post-drafter",
+  "name": "Blog Post Drafter",
+  "nameKey": "presets.blogPostDrafter.name",
+  "domain": "writing",
+  "description": "Turn a topic into a fully drafted blog post via outline expansion and full prose generation.",
+  "descriptionKey": "presets.blogPostDrafter.description",
+  "flow": {
+    "id": "flow-blog-post-drafter",
+    "name": "Blog Post Drafter",
+    "phase": 0,
+    "createdAt": "2026-05-13T00:00:00.000Z",
+    "updatedAt": "2026-05-13T00:00:00.000Z",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "input",
+        "label": "Topic",
+        "position": { "x": 60, "y": 200 },
+        "params": { "value": "" },
+        "preset": "blog-post-drafter"
+      },
+      {
+        "id": "n2",
+        "type": "llm",
+        "label": "Expand Outline",
+        "position": { "x": 320, "y": 200 },
+        "params": {
+          "model": "llama3",
+          "temperature": 0.7,
+          "max_tokens": 1024,
+          "system": "You are an expert content strategist. Given a blog topic, generate a detailed section-by-section outline with 5-7 sections, each including a heading and 2-3 bullet points of key ideas to cover. Output only the outline."
+        },
+        "preset": "blog-post-drafter"
+      },
+      {
+        "id": "n3",
+        "type": "llm",
+        "label": "Write Full Draft",
+        "position": { "x": 580, "y": 200 },
+        "params": {
+          "model": "llama3",
+          "temperature": 0.7,
+          "max_tokens": 1024,
+          "system": "You are a skilled blog writer. Given a structured outline, write a complete, engaging blog post with a compelling introduction, fully developed body sections, and a clear conclusion. Use a conversational yet authoritative tone. Output only the finished prose."
+        },
+        "preset": "blog-post-drafter"
+      },
+      {
+        "id": "n4",
+        "type": "display",
+        "label": "Result",
+        "position": { "x": 840, "y": 200 },
+        "params": {},
+        "preset": "blog-post-drafter"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1-2",
+        "source": "n1",
+        "sourceHandle": "source",
+        "target": "n2",
+        "targetHandle": "target"
+      },
+      {
+        "id": "e2-3",
+        "source": "n2",
+        "sourceHandle": "source",
+        "target": "n3",
+        "targetHandle": "target"
+      },
+      {
+        "id": "e3-4",
+        "source": "n3",
+        "sourceHandle": "source",
+        "target": "n4",
+        "targetHandle": "target"
+      }
+    ]
+  }
+}
