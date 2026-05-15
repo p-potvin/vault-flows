@@ -19,7 +19,7 @@ export function PresetCard({ preset, onOpen }: PresetCardProps) {
   const { t } = useTranslation()
 
   return (
-    <button
+    <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
       onClick={onOpen}
       style={{
         display: 'flex',

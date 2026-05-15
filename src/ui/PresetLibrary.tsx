@@ -46,7 +46,7 @@ export function PresetLibrary({ onPresetLoaded }: PresetLibraryProps) {
         }}
       >
         {DOMAINS.map((d) => (
-          <button
+          <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             key={d}
             onClick={() => setActiveDomain(d)}
             style={{

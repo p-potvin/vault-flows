@@ -87,7 +87,7 @@ export function SignupModal({ onSuccess, onSwitchToLogin, onCancel }: SignupModa
           {/* Username */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={labelStyle}>{t('auth.username')}</label>
-            <input
+            <input className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               ref={usernameRef}
               type="text"
               autoComplete="username"
@@ -102,7 +102,7 @@ export function SignupModal({ onSuccess, onSwitchToLogin, onCancel }: SignupModa
           {/* Password */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={labelStyle}>{t('auth.password')}</label>
-            <input
+            <input className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               type="password"
               autoComplete="new-password"
               value={password}
@@ -131,7 +131,7 @@ export function SignupModal({ onSuccess, onSwitchToLogin, onCancel }: SignupModa
                 {t('auth.optional')}
               </span>
             </div>
-            <input
+            <input className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               type="email"
               autoComplete="email"
               value={email}
@@ -161,7 +161,7 @@ export function SignupModal({ onSuccess, onSwitchToLogin, onCancel }: SignupModa
           {/* Actions */}
           <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
             {onCancel && (
-              <button
+              <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
                 type="button"
                 onClick={onCancel}
                 disabled={loading}
@@ -170,7 +170,7 @@ export function SignupModal({ onSuccess, onSwitchToLogin, onCancel }: SignupModa
                 Cancel
               </button>
             )}
-            <button
+            <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               type="submit"
               disabled={loading || !username || !password}
               style={{
@@ -195,7 +195,7 @@ export function SignupModal({ onSuccess, onSwitchToLogin, onCancel }: SignupModa
         {/* Switch to login */}
         <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center' }}>
           {t('auth.have_account')}{' '}
-          <button
+          <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             type="button"
             onClick={onSwitchToLogin}
             style={{

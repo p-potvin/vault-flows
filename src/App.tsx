@@ -89,7 +89,7 @@ export default function App() {
         </span>
 
         {/* Preset toggle */}
-        <button onClick={() => setSidebarOpen((v) => !v)} style={headerBtnStyle}>
+        <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" onClick={() => setSidebarOpen((v) => !v)} style={headerBtnStyle}>
           {t('nav.presets')}
         </button>
 
@@ -103,7 +103,7 @@ export default function App() {
         )}
 
         {/* Execute */}
-        <button
+        <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
           onClick={handleRun}
           disabled={executionStatus === 'running' || !activePreset}
           style={{
@@ -137,13 +137,13 @@ export default function App() {
             {currentUser}
           </span>
         ) : (
-          <button onClick={() => { setRunAfterLogin(false); setAuthModal('login') }} style={headerBtnStyle}>
+          <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" onClick={() => { setRunAfterLogin(false); setAuthModal('login') }} style={headerBtnStyle}>
             {t('auth.login')}
           </button>
         )}
 
         {/* Language toggle */}
-        <button onClick={toggleLang} style={headerBtnStyle}>
+        <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" onClick={toggleLang} style={headerBtnStyle}>
           {i18n.language?.startsWith('fr') ? 'EN' : 'FR'}
         </button>
 
@@ -204,7 +204,7 @@ export default function App() {
                 {t('app.title')}
               </span>
               <span style={{ fontSize: '14px' }}>{t('app.tagline')}</span>
-              <button
+              <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
                 onClick={() => setSidebarOpen(true)}
                 style={{
                   marginTop: '8px',

@@ -17,3 +17,7 @@
 ## 2026-05-14 - Sibling Labels Require Explicit htmlFor Bindings
 **Learning:** When a `<label>` element is a sibling of an `<input>` (e.g. for sliders and color pickers) rather than wrapping it, screen readers cannot implicitly associate them. Explicit `htmlFor` and `id` attributes are critical for accessibility.
 **Action:** Always ensure sibling `<label>` elements use `htmlFor` that exactly matches the `id` of their corresponding input, and continue applying consistent `focus-visible` styles to all interactive elements.
+
+## 2024-05-15 - Missing Focus Rings on Inline-Styled Elements
+**Learning:** In this codebase, many custom interactive elements (like modal inputs, header buttons, and preset cards) were heavily styled using inline `style={{...}}` props. These inline styles often lacked specific `:focus` or `:focus-visible` states, and custom border/background styling implicitly suppressed the browser's default focus ring, leading to poor keyboard accessibility.
+**Action:** Always append Tailwind `focus-visible` utilities (e.g., `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500`) to interactive elements, even when they otherwise rely on inline styles, to explicitly restore keyboard focus indicators.

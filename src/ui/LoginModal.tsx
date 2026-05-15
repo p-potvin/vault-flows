@@ -87,7 +87,7 @@ export function LoginModal({ onSuccess, onSwitchToSignup, onCancel, runIntent }:
         <form onSubmit={(e) => void handleSubmit(e)} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={labelStyle}>{t('auth.username')}</label>
-            <input
+            <input className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               ref={usernameRef}
               type="text"
               autoComplete="username"
@@ -101,7 +101,7 @@ export function LoginModal({ onSuccess, onSwitchToSignup, onCancel, runIntent }:
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={labelStyle}>{t('auth.password')}</label>
-            <input
+            <input className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               type="password"
               autoComplete="current-password"
               value={password}
@@ -131,7 +131,7 @@ export function LoginModal({ onSuccess, onSwitchToSignup, onCancel, runIntent }:
           {/* Actions */}
           <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
             {onCancel && (
-              <button
+              <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
                 type="button"
                 onClick={onCancel}
                 disabled={loading}
@@ -140,7 +140,7 @@ export function LoginModal({ onSuccess, onSwitchToSignup, onCancel, runIntent }:
                 Cancel
               </button>
             )}
-            <button
+            <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               type="submit"
               disabled={loading || !username || !password}
               style={{
@@ -166,7 +166,7 @@ export function LoginModal({ onSuccess, onSwitchToSignup, onCancel, runIntent }:
         {onSwitchToSignup && (
           <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center' }}>
             {t('auth.no_account')}{' '}
-            <button
+            <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               type="button"
               onClick={onSwitchToSignup}
               style={{

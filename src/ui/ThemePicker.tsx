@@ -5,7 +5,7 @@ export function ThemePicker() {
   const current = localStorage.getItem('vw-theme-id') ?? THEMES[0].id
 
   return (
-    <select
+    <select className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
       value={current}
       onChange={(e) => {
         const theme = THEMES.find((t) => t.id === e.target.value)

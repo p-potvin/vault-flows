@@ -65,7 +65,7 @@ export function NodeParamPanel() {
             {t(`node.${key}`, { defaultValue: key })}
           </label>
           {typeof value === 'number' ? (
-            <input
+            <input className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               type="number"
               value={value}
               step={key === 'temperature' ? 0.1 : 1}
@@ -75,7 +75,7 @@ export function NodeParamPanel() {
               style={inputStyle}
             />
           ) : (
-            <textarea
+            <textarea className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               value={String(value ?? '')}
               rows={String(value).length > 80 ? 4 : 2}
               onChange={(e) => updateNodeParam(node.id, key, e.target.value)}
@@ -120,7 +120,7 @@ export function NodeParamPanel() {
               {executionError}
             </div>
           )}
-          <button onClick={resetExecution} style={{ marginTop: '8px', ...ghostButtonStyle }}>
+          <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500" onClick={resetExecution} style={{ marginTop: '8px', ...ghostButtonStyle }}>
             ↺ Reset
           </button>
         </div>
