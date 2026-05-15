@@ -34,6 +34,26 @@ npm run bridge:local
 
 The Config panel exposes the matching `Local bridge URL`, `Local ComfyUI URL`, `Model Directory`, and `FaceFusion Command` fields.
 
+## Features
+
+- **assessment-state**: Read the markdown corpus, `.github/`, and OMX state to identify the real repo status.
+- **assess-api**: Confirmed the frontend is not reliably plugged into a working backend contract.
+- **assess-build**: Confirmed `npm run lint` passes and `npm run build` initially failed on missing API exports.
+- **doc-bootstrap**: Restored `README.md` and `.env.example` so the repo has an actual entrypoint and environment contract.
+- **local-api-fallback**: Built a local-resilient data layer so the frontend works even when `VITE_API_URL` is unset or broken.
+- **panel-wiring**: Wired workflow, config, and storage panels to the new data layer and removed missing-import build failures.
+- **feature-honesty**: Replaced obvious placeholder behavior with honest browser-local captioning and LoRA planning utilities.
+- **verification-sweep**: Re-ran lint, build, Playwright, and deployed-preview browser checks after wiring changes.
+- **vercel-preview**: Created a Vercel preview deployment for the current workspace state.
+- **workflow-actions**: Finish wiring any remaining exposed workflow actions that still rely on dead UI paths.
+- **storage-providers**: Decide whether provider-specific uploads remain demo metadata only or should move behind a real API contract.
+- **config-contract**: Tighten the configuration schema and UI around remote/local API mode visibility.
+- **Setup PostgreSQL schema**: (Users, Workflows, Datasets, Configs). (API)
+- **Build User Registration & Authentication flow**: (API)
+- **Implement API Key generation, validation, and middleware protection**: (API)
+- **Refactor React Router**: to support dedicated workflow pages (`/workflows/:id`).
+- **Create LIBRARIES.md**: outlining image manipulation libraries (Fabric.js, CamanJS, OpenCV, etc).
+
 ## Environment
 
 - `VITE_API_URL`

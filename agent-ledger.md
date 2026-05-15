@@ -63,3 +63,14 @@ Scope-risk: Low
 Directive: CI Pipeline Repair
 Tested: Local unit tests via `pnpm test`.
 Not-tested: End-to-end cloud environment deployment triggers.
+Intent: Synchronize feature registry and scaffold LoRA training validation to prevent VRAM OOM
+
+Added a completed features list to the `README.md` and created an initial API scaffolding in `run_local_runtime_bridge.py` for `/lora/validate` to enforce boundaries on memory-intensive training parameters (`batch_size`, `resolution`).
+
+Constraint: Low budget and minimal infrastructure.
+Rejected: Relying on client-side validation alone | Reason: Fails to securely prevent backend OOM Denial of Service vulnerabilities at the local bridge API layer.
+Confidence: high
+Scope-risk: narrow
+Directive: Ensure new features synchronized to `README.md` are accurate and verified. Any future LoRA backend integrations must route through the local bridge `validate_lora_params` check.
+Tested: Verified via `python3 -m py_compile run_local_runtime_bridge.py` and grep outputs.
+Not-tested: End-to-end user interface integration of the `/lora/validate` endpoint.

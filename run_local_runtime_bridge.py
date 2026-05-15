@@ -164,6 +164,46 @@ def resolve_command(command: str) -> List[str]:
     return parts
 
 
+def validate_lora_params(payload: dict) -> dict:
+    """
+    Validates LoRA training parameters to prevent VRAM Out-Of-Memory (OOM) exceptions.
+    Enforces strict numerical boundaries on memory-intensive settings.
+    """
+    batch_size = payload.get("batch_size", 1)
+    resolution = payload.get("resolution", 512)
+    network_dim = payload.get("network_dim", 32)
+    network_alpha = payload.get("network_alpha", 16)
+
+    try:
+        batch_size = int(batch_size)
+    except (ValueError, TypeError):
+        raise ValueError("Security Error: 'batch_size' must be an integer.")
+
+    try:
+        resolution = int(resolution)
+    except (ValueError, TypeError):
+        raise ValueError("Security Error: 'resolution' must be an integer.")
+
+    if batch_size > 4:
+        raise ValueError("Security Error: 'batch_size' cannot exceed 4 to prevent VRAM OOM DoS.")
+
+    if batch_size < 1:
+        raise ValueError("Security Error: 'batch_size' must be at least 1.")
+
+    if resolution > 1024:
+        raise ValueError("Security Error: 'resolution' cannot exceed 1024 to prevent VRAM OOM DoS.")
+
+    if resolution < 256:
+         raise ValueError("Security Error: 'resolution' must be at least 256.")
+
+    return {
+        "batch_size": batch_size,
+        "resolution": resolution,
+        "network_dim": network_dim,
+        "network_alpha": network_alpha
+    }
+
+
 def normalize_output_name(output_name: str, target_name: str) -> str:
     if output_name and output_name.strip():
         # Security: Prevent path traversal by extracting only the base filename
@@ -316,7 +356,24 @@ class VaultFlowsBridgeHandler(BaseHTTPRequestHandler):
             self.handle_faceswap_run()
             return
 
+        if path == "/lora/validate" or path.endswith("/lora/validate"):
+            self.handle_lora_validation()
+            return
+
         error_response(self, HTTPStatus.NOT_FOUND, f"Route not found: {parsed.path}")
+
+    def handle_lora_validation(self) -> None:
+        content_length = int(self.headers.get("Content-Length", "0") or 0)
+        body = self.rfile.read(content_length)
+
+        try:
+            payload = json.loads(body.decode("utf-8") or "{}")
+            result = validate_lora_params(payload)
+            json_response(self, HTTPStatus.OK, {"status": "valid", "validatedParams": result})
+        except ValueError as exc:
+            error_response(self, HTTPStatus.BAD_REQUEST, str(exc))
+        except Exception:
+            error_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, "An internal error occurred during validation.")
 
     def handle_model_scan(self) -> None:
         content_length = int(self.headers.get("Content-Length", "0") or 0)
