@@ -1,0 +1,4 @@
+## 🛡️-05-16 - Falsy Zero Bypass in Security Limits
+**Vulnerability:** A validation function designed to strictly limit numerical inputs (like `networkDim` or `batchSize` to prevent OOM DOS) checked for the presence of the value using truthiness (`if (networkDim && ...)`). This allowed a malicious user to pass `0`, which evaluated as falsy, entirely bypassing the strict minimum/maximum bounds checks (e.g., `minNetworkDim: 4`).
+**Learning:** Security bounds checks must explicitly verify `undefined` and `null` rather than relying on loose truthiness. `0` is a valid number that can violate minimum constraints if ignored by the logic.
+**Prevention:** Use explicit `!== undefined && !== null` checks when validating numerical security limits to ensure `0` is properly evaluated against the boundary rules.

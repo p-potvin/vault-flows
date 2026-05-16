@@ -54,3 +54,12 @@ python -m py_compile run_local_runtime_bridge.py
 - `TODO.md` is the implementation backlog and current execution tracker.
 - `ROADMAP.md` records the larger phased direction.
 - `.omx/plans/` contains assessment and execution plans produced during repo maintenance.
+## Features
+- Built a local-resilient data layer so the frontend works even when `VITE_API_URL` is unset or broken.
+- Replaced obvious placeholder behavior with honest browser-local captioning and LoRA planning utilities.
+- Created a Vercel preview deployment for the current workspace state.
+- Setup PostgreSQL schema (Users, Workflows, Datasets, Configs).
+- Build User Registration & Authentication flow.
+- Implement API Key generation, validation, and middleware protection.
+- Refactor React Router to support dedicated workflow pages (`/workflows/:id`).
+- Create `LIBRARIES.md` outlining image manipulation libraries (Fabric.js, CamanJS, OpenCV, etc).
