@@ -21,3 +21,15 @@ Scope-risk: narrow
 Directive: Ensure any new flows similarly follow the Lore Commit Protocol and specify the local model paths if applicable.
 Tested: Verified e2e UI visibility tests pass and SKILL.md was created.
 Not-tested: End-to-end execution of the flow using actual local models.
+
+Intent: Enhance local runtime bridge security against path traversal
+
+Updated `run_local_runtime_bridge.py` to accept an `--allowed-models-dir` CLI argument and explicitly verify that any requested `models_dir` is safely contained within this base directory using `.resolve().is_relative_to(...)`. This addresses task 11c from TASKS.md to mitigate filesystem exposure.
+
+Constraint: Must secure the local bridge while maintaining functionality and avoiding new external dependencies.
+Rejected: Complex path parsing | Reason: Python's native `pathlib.Path.resolve().is_relative_to()` is robust and standard library.
+Confidence: high
+Scope-risk: narrow
+Directive: Ensure new features handling user-supplied paths also enforce strict base directory containment checks.
+Tested: Verified via curl requests that paths attempting to escape the allowed directory are rejected with a 400 Bad Request, while legitimate paths succeed.
+Not-tested: Windows specific drive letter traversal edge cases (though `.resolve()` generally handles these correctly).

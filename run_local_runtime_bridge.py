@@ -78,11 +78,16 @@ def error_response(handler: BaseHTTPRequestHandler, status: int, message: str) -
     json_response(handler, status, {"error": message})
 
 
-def scan_models(models_dir: str) -> dict:
+def scan_models(models_dir: str, allowed_models_dir: str | None = None) -> dict:
     if not models_dir:
         raise ValueError("modelsDir is required")
 
-    root = Path(models_dir)
+    root = Path(models_dir).resolve()
+    if allowed_models_dir:
+        allowed_root = Path(allowed_models_dir).resolve()
+        if not root.is_relative_to(allowed_root):
+            raise ValueError("Security Error: Path traversal detected in models_dir.")
+
     if not root.exists():
         raise FileNotFoundError(f"Model directory does not exist: {models_dir}")
 
@@ -256,6 +261,7 @@ def run_faceswap_job(job: dict, source_path: Path, target_path: Path, server_hos
 
 class VaultFlowsBridgeHandler(BaseHTTPRequestHandler):
     server_version = "VaultFlowsLocalBridge/0.1"
+    allowed_models_dir: str | None = None
 
     def do_OPTIONS(self) -> None:  # noqa: N802
         self.send_response(HTTPStatus.OK)
@@ -318,7 +324,7 @@ class VaultFlowsBridgeHandler(BaseHTTPRequestHandler):
 
         try:
             payload = json.loads(body.decode("utf-8") or "{}")
-            result = scan_models(payload.get("modelsDir", ""))
+            result = scan_models(payload.get("modelsDir", ""), self.allowed_models_dir)
         except Exception as exc:  # noqa: BLE001
             error_response(self, HTTPStatus.BAD_REQUEST, str(exc))
             return
@@ -373,7 +379,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run the Vault Flows local runtime bridge")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8484)
+    parser.add_argument("--allowed-models-dir", default=None, help="Restrict model scanning to this base directory")
     args = parser.parse_args()
+
+    VaultFlowsBridgeHandler.allowed_models_dir = args.allowed_models_dir
 
     server = ThreadingHTTPServer((args.host, args.port), VaultFlowsBridgeHandler)
     print(f"[VaultFlows local bridge] Listening on http://{args.host}:{args.port}")
