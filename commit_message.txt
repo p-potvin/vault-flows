@@ -1,0 +1,5 @@
+Add keyboard navigation focus styles and label to WorkflowList
+
+- Replaced the visual `Theme:` text with a proper `<label>` associated with the `<select>` element to improve screen reader accessibility.
+- Added explicit `focus-visible` utility classes to the theme `<select>` and all interactive buttons/links (`Modify Copy`, `Design`, `Edit`) to guarantee keyboard navigation focus rings remain visible over custom styling.
+- Created `.Jules/palette.md` to document the necessity of explicit focus-visible states for custom styled interactive elements.

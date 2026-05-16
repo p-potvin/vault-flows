@@ -1,0 +1,3 @@
+## 2024-05-24 - Interactive Elements Focus States
+**Learning:** Custom styled interactive elements (like the theme `<select>` menu, and custom `Link`/`button` components in `WorkflowList.jsx`) often lose default browser focus outlines due to utility class resets (e.g. Tailwind). Keyboard users depend on these visual cues to know what element has focus.
+**Action:** Always verify that interactive elements either inherit the browser's default focus ring or explicitly define a `focus-visible:` state (such as `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500`) to guarantee accessibility for keyboard navigation.
