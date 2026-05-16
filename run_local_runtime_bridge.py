@@ -60,33 +60,16 @@ JOB_ROOT.mkdir(parents=True, exist_ok=True)
 
 JOB_OUTPUTS: Dict[str, Path] = {}
 
-ALLOWED_ORIGINS = {
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://localhost:5173",
-    "https://127.0.0.1:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-}
-
-def set_cors_headers(handler: BaseHTTPRequestHandler) -> None:
-    origin = handler.headers.get("Origin")
-    if origin in ALLOWED_ORIGINS:
-        handler.send_header("Access-Control-Allow-Origin", origin)
-    else:
-        # Fallback to a strict default if not in allowlist
-        handler.send_header("Access-Control-Allow-Origin", "http://localhost:5173")
-
-    handler.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-    handler.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-    handler.send_header("Access-Control-Allow-Private-Network", "true")
 
 def json_response(handler: BaseHTTPRequestHandler, status: int, payload: dict) -> None:
     encoded = json.dumps(payload).encode("utf-8")
     handler.send_response(status)
     handler.send_header("Content-Type", "application/json")
     handler.send_header("Content-Length", str(len(encoded)))
-    set_cors_headers(handler)
+    handler.send_header("Access-Control-Allow-Origin", "*")
+    handler.send_header("Access-Control-Allow-Headers", "*")
+    handler.send_header("Access-Control-Allow-Methods", "*")
+    handler.send_header("Access-Control-Allow-Private-Network", "true")
     handler.end_headers()
     handler.wfile.write(encoded)
 
@@ -276,7 +259,10 @@ class VaultFlowsBridgeHandler(BaseHTTPRequestHandler):
 
     def do_OPTIONS(self) -> None:  # noqa: N802
         self.send_response(HTTPStatus.OK)
-        set_cors_headers(self)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Headers", "*")
+        self.send_header("Access-Control-Allow-Methods", "*")
+        self.send_header("Access-Control-Allow-Private-Network", "true")
         self.send_header("Content-Length", "0")
         self.end_headers()
 
@@ -300,7 +286,8 @@ class VaultFlowsBridgeHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", mime_type)
             self.send_header("Content-Length", str(len(payload)))
             self.send_header("Content-Disposition", f'inline; filename="{output_path.name}"')
-            set_cors_headers(self)
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Private-Network", "true")
             self.end_headers()
             self.wfile.write(payload)
             return

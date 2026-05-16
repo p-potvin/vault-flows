@@ -51,8 +51,3 @@
 **Vulnerability:** The Redis dashboard UI rendered inside `run_coordinated_system.py` directly interpolated unescaped user inputs (`head`, `meta`, `details`) into HTML using a template literal. Since tasks and agents update these fields dynamically (e.g., from Redis messages), an attacker could submit malicious input that would be parsed and executed as raw HTML/JavaScript (XSS).
 **Learning:** Any UI elements built from dynamic string concatenation or template literals that include user-controlled properties are immediately susceptible to XSS if the data isn't properly escaped.
 **Prevention:** Always implement and use an HTML escaping function (converting `&`, `<`, `>`, `"`, `'` to their respective HTML entities) on all dynamic strings before they are injected into the DOM via methods like `innerHTML` or string templating.
-
-## 2026-05-16 - Restrict CORS Configuration in local runtime bridge
-**Vulnerability:** The `VaultFlowsBridgeHandler` in `run_local_runtime_bridge.py` used a wildcard (`Access-Control-Allow-Origin: *`) alongside `Access-Control-Allow-Private-Network: true`, creating an overly permissive CORS configuration. This allowed any arbitrary website to interact with the local runtime bridge.
-**Learning:** Returning a wildcard for CORS headers, especially on endpoints designed for local bridging or that access local file resources, allows any web page the user visits to perform actions or read data. This is a severe security risk.
-**Prevention:** Always restrict CORS policies to a specific, hardcoded or environment-configured allowlist of trusted origins, validating the incoming `Origin` header dynamically rather than allowing everything.
