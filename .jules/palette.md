@@ -1,6 +1,3 @@
 ## 2024-04-22 - [Edit Workflow Modal Accessibility & UX Polish]
 **Learning:** Adding dynamic disabled tooltips (e.g., explaining why a button is disabled) paired with visual `disabled:opacity-60` cues significantly clarifies form states for users who might otherwise struggle to identify missing required fields.
 **Action:** Always conditionally render the `title` attribute for disabled buttons so the error tooltip doesn't persist inappropriately when the button becomes active again.
-## 2026-05-16 - [Backup Restore Panel Loading and Disabled States]
-**Learning:** Generic loading states provide poor feedback during asymmetrical operations (e.g., "Backup" vs "Restore"). Splitting generic loading booleans into discrete operation states (`isBackingUp`, `isRestoring`) allows for much clearer context-aware button text. Furthermore, tying textarea placeholders and conditional `title` attributes (when empty) prevents the common UX pitfall of guessing why a submit action is locked.
-**Action:** When components have multiple async actions, always implement discrete loading states for each action instead of a shared global loading state. Always clear destructive or bulk inputs (like a restore textarea) on success to prevent double-submissions, and tie it with a conditional tooltip explaining the state.
