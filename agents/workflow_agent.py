@@ -2,6 +2,7 @@ import time
 import os
 import sys
 import json
+from pathlib import Path
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from vaultwares_agentciation.extrovert_agent import ExtrovertAgent
@@ -97,17 +98,17 @@ class WorkflowAgent(ExtrovertAgent):
         workflow_name = details.get("workflow_name", "unnamed")
 
         # Security: Prevent path traversal by resolving relative to an exports directory
-        base_dir = os.path.abspath("exports")
+        base_dir = Path("exports").resolve()
         requested_path = details.get("output_path", f"{workflow_name}_comfyui.json")
-        resolved_path = os.path.abspath(os.path.join(base_dir, requested_path))
+        resolved_path = (Path("exports") / requested_path).resolve()
 
-        if os.path.commonpath([base_dir, resolved_path]) != base_dir:
+        if not resolved_path.is_relative_to(base_dir):
             error_msg = "Invalid output path: Path traversal detected."
             print(f"[ERROR] [{self.agent_id}] Export failed: {error_msg}")
             self._publish_result("export_comfyui", f"Export failed: {error_msg}")
             return
 
-        output_path = resolved_path
+        output_path = str(resolved_path)
 
         steps = details.get("steps", [])
         print(f"[WORKFLOW] [{self.agent_id}] Exporting to ComfyUI | workflow={workflow_name} -> {output_path}")
@@ -137,17 +138,17 @@ class WorkflowAgent(ExtrovertAgent):
         workflow_name = details.get("workflow_name", "unnamed")
 
         # Security: Prevent path traversal by resolving relative to an exports directory
-        base_dir = os.path.abspath("exports")
+        base_dir = Path("exports").resolve()
         requested_path = details.get("output_path", f"{workflow_name}_diffusion.json")
-        resolved_path = os.path.abspath(os.path.join(base_dir, requested_path))
+        resolved_path = (Path("exports") / requested_path).resolve()
 
-        if os.path.commonpath([base_dir, resolved_path]) != base_dir:
+        if not resolved_path.is_relative_to(base_dir):
             error_msg = "Invalid output path: Path traversal detected."
             print(f"[ERROR] [{self.agent_id}] Export failed: {error_msg}")
             self._publish_result("export_diffusion", f"Export failed: {error_msg}")
             return
 
-        output_path = resolved_path
+        output_path = str(resolved_path)
 
         print(f"[WORKFLOW] [{self.agent_id}] Exporting to Diffusion format | workflow={workflow_name} -> {output_path}")
         time.sleep(1)

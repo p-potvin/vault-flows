@@ -176,11 +176,11 @@ def run_faceswap_job(job: dict, source_path: Path, target_path: Path, server_hos
     requested_save_dir = job.get("saveDirectory", "")
 
     if requested_save_dir:
-        base_dir = os.path.abspath(JOB_ROOT)
-        resolved_path = os.path.abspath(os.path.join(base_dir, requested_save_dir))
-        if os.path.commonpath([base_dir, resolved_path]) != base_dir:
+        base_dir = JOB_ROOT.resolve()
+        resolved_path = (JOB_ROOT / requested_save_dir).resolve()
+        if not resolved_path.is_relative_to(base_dir):
             raise ValueError("Security Error: Path traversal detected in saveDirectory.")
-        output_dir = Path(resolved_path)
+        output_dir = resolved_path
     else:
         output_dir = job_dir
 
