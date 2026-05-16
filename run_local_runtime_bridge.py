@@ -174,7 +174,11 @@ def run_faceswap_job(job: dict, source_path: Path, target_path: Path, server_hos
     requested_save_dir = job.get("saveDirectory", "")
     output_dir = Path(requested_save_dir) if requested_save_dir else job_dir
     output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = output_dir / output_name
+
+    output_path = (output_dir / output_name).resolve()
+    # Security: Prevent path traversal by ensuring output_path is strictly within output_dir
+    if not output_path.is_relative_to(output_dir.resolve()):
+        raise ValueError("Security Error: Output path traversal detected.")
 
     command = resolve_command(job.get("facefusionCommand", "facefusion"))
     processors = ["face_swapper"]

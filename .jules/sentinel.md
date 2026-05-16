@@ -22,3 +22,8 @@
 **Vulnerability:** The `resolve_command` function inside the local runtime bridge took the `facefusionCommand` payload string provided by the user and directly passed it to `subprocess.run()`. This allowed arbitrary execution of commands on the Windows host machine.
 **Learning:** Naively executing external binaries by user-supplied paths without restriction represents an immediate remote code execution vector. Because the command may include Windows-style paths (e.g., `C:\facefusion\facefusion.bat`), one must parse it correctly using `shlex.split(command, posix=False)` to prevent string parsing errors. Furthermore, simply splitting strings doesn't prevent an attacker from swapping `facefusion` with `cmd.exe /c calc` or `python -c "..."`.
 **Prevention:** Always construct command execution with arguments where the executable is strictly checked against a known allow-list (e.g. `['facefusion', 'python']`). Secondary logic flags inside languages that could themselves act as execution environments (like `python -c`) should be rejected if the payload string attempts to run them.
+## 2024-05-18 - Sibling Path Traversal Vulnerability
+
+**Vulnerability:** Path traversal mitigations that rely on `str.startswith()` with `.resolve()` fail to protect against sibling directory access because they ignore directory boundaries (e.g. `"/app/data".startswith("/app/data")` vs `"/app/data_hacked/evil".startswith("/app/data")`).
+**Learning:** Always use path-aware boundary checks like `pathlib.Path.is_relative_to()` or `os.path.commonpath()` rather than generic string comparisons for directory constraints.
+**Prevention:** Stop using `.startswith()` on file paths for security boundaries.
