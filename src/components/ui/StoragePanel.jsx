@@ -179,7 +179,7 @@ export const StoragePanel = React.memo(function StoragePanel() {
           ref={inputRef}
           type="file"
           aria-label="Select file to upload"
-          className="block w-full text-sm mb-3 text-gray-700 dark:text-gray-200 file:mr-4 file:rounded file:border-0 file:px-3 file:py-2 file:font-semibold file:cursor-pointer"
+          className="block w-full text-sm mb-3 text-gray-700 dark:text-gray-200 file:mr-4 file:rounded file:border-0 file:px-3 file:py-2 file:font-semibold file:cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
           onChange={(event) => {
             setFile(event.target.files?.[0] ?? null);
             setMessage(null);
@@ -201,7 +201,7 @@ export const StoragePanel = React.memo(function StoragePanel() {
         )}
 
         <button
-          className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
           style={{ background: theme.accent, color: theme.primary }}
           onClick={handleUpload}
           disabled={loading || !file}
