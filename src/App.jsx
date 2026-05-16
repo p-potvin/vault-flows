@@ -64,6 +64,7 @@ function App() {
   const [newName, setNewName] = useState('');
   const [newCategory, setNewCategory] = useState('');
   const [formError, setFormError] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
   const [panel, setPanel] = useState('workflows');
 
   const loadWorkflows = useCallback(() => {
@@ -93,6 +94,7 @@ function App() {
       setFormError(result.error.errors[0]?.message || 'Invalid input');
       return;
     }
+    setIsCreating(true);
     try {
       await createWorkflow({ name: newName, category: newCategory });
       setShowCreate(false);
@@ -101,6 +103,8 @@ function App() {
       loadWorkflows();
     } catch (err) {
       setFormError(err.message);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -183,14 +187,14 @@ function App() {
           </div>
           {formError && <div className="text-red-500 mb-2">{formError}</div>}
           <div className="flex justify-end space-x-2">
-            <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={() => setShowCreate(false)}>Cancel</button>
+            <button className="px-4 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100" onClick={() => setShowCreate(false)} disabled={isCreating}>Cancel</button>
             <button
-              className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 font-bold disabled:opacity-60 disabled:cursor-not-allowed"
               onClick={handleCreate}
-              disabled={!newName.trim()}
+              disabled={isCreating || !newName.trim()}
               title={!newName.trim() ? "Workflow name is required" : undefined}
             >
-              Create
+              {isCreating ? 'Creating...' : 'Create'}
             </button>
           </div>
         </Modal>
