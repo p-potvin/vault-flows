@@ -18,6 +18,20 @@ const viteEnv = import.meta.env || {};
 const browserStorage = typeof window !== 'undefined' ? window.localStorage : null;
 
 const configuredBase = (viteEnv.VITE_API_URL || '').trim().replace(/\/$/, '');
+const inferredSameOriginApiBase = (() => {
+  if (typeof window === 'undefined') return '';
+
+  const host = (window.location?.hostname || '').toLowerCase();
+  if (!host) return '';
+
+  // When served from noddit, prefer a same-origin relative API base to avoid mixed-content
+  // warnings and to keep tailnet-only targets out of the browser.
+  if (host === 'noddit.org' || host.endsWith('.noddit.org')) {
+    return '/api';
+  }
+
+  return '';
+})();
 const defaultCoordinationBase = (
   viteEnv.VITE_COORDINATION_API_URL
   || browserStorage?.getItem('vault-flows.coordinationApiUrl')
@@ -211,10 +225,37 @@ const DEFAULT_WORKFLOWS = [
     lastRun: null,
   },
   {
+    id: 'wf-multimodal-vqa',
+    name: 'Multimodal Video Interrogation Pipeline',
+    category: 'Natural Language & Intelligence',
+    description: 'Detailed image and video interrogation (captioning + logic). Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
     id: 'wf-legal-clause-comparison',
     name: 'Legal Clause Comparison',
     category: 'Specialized & Niche',
     description: 'Automated extraction and comparison of legal clauses using specialized subagents. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-motion-capture-transfer',
+    name: 'Motion Capture & Pose Transfer Pipeline',
+    category: 'Visual & Graphics',
+    description: 'Automated human pose transfer, hand-tracking refinement, and facial re-targeting across video sequences. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
+    id: 'wf-layout-document-intelligence',
+    name: 'Layout-Aware Document Intelligence Pipeline',
+    category: 'Utility & Structural',
+    description: 'Automated form extraction and layout-aware PDF analysis using specialized subagents. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
     favorite: false,
     pin: false,
     lastRun: null,
@@ -225,11 +266,11 @@ const PRESET_WORKFLOW_IDS = new Set(DEFAULT_WORKFLOWS.map((workflow) => workflow
 const DEFAULT_CONFIG = normalizeExecutionConfig({
   modelsDir: '',
   preferredStorageProvider: 'other',
-  apiMode: configuredBase ? 'remote-with-local-fallback' : 'local-demo',
-  apiBase: configuredBase || '',
+  apiMode: (configuredBase || inferredSameOriginApiBase) ? 'remote-with-local-fallback' : 'local-demo',
+  apiBase: configuredBase || inferredSameOriginApiBase || '',
   apiKey: '', // Stub for API Key Auth
   themeIndex: 0,
-  runtimeProvider: configuredBase ? 'remote-api' : 'browser-local',
+  runtimeProvider: (configuredBase || inferredSameOriginApiBase) ? 'remote-api' : 'browser-local',
   scannedModels: createEmptyScannedModels(),
 });
 

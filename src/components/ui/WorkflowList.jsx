@@ -7,8 +7,10 @@ import { Link } from 'react-router-dom';
 function ThemeSwitcher({ theme, themeIndex, setThemeIndex, themes }) {
   return (
     <div className="mb-4 flex items-center gap-2">
-      <span className="font-semibold">Theme:</span>
+      <label htmlFor="theme-select" className="font-semibold">Theme:</label>
       <select
+        id="theme-select"
+        className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
         value={themeIndex}
         onChange={e => setThemeIndex(Number(e.target.value))}
         style={{
@@ -115,7 +117,7 @@ export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpda
           {isPreset ? (
             <button
               type="button"
-              className="px-3 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 hover:bg-vault-800 dark:hover:bg-vault-200 font-semibold"
+              className="px-3 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 hover:bg-vault-800 dark:hover:bg-vault-200 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               onClick={() => onModifyWorkflow?.(wf)}
             >
               Modify Copy
@@ -123,14 +125,14 @@ export const WorkflowList = React.memo(function WorkflowList({ workflows, onUpda
           ) : (
             <Link
               to={`/workflows/${wf.id}`}
-              className="px-3 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 hover:bg-vault-800 dark:hover:bg-vault-200 font-semibold"
+              className="px-3 py-1 rounded bg-vault-900 dark:bg-vault-100 text-white dark:text-vault-900 hover:bg-vault-800 dark:hover:bg-vault-200 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             >
               Design
             </Link>
           )}
           {!isPreset ? (
             <button
-              className="px-3 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600 font-semibold"
+              className="px-3 py-1 rounded bg-vault-200 dark:bg-vault-700 text-vault-900 dark:text-vault-100 hover:bg-vault-300 dark:hover:bg-vault-600 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               onClick={() => openEdit(wf)}
             >
               Edit
