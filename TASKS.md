@@ -116,3 +116,8 @@ Make vault-flows a **general-purpose node-based workflow builder** (ComfyUI-like
 - All tasks must maintain local-first + remote API hybrid capability.
 
 **Next Available Task Assignment**: Agents in RELAXING state should pick the lowest unassigned main task after reviewing ROADMAP.md.
+
+14 [ ] Complete and Integrate Mask Creation Widget
+    14a [ ] [kraftwerk] Review `src/features/mask/MaskWidget.jsx` scaffolding.
+    14b [ ] [kraftwerk] Wire the MaskWidget into the Advanced Workflow Creator or individual image editing panels.
+    14c [ ] [kraftwerk] Ensure the exported mask is correctly passed to the backend API for inpainting/outpainting execution.

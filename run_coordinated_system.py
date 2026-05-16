@@ -807,7 +807,7 @@ REDIS_DASHBOARD_HTML = """
     }
 
     function renderItem(head, meta, details, extraClass = "") {
-      return `<div class="item ${extraClass}">
+      return `<div class="item ${escapeHTML(extraClass)}">
         <div class="item-head">
           <span class="name">${escapeHTML(head)}</span>
           <span class="muted">${escapeHTML(meta)}</span>
