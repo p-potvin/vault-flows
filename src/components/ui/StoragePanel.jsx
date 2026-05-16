@@ -4,22 +4,34 @@ import { useVaultTheme } from '../../lib/vaultTheme';
 
 const STORAGE_HISTORY_KEY = 'vault-flows-storage-history';
 
+// ⚡ Bolt: Cache local upload history in memory to avoid repeated expensive
+// synchronous localStorage reads and JSON.parse() calls when history updates.
+let cachedUploadHistory = null;
+
 function readUploadHistory() {
+  if (cachedUploadHistory) {
+    return cachedUploadHistory;
+  }
+
   try {
     const raw = localStorage.getItem(STORAGE_HISTORY_KEY);
     if (!raw) {
-      return [];
+      cachedUploadHistory = [];
+      return cachedUploadHistory;
     }
 
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    cachedUploadHistory = Array.isArray(parsed) ? parsed : [];
+    return cachedUploadHistory;
   } catch {
-    return [];
+    cachedUploadHistory = [];
+    return cachedUploadHistory;
   }
 }
 
 function writeUploadHistory(history) {
   localStorage.setItem(STORAGE_HISTORY_KEY, JSON.stringify(history));
+  cachedUploadHistory = history;
 }
 
 function formatFileSize(bytes) {

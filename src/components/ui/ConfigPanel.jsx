@@ -5,22 +5,34 @@ import { summarizeModelCatalog } from '../../lib/flowRuntime';
 
 const CONFIG_STORAGE_KEY = 'vault-flows-config-panel';
 
+// ⚡ Bolt: Cache local config in memory to avoid repeated expensive
+// synchronous localStorage reads and JSON.parse() calls when panel mounts.
+let cachedLocalConfig = null;
+
 function getLocalConfig() {
+  if (cachedLocalConfig) {
+    return cachedLocalConfig;
+  }
+
   try {
     const raw = localStorage.getItem(CONFIG_STORAGE_KEY);
     if (!raw) {
-      return {};
+      cachedLocalConfig = {};
+      return cachedLocalConfig;
     }
 
     const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    cachedLocalConfig = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    return cachedLocalConfig;
   } catch {
-    return {};
+    cachedLocalConfig = {};
+    return cachedLocalConfig;
   }
 }
 
 function saveLocalConfig(config) {
   localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(config, null, 2));
+  cachedLocalConfig = config;
 }
 
 function normalizeConfigPayload(payload) {
