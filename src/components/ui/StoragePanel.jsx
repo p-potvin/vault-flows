@@ -201,7 +201,7 @@ export const StoragePanel = React.memo(function StoragePanel() {
         )}
 
         <button
-          className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
           style={{ background: theme.accent, color: theme.primary }}
           onClick={handleUpload}
           disabled={loading || !file}

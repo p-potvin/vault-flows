@@ -10,3 +10,6 @@
 ## 2024-05-24 - Interactive Component Focus Indicators
 **Learning:** Config panels and deeply nested form buttons sometimes rely strictly on standard border outlines, which may conflict with container borders or background colors, making keyboard tab-navigation confusing. Adding `focus-visible` styles enhances usability without impacting mouse hover states. Furthermore, disabled buttons that omit dynamic context via `title` tags confuse users regarding the state they need to resolve to progress.
 **Action:** Consistently append `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500` to form buttons and configure conditional tooltips (`title`) on dynamically disabled controls explaining their disabled state.
+## 2024-05-24 - File Upload Keyboard Navigation Visibility
+**Learning:** Functional file upload buttons without `focus-visible` states make keyboard navigation invisible and confusing for accessibility users relying on tabs.
+**Action:** Always append explicit focus rings (e.g., `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500`) to upload or submit buttons in UI forms.
