@@ -327,7 +327,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
               name="runtimeProvider"
               value={runtimeForm.runtimeProvider}
               onChange={(event) => handleRuntimeFieldChange('runtimeProvider', event.target.value)}
-              className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+              className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             >
               <option value="browser-local">Browser local only</option>
               <option value="local-bridge">Local bridge</option>
@@ -344,7 +344,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
               value={runtimeForm.modelsDir}
               onChange={(event) => handleRuntimeFieldChange('modelsDir', event.target.value)}
               placeholder="D:\\comfyui\\resources\\comfyui\\models"
-              className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+              className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             />
           </label>
 
@@ -355,7 +355,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
               name="localBridgeUrl"
               value={runtimeForm.localBridgeUrl}
               onChange={(event) => handleRuntimeFieldChange('localBridgeUrl', event.target.value)}
-              className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+              className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             />
           </label>
 
@@ -366,7 +366,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
               name="localComfyUrl"
               value={runtimeForm.localComfyUrl}
               onChange={(event) => handleRuntimeFieldChange('localComfyUrl', event.target.value)}
-              className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+              className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             />
           </label>
 
@@ -378,7 +378,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
               value={runtimeForm.saveDirectory}
               onChange={(event) => handleRuntimeFieldChange('saveDirectory', event.target.value)}
               placeholder="Optional output folder for local jobs"
-              className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+              className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             />
           </label>
 
@@ -389,14 +389,14 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
               name="facefusionCommand"
               value={runtimeForm.facefusionCommand}
               onChange={(event) => handleRuntimeFieldChange('facefusionCommand', event.target.value)}
-              className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+              className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             />
           </label>
         </form>
 
         <div className="mt-4 flex flex-wrap gap-2">
           <button
-            className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             style={{ background: theme.accent, color: theme.primary }}
             onClick={handleRuntimeSave}
             disabled={loading || saving}
@@ -404,7 +404,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
             {saving ? 'Saving...' : 'Save Runtime Settings'}
           </button>
           <button
-            className="px-4 py-2 rounded font-bold border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded font-bold border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             onClick={handleModelRefresh}
             disabled={loading || saving}
           >
@@ -425,7 +425,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
 
       <div className="flex gap-2 mb-3">
         <button
-          className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
           style={{ background: theme.accent, color: theme.primary }}
           onClick={loadConfig}
           disabled={loading || saving}
@@ -433,7 +433,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
           {loading ? 'Loading...' : 'Reload'}
         </button>
         <button
-          className="px-4 py-2 rounded font-bold border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded font-bold border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
           onClick={() => {
             setEdit(initialValue);
             const nextRuntimeForm = pickRuntimeForm(configSnapshot || {});
@@ -466,7 +466,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
       ) : (
         <>
           <textarea
-            className="w-full p-3 border rounded dark:bg-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 font-mono text-sm"
+            className="w-full p-3 border rounded dark:bg-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
             rows={14}
             value={edit}
             onChange={(event) => setEdit(event.target.value)}
@@ -479,7 +479,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
               {isDirty ? 'Unsaved changes in editor.' : 'Editor matches the last saved snapshot.'}
             </div>
             <button
-              className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded font-bold disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500"
               style={{ background: theme.accent, color: theme.primary }}
               onClick={handleUpdate}
               disabled={saving || loading}

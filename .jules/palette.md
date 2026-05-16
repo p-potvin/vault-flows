@@ -7,3 +7,6 @@
 ## 2024-05-24 - Keyboard Navigation Visibility on Custom Tabs
 **Learning:** Custom navigation buttons, such as those used in sidebars or header tab bars, often suppress default browser focus outlines due to custom background colors or border styling, making keyboard navigation invisible and inaccessible to users.
 **Action:** Always apply explicit `focus-visible` utility classes (e.g., `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500`) to custom navigation buttons and tabs to ensure a clear focus indicator is present for keyboard users.
+## 2024-05-24 - Keyboard Navigation Visibility on Form Elements
+**Learning:** Interactive form elements (like `input`, `select`, `textarea`) inside utility panels (e.g., ConfigPanel) may lack visible focus outlines when using styling reset classes, rendering them inaccessible to keyboard navigation.
+**Action:** Always apply explicit `focus-visible` utility classes (e.g., `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500`) to all interactive form elements to ensure clear focus indicators for keyboard users.
