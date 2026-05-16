@@ -1,0 +1,4 @@
+## 🛡️-05-14 - Prevent Git Options Injection in git add
+**Vulnerability:** In `vaultwares-agentciation/omx_integration/omx_worker.py` and `vaultwares-agentciation/omx_integration/demo/run_demo.py`, `git add` commands were constructed by concatenating `["git", "add"]` with a list of user-controlled file paths (`created_files` or `all_files`) without a `--` separator. An attacker could supply a filename starting with a hyphen (e.g., `--chmod=+x`) to inject arbitrary Git options.
+**Learning:** Functions invoking command-line tools like `git` with user-supplied arguments are vulnerable to options injection if flags aren't separated from positional arguments. Even when intending to pass paths, arguments starting with `-` can be interpreted as flags.
+**Prevention:** Always use the `--` double-dash separator to signify the end of command options when passing variable data (like paths) to command-line tools like `git`. For example: `["git", "add", "--"] + files`.
