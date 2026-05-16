@@ -39,5 +39,13 @@ export default defineConfig(({ mode }) => {
       port: 3100,
       https: httpsConfig,
     },
+    /*
+     * Fix: e2e test globbing issue
+     * Issue: vitest attempting to run playwright e2e tests
+     * Solution: Explicitly exclude e2e test directory from vitest
+     */
+    test: {
+      exclude: ['tests/e2e/**', 'node_modules/**']
+    },
   }
 })
