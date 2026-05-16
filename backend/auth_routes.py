@@ -53,7 +53,14 @@ def login(request: Request, user: UserCreate, db: Session = Depends(get_db)):
             raise HTTPException(status_code=429, detail="Too many failed login attempts. Please try again later.")
 
     db_user = db.query(User).filter(User.username == user.username).first()
-    if not db_user or not pwd_context.verify(user.password, db_user.hashed_password):
+    if not db_user:
+        # Prevent timing attacks by running a dummy verification
+        pwd_context.dummy_verify()
+        password_matches = False
+    else:
+        password_matches = pwd_context.verify(user.password, db_user.hashed_password)
+
+    if not password_matches:
         # Record failed attempt
         if ip not in FAILED_LOGIN_ATTEMPTS:
             FAILED_LOGIN_ATTEMPTS[ip] = []
