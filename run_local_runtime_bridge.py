@@ -19,6 +19,7 @@ import cgi
 import datetime as dt
 import json
 import mimetypes
+import os
 import shlex
 import shutil
 import subprocess
@@ -172,9 +173,25 @@ def run_faceswap_job(job: dict, source_path: Path, target_path: Path, server_hos
 
     output_name = normalize_output_name(job.get("outputName", ""), target_path.name)
     requested_save_dir = job.get("saveDirectory", "")
-    output_dir = Path(requested_save_dir) if requested_save_dir else job_dir
+
+    # Path traversal mitigation
+    base_dir = os.path.abspath(str(JOB_ROOT))
+    if requested_save_dir:
+        resolved_dir = os.path.abspath(os.path.join(base_dir, requested_save_dir))
+    else:
+        resolved_dir = os.path.abspath(str(job_dir))
+
+    if os.path.commonpath([base_dir, resolved_dir]) != base_dir:
+        raise ValueError("Security Error: Path traversal detected in saveDirectory.")
+
+    output_dir = Path(resolved_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = output_dir / output_name
+
+    resolved_output = os.path.abspath(os.path.join(str(output_dir), output_name))
+    if os.path.commonpath([str(output_dir), resolved_output]) != str(output_dir):
+        raise ValueError("Security Error: Path traversal detected in outputName.")
+
+    output_path = Path(resolved_output)
 
     command = resolve_command(job.get("facefusionCommand", "facefusion"))
     processors = ["face_swapper"]
