@@ -8,3 +8,8 @@
 **Symptom Pattern:** `pnpm run test:e2e` fails when `tests/e2e/` is empty or missing, returning `Error: No tests found`. This breaks the CI pipelines.
 **Root Cause:** Playwright expects tests in `testDir` (`tests/e2e`) as specified in `playwright.config.js`. If there are none, it throws an error.
 **Prevention:** Include a dummy smoke test or verify the basic UI interactions when creating new pipelines. We created `tests/e2e/basic-smoke.spec.js` which performs some basic `page.goto` testing to fix the failure. `vitest.config.ts` was also updated to explicitly exclude `tests/e2e/` so `vitest` doesn't pick up playwright tests.
+
+## 🚨-02-28 - Vite build fails on missing Node typings
+**Symptom Pattern:** `pnpm run build` fails with TS errors indicating missing modules `node:fs`, `node:path`, `process`, and `__dirname` in `vite.config.ts`.
+**Root Cause:** The `vite.config.ts` utilizes Node APIs for configuration resolution, but `@types/node` is missing from the devDependencies, causing TypeScript compilation (which is part of the build step: `tsc -b && vite build`) to fail.
+**Prevention:** Always ensure `@types/node` is installed as a `devDependency` (`pnpm install -D @types/node`) when configuring Vite with Node built-ins.
