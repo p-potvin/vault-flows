@@ -96,7 +96,7 @@ Make vault-flows a **general-purpose node-based workflow builder** (ComfyUI-like
 11 [ ] Security & Production Readiness
     11a [ ] API key / auth propagation from frontend to backend
     11b [ ] Sandboxing for custom code nodes
-    11c [ ] Rate limiting and local bridge security (filesystem exposure)
+    11c [x] Rate limiting and local bridge security (filesystem exposure)
 
 12 [ ] Testing & Documentation
     12a [ ] Expand Playwright e2e for builder + execution flows

@@ -1,0 +1,4 @@
+## 🛡️-2024-05-13 - Path Traversal Mitigation in Python Local Bridge
+**Vulnerability:** In `run_local_runtime_bridge.py`, `os.path.commonpath` was previously used to prevent directory traversal when validating user-supplied directories. While `commonpath` checks if paths share a common prefix, it is prone to bypasses if paths are not strictly canonicalized correctly on all OS platforms (e.g. symlinks, edge cases with `..`).
+**Learning:** `pathlib.Path.resolve().is_relative_to()` is the more secure and robust way to enforce a strict base boundary for path resolution in modern Python, as `resolve()` fully resolves symlinks and normalizes `..` components before performing the prefix check.
+**Prevention:** Always use `not Path(target_path).resolve().is_relative_to(Path(base_dir).resolve())` when validating any client-supplied filesystem paths in python scripts to prevent escaping the designated directory.

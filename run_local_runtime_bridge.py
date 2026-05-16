@@ -19,7 +19,6 @@ import cgi
 import datetime as dt
 import json
 import mimetypes
-import os
 import shlex
 import shutil
 import subprocess
@@ -30,6 +29,21 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Dict, List
 from urllib.parse import urlparse
+import time
+from collections import defaultdict
+
+REQUEST_TIMES = defaultdict(list)
+MAX_REQUESTS_PER_MINUTE = 100
+
+def check_rate_limit(client_address):
+    ip = client_address[0]
+    now = time.time()
+    REQUEST_TIMES[ip] = [t for t in REQUEST_TIMES[ip] if now - t < 60]
+    if len(REQUEST_TIMES[ip]) >= MAX_REQUESTS_PER_MINUTE:
+        return False
+    REQUEST_TIMES[ip].append(now)
+    return True
+
 
 
 MODEL_GROUP_PATHS = {
@@ -176,9 +190,9 @@ def run_faceswap_job(job: dict, source_path: Path, target_path: Path, server_hos
     requested_save_dir = job.get("saveDirectory", "")
 
     if requested_save_dir:
-        base_dir = os.path.abspath(JOB_ROOT)
-        resolved_path = os.path.abspath(os.path.join(base_dir, requested_save_dir))
-        if os.path.commonpath([base_dir, resolved_path]) != base_dir:
+        base_dir = JOB_ROOT.resolve()
+        resolved_path = (JOB_ROOT / requested_save_dir).resolve()
+        if not resolved_path.is_relative_to(base_dir):
             raise ValueError("Security Error: Path traversal detected in saveDirectory.")
         output_dir = Path(resolved_path)
     else:
@@ -267,6 +281,9 @@ class VaultFlowsBridgeHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self) -> None:  # noqa: N802
+        if not check_rate_limit(self.client_address):
+            error_response(self, HTTPStatus.TOO_MANY_REQUESTS, "Rate limit exceeded")
+            return
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/")
         if path == "/health":
@@ -300,6 +317,9 @@ class VaultFlowsBridgeHandler(BaseHTTPRequestHandler):
         error_response(self, HTTPStatus.NOT_FOUND, f"Route not found: {parsed.path}")
 
     def do_POST(self) -> None:  # noqa: N802
+        if not check_rate_limit(self.client_address):
+            error_response(self, HTTPStatus.TOO_MANY_REQUESTS, "Rate limit exceeded")
+            return
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/")
         if path == "/models/scan" or path.endswith("/models/scan"):

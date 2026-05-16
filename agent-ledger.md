@@ -33,3 +33,15 @@ Scope-risk: narrow
 Directive: Ensure new default workflows are mirrored in e2e tests to maintain UI test stability.
 Tested: Verified e2e UI visibility tests pass and SKILL.md was created.
 Not-tested: End-to-end execution of the flow using actual local models.
+
+Intent: Implement local bridge security and rate limiting
+
+Addressed Task 11c from TASKS.md. Added a simple rate limiting mechanism to `VaultFlowsBridgeHandler` to prevent abuse. Also mitigated a path traversal vulnerability in `run_faceswap_job` by using `Path.resolve().is_relative_to()` instead of `os.path.commonpath`.
+
+Constraint: Adhere to standard Python library and maintain single-file simplicity for the bridge.
+Rejected: Advanced rate limiting with Redis | Reason: The bridge needs to be dependency-free and machine-local.
+Confidence: high
+Scope-risk: narrow
+Directive: Ensure all filesystem paths in the local bridge continue to use `.resolve().is_relative_to()` for boundary checks.
+Tested: Verified script builds without syntax errors and runs successfully in validation checks.
+Not-tested: High volume concurrent requests to test the rate limiting under load.
