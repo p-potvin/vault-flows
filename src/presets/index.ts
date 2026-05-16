@@ -253,11 +253,61 @@ const imageGenBasic: Preset = {
   },
 }
 
+const skateboardingTrickAnalysis: Preset = {
+  id: 'skateboarding-trick-analysis',
+  name: 'Skateboarding Trick Analysis & Slow-Mo Generation',
+  nameKey: 'presets.skateboardingTrickAnalysis.name',
+  domain: 'creative',
+  description:
+    'Provides automated pose tracking, trick classification, and AI-driven frame interpolation to generate ultra-slow-motion replays of skateboarding tricks.',
+  descriptionKey: 'presets.skateboardingTrickAnalysis.description',
+  flow: {
+    id: 'flow-skateboarding-trick-analysis',
+    name: 'Skateboarding Trick Analysis',
+    phase: 0,
+    createdAt: '2026-05-13T00:00:00.000Z',
+    updatedAt: '2026-05-13T00:00:00.000Z',
+    nodes: [
+      {
+        id: 'n1',
+        type: 'input',
+        label: 'Source Video',
+        position: { x: 60, y: 200 },
+        params: { value: '' },
+        preset: 'skateboarding-trick-analysis',
+      },
+      {
+        id: 'n2',
+        type: 'transform',
+        label: 'Analyze Trick',
+        position: { x: 320, y: 200 },
+        params: {
+          template: '{"source": "{{input}}", "action": "skateboarding_trick_analysis", "model": "skate-pose-v1"}',
+        },
+        preset: 'skateboarding-trick-analysis',
+      },
+      {
+        id: 'n3',
+        type: 'output',
+        label: 'Slow-Mo Result',
+        position: { x: 580, y: 200 },
+        params: {},
+        preset: 'skateboarding-trick-analysis',
+      },
+    ],
+    edges: [
+      { id: 'e1-2', source: 'n1', sourceHandle: 'source', target: 'n2', targetHandle: 'target' },
+      { id: 'e2-3', source: 'n2', sourceHandle: 'source', target: 'n3', targetHandle: 'target' },
+    ],
+  },
+}
+
 export const PRESETS: Preset[] = [
   blogPostDrafter,
   lessonPlanBuilder,
   meetingSummary,
   imageGenBasic,
+  skateboardingTrickAnalysis,
 ]
 
 export function getPresetsByDomain(domain: PresetDomain): Preset[] {
