@@ -10,3 +10,6 @@
 ## 2024-05-24 - Interactive Component Focus Indicators
 **Learning:** Config panels and deeply nested form buttons sometimes rely strictly on standard border outlines, which may conflict with container borders or background colors, making keyboard tab-navigation confusing. Adding `focus-visible` styles enhances usability without impacting mouse hover states. Furthermore, disabled buttons that omit dynamic context via `title` tags confuse users regarding the state they need to resolve to progress.
 **Action:** Consistently append `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500` to form buttons and configure conditional tooltips (`title`) on dynamically disabled controls explaining their disabled state.
+## 2024-05-25 - Explicit HTMLFor Bindings in Dynamic Select Lists
+**Learning:** Implicitly nested `<label>` tags (e.g., `<label><span>Label Text</span><select /></label>`) around dynamically rendered input arrays or complex structures can be challenging for some screen readers to parse reliably compared to strict `htmlFor` matching.
+**Action:** Always favor explicit `htmlFor` and `id` bindings for `<label>` elements when wrapping interactive inputs like `select` in React components, rather than relying on implicit nesting.

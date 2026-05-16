@@ -467,6 +467,7 @@ export const ConfigPanel = React.memo(function ConfigPanel() {
       ) : (
         <>
           <textarea
+            aria-label="Configuration JSON editor"
             className="w-full p-3 border rounded dark:bg-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 font-mono text-sm"
             rows={14}
             value={edit}

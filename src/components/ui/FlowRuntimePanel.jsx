@@ -158,9 +158,10 @@ export const FlowRuntimePanel = React.memo(function FlowRuntimePanel({ flowId, t
       <div className="mb-4 flex flex-wrap gap-2">
         <button
           type="button"
-          className="rounded bg-vault-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-vault-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-vault-100 dark:text-vault-900 dark:hover:bg-vault-200"
+          className="rounded bg-vault-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-vault-800 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vault-500 dark:bg-vault-100 dark:text-vault-900 dark:hover:bg-vault-200"
           onClick={handleRefresh}
           disabled={refreshing}
+          title={refreshing ? 'Please wait while the model catalog is refreshing' : undefined}
         >
           {refreshing ? 'Refreshing...' : 'Refresh Model Catalog'}
         </button>
@@ -187,11 +188,12 @@ export const FlowRuntimePanel = React.memo(function FlowRuntimePanel({ flowId, t
           const options = config?.scannedModels?.categories?.[slot.group] || [];
 
           return (
-            <label key={slot.key} className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-900 dark:text-gray-100">
+            <div key={slot.key} className="block">
+              <label htmlFor={`slot-${slot.key}`} className="mb-1 block text-sm font-medium text-gray-900 dark:text-gray-100">
                 {slot.label}
-              </span>
+              </label>
               <select
+                id={`slot-${slot.key}`}
                 value={selection[slot.key] || ''}
                 onChange={(event) => handleSelect(slot.key, event.target.value)}
                 className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
@@ -210,7 +212,7 @@ export const FlowRuntimePanel = React.memo(function FlowRuntimePanel({ flowId, t
                   ? `${options.length} local models available in this group.`
                   : 'No scanned models available for this group yet.'}
               </span>
-            </label>
+            </div>
           );
         })}
       </div>
