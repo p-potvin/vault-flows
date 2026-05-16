@@ -2,6 +2,14 @@
 
 Vault Flows is a Vite + React frontend for managing workflow definitions, backup and export operations, storage uploads, and a set of AI-adjacent workflow demos. The repository also contains a Python Redis-based multi-agent coordination prototype under `agents/` and `vaultwares_agentciation/`.
 
+## Features
+
+- Local-resilient data layer allowing the frontend to work offline.
+- PostgreSQL schema for Users, Workflows, Datasets, and Configs.
+- User Registration & Authentication flow.
+- API Key generation, validation, and middleware protection.
+- Feature-honest browser-local captioning and LoRA planning utilities.
+
 ## Current state
 
 - The web app is the primary runnable surface for Vercel deployment.
