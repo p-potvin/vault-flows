@@ -2,10 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test('basic smoke test', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveTitle(/VaultFlows/i);
+  await expect(page).toHaveTitle(/VaultFlows/);
 });
 
 test('displays workflow sections', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('body')).toBeVisible();
+  await expect(page.getByText('Preset Library', { exact: true }).first()).toBeVisible();
 });
