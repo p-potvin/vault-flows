@@ -1,0 +1,4 @@
+## 🛡️-05-11 - Path Traversal Vulnerability via Missing Boundary Check
+**Vulnerability:** The `run_local_runtime_bridge.py` server used the user-provided `saveDirectory` parameter to dynamically create an output path, previously using `os.path.commonpath` which had insufficient strict boundary constraints. This allowed arbitrary absolute paths or relative traversal strings, enabling remote attackers to potentially escape the intended working directory.
+**Learning:** `os.path.commonpath` or `os.path.abspath` are not reliable on their own for enforcing path boundaries when untrusted input might involve symlinks or specific trailing sequences.
+**Prevention:** Standard path traversal mitigation for file operations involves resolving user-provided paths relative to a strict base boundary (like `JOB_ROOT`) and validating it using `pathlib.Path.resolve().is_relative_to(base_dir)` to ensure it definitively does not escape the boundary.
