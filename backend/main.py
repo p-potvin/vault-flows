@@ -1,13 +1,21 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, Request
 from sqlalchemy.orm import Session
-from .db import get_db, User, APIKey, WorkflowConfig, Dataset
-from .auth import authenticate_user
+from .db import get_db
 from .api_key_middleware import api_key_required
 from fastapi.middleware.cors import CORSMiddleware
 from backend.auth_routes import router as auth_router
 import os
 
 app = FastAPI(title="Vault-Flows Core API", version="1.0.0")
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Content-Security-Policy"] = "default-src 'self'"
+    return response
 
 # Security: Configure CORS properly using environment variable or safe defaults
 allowed_origins_str = os.environ.get("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000")

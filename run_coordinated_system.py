@@ -239,7 +239,7 @@ def update_tasks_file_status(path: Path, task_ref: str, marker: str) -> bool:
 
 def create_pull_request(repo_path: Path, branch_name: str, base_branch: str, title: str, body: str) -> dict[str, Any]:
     gh = subprocess.run(
-        ["gh", "pr", "create", "--base", base_branch, "--head", branch_name, "--title", title, "--body", body],
+        ["gh", "pr", "create", "--base", base_branch, "--head", branch_name, "--title", title, "--body", body, "--"],
         capture_output=True,
         text=True,
         timeout=60,
