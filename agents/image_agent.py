@@ -32,6 +32,7 @@ class ImageAgent(ExtrovertAgent):
         "workflow_creation",
         "comfyui_export",
         "nerf_generation",
+        "script_to_comic",
     ]
 
     def __init__(
@@ -61,6 +62,7 @@ class ImageAgent(ExtrovertAgent):
             "create_workflow": self._create_image_workflow,
             "export_comfyui": self._export_comfyui,
             "generate_nerf": self._generate_nerf,
+            "script_to_comic": self._script_to_comic,
         }
 
         handler = handlers.get(task)
@@ -157,6 +159,19 @@ class ImageAgent(ExtrovertAgent):
         time.sleep(2)
         result = f"[NeRF model generated using {model} from '{images_dir}']"
         self._publish_result("generate_nerf", result)
+
+
+    def _script_to_comic(self, details: dict):
+        """Convert script text into a multi-frame comic layout."""
+        script = details.get("script", "unknown")
+        model = details.get("model_type", "ip-adapter")
+        model_name = details.get("model_name", "comic_v1")
+        print(f"📖 [{self.agent_id}] Generating comic from script | model={model}")
+        print(f"   Script: '{script[:80]}'")
+        import time
+        time.sleep(2)
+        result = f"[Comic generated from script using local models at D:\\comfyui\\resources\\comfyui\\models\\{model}\\_{model_name}]"
+        self._publish_result("script_to_comic", result)
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""

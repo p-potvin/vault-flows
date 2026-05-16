@@ -49,6 +49,15 @@ const DEFAULT_WORKFLOWS = [
     lastRun: null,
   },
   {
+    id: 'wf-comic-visualizer',
+    name: 'Comic Script Visualizer',
+    category: 'Visual & Graphics',
+    description: 'Convert script text into a visually consistent multi-frame comic layout using IP-Adapter. Uses local models at D:\\\\comfyui\\\\resources\\\\comfyui\\\\models\\\\{model_type}\\\\_{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
     id: 'wf-nerf-automation',
     name: 'NeRF Automation Pipeline',
     category: 'ML',
