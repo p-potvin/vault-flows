@@ -18,7 +18,7 @@
 **Vulnerability:** The user provided a GitHub Personal Access Token (PAT) in plaintext within the conversation prompt. Hardcoding or storing this token in the repository would lead to credential exposure.
 **Learning:** Users may inadvertently share sensitive tokens when requesting automation that requires API access.
 **Prevention:** Never hardcode provided tokens in source code, scripts, or configuration files. Use environment variables and secret management systems (like GitHub Actions Secrets) to handle credentials securely. Advise the user to revoke the exposed token and use a secret manager.
-## $(date +%Y-%m-%d) - Prevent Command Injection in `run_local_runtime_bridge.py`
+## 2026-05-16 - Prevent Command Injection in `run_local_runtime_bridge.py`
 **Vulnerability:** The `resolve_command` function inside the local runtime bridge took the `facefusionCommand` payload string provided by the user and directly passed it to `subprocess.run()`. This allowed arbitrary execution of commands on the Windows host machine.
 **Learning:** Naively executing external binaries by user-supplied paths without restriction represents an immediate remote code execution vector. Because the command may include Windows-style paths (e.g., `C:\facefusion\facefusion.bat`), one must parse it correctly using `shlex.split(command, posix=False)` to prevent string parsing errors. Furthermore, simply splitting strings doesn't prevent an attacker from swapping `facefusion` with `cmd.exe /c calc` or `python -c "..."`.
 **Prevention:** Always construct command execution with arguments where the executable is strictly checked against a known allow-list (e.g. `['facefusion', 'python']`). Secondary logic flags inside languages that could themselves act as execution environments (like `python -c`) should be rejected if the payload string attempts to run them.
@@ -47,7 +47,12 @@
 **Vulnerability:** The `run_git` calls in `run_coordinated_system.py` directly appended user-supplied `branch` names (e.g., in `git rev-parse --verify`, `git branch`, `git switch`, and `git push`). An attacker could supply a branch name starting with `-` (e.g. `-h` or other git options), potentially bypassing validations or leading to options injection.
 **Learning:** Even internal Git subcommands can interpret user-supplied branch names as options if they start with a hyphen.
 **Prevention:** Always include the `--` separator to explicitly delineate flags from positional arguments when passing variables such as branch names, paths, or URLs to Git commands (e.g., `git push origin -- branch_name`, `git switch -- branch_name`).
-## $(date +%Y-%m-%d) - Prevent XSS in HTML string templates
+## 2026-05-16 - Prevent XSS in HTML string templates
 **Vulnerability:** The Redis dashboard UI rendered inside `run_coordinated_system.py` directly interpolated unescaped user inputs (`head`, `meta`, `details`) into HTML using a template literal. Since tasks and agents update these fields dynamically (e.g., from Redis messages), an attacker could submit malicious input that would be parsed and executed as raw HTML/JavaScript (XSS).
 **Learning:** Any UI elements built from dynamic string concatenation or template literals that include user-controlled properties are immediately susceptible to XSS if the data isn't properly escaped.
 **Prevention:** Always implement and use an HTML escaping function (converting `&`, `<`, `>`, `"`, `'` to their respective HTML entities) on all dynamic strings before they are injected into the DOM via methods like `innerHTML` or string templating.
+
+## 2026-05-16 - Prevent Path Traversal in OMXWorker output handling
+**Vulnerability:** The `execute_task` function in `omx_worker.py` accepted an `output_files` payload from Redis messages, containing relative file paths. It blindly concatenated these relative paths to the base directory and wrote out files. This allowed for Path Traversal vulnerabilities (e.g. using `../../`) which would let an attacker or rogue agent overwrite arbitrary files outside the repository.
+**Learning:** Functions that accept arbitrary relative file paths from external sources or payloads and write to them must strictly validate that the resolved path does not traverse outside the intended base directory, even for internal-facing agents.
+**Prevention:** Use `pathlib.Path` to resolve the base directory. Combine the base directory with the input relative path and `.resolve()` the combination. Finally, ensure the final absolute path is constrained by checking `is_relative_to(base_dir)`.
