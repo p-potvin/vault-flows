@@ -18,7 +18,7 @@
 **Vulnerability:** The user provided a GitHub Personal Access Token (PAT) in plaintext within the conversation prompt. Hardcoding or storing this token in the repository would lead to credential exposure.
 **Learning:** Users may inadvertently share sensitive tokens when requesting automation that requires API access.
 **Prevention:** Never hardcode provided tokens in source code, scripts, or configuration files. Use environment variables and secret management systems (like GitHub Actions Secrets) to handle credentials securely. Advise the user to revoke the exposed token and use a secret manager.
-## $(date +%Y-%m-%d) - Prevent Command Injection in `run_local_runtime_bridge.py`
+## 2026-05-16 - Prevent Command Injection in `run_local_runtime_bridge.py`
 **Vulnerability:** The `resolve_command` function inside the local runtime bridge took the `facefusionCommand` payload string provided by the user and directly passed it to `subprocess.run()`. This allowed arbitrary execution of commands on the Windows host machine.
 **Learning:** Naively executing external binaries by user-supplied paths without restriction represents an immediate remote code execution vector. Because the command may include Windows-style paths (e.g., `C:\facefusion\facefusion.bat`), one must parse it correctly using `shlex.split(command, posix=False)` to prevent string parsing errors. Furthermore, simply splitting strings doesn't prevent an attacker from swapping `facefusion` with `cmd.exe /c calc` or `python -c "..."`.
 **Prevention:** Always construct command execution with arguments where the executable is strictly checked against a known allow-list (e.g. `['facefusion', 'python']`). Secondary logic flags inside languages that could themselves act as execution environments (like `python -c`) should be rejected if the payload string attempts to run them.
@@ -32,3 +32,8 @@
 **Vulnerability:** The `normalize_output_name` function blindly returned the `outputName` string from user-supplied payloads, which was later appended to a directory path. An attacker could supply `../../evil.exe` to overwrite arbitrary system files outside the job directory.
 **Learning:** Unsanitized filenames mixed with directory paths expose local runtime bridges to path traversal attacks, even if the target directory is otherwise checked or isolated.
 **Prevention:** When accepting a raw filename from an external payload to create a local file, extract strictly the base name using `Path(filename).name` before using it in any file path composition.
+
+## 2026-05-16 - Enforce Minimum Password Length
+**Vulnerability:** The API lacked minimum password length constraints on user creation, allowing users to register with trivially short and guessable passwords (e.g., "1").
+**Learning:** Depending entirely on external enforcement for password policies is brittle. The backend API must actively reject weak credentials at the boundary before they are hashed or processed.
+**Prevention:** Always enforce strong authentication requirements using input validation frameworks like Pydantic (`constr(min_length=8)`) directly on the API route payload schema.

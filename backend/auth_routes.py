@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 from backend.db import get_db, User
 from passlib.context import CryptContext
 from typing import Optional
@@ -11,7 +11,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class UserCreate(BaseModel):
     username: str
-    password: str
+    # Security: Enforce minimum password length to prevent weak credentials
+    password: constr(min_length=8)
 
 class UserResponse(BaseModel):
     id: int
