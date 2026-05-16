@@ -4,8 +4,15 @@ from pydantic import BaseModel
 from backend.db import get_db, User
 from passlib.context import CryptContext
 from typing import Optional
+import re
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+def validate_password(password: str):
+    if len(password) < 12:
+        raise HTTPException(status_code=400, detail="Password must be at least 12 characters long")
+    if not re.search(r"[A-Za-z]", password) or not re.search(r"\d", password):
+        raise HTTPException(status_code=400, detail="Password must be alphanumeric (contain both letters and digits)")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -22,6 +29,8 @@ class UserResponse(BaseModel):
 
 @router.post("/register", response_model=UserResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    validate_password(user.password)
+
     db_user = db.query(User).filter(User.username == user.username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")

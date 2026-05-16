@@ -263,7 +263,7 @@ correlation_id = "c" + "".join(secrets.choice(_alphabet) for _ in range(6))
 - **OWASP Top 10 compliance:** Treat every endpoint as adversarial. Validate, sanitize, and authorize before processing.
 - **Input validation:** All user inputs must pass a Zod schema (TypeScript) or a validated model (Python/C#) before touching business logic.
 - **SQL injection prevention:** Use parameterized queries exclusively. No string concatenation in SQL. Ever.
-- **Authentication:** Passwords hashed with `bcryptjs` (Node) or `bcrypt` (Python). JWT tokens expire in 24 hours; verify signature on every protected route.
+- **Authentication:** Passwords must be at least 12 alphanumeric characters. Hash with `bcryptjs` (Node) or `bcrypt` (Python). JWT tokens expire in 24 hours; verify signature on every protected route.
 - **Secrets:** Use GCP Secret Manager. Never commit `.env` files. Add `.env*` to `.gitignore`. Document required variables in `.env.example` with placeholder values only.
 - **Minimalist footprint:** Zero-dependency policy for non-essential features. Every third-party package must justify its inclusion.
 - **Row-Level Security (RLS):** Enforce user-scoped data access at the query level (filter by `user_id` from the authenticated JWT). Design for RLS even when using managed PostgreSQL.
