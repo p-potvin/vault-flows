@@ -1,0 +1,1 @@
+import { test, expect } from '@playwright/test'; test('basic smoke', async ({ page }) => { await page.goto('/'); await expect(page.getByText('Cultural Adaptation Translation')).toBeVisible(); await expect(page.getByText('Image to Video Face Swap')).toBeVisible(); });
