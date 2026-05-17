@@ -35,6 +35,7 @@ class VideoAgent(ExtrovertAgent):
         "generate_foley",
         "motion_capture_transfer",
         "skateboarding_trick_analysis",
+        "text_to_video_generation",
     ]
 
     def __init__(
@@ -69,6 +70,7 @@ class VideoAgent(ExtrovertAgent):
             "generate_foley": self._generate_foley,
             "motion_capture_transfer": self._motion_capture_transfer,
             "skateboarding_trick_analysis": self._skateboarding_trick_analysis,
+            "generate_video_from_text": self._generate_video_from_text,
         }
 
         handler = handlers.get(task)
@@ -255,6 +257,18 @@ class VideoAgent(ExtrovertAgent):
 
         result = f"[Foley generated & noise reduced for '{source}' using {model}]"
         self._publish_result("generate_foley", result)
+
+    def _generate_video_from_text(self, details: dict):
+        """Generates a video from a text prompt using local models."""
+        prompt = details.get("prompt", "unknown prompt")
+        model_type = details.get("model_type", "diffusion")
+        model_name = details.get("model_name", "model_v1")
+
+        print(
+            f"🎬 [{self.agent_id}] Generating video from text | prompt={prompt} | Using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\{model_name}"
+        )
+        time.sleep(1)
+        print(f"✅ [{self.agent_id}] Video generation complete.")
 
     def _motion_capture_transfer(self, details: dict):
         """Automated human pose transfer, hand-tracking refinement, and facial re-targeting."""
