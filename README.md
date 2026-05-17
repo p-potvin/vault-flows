@@ -8,6 +8,15 @@ Vault Flows is a Vite + React frontend for managing workflow definitions, backup
 - The Python agent subsystem is present, but it is still mostly simulation and coordination scaffolding rather than production task execution.
 - The repo previously depended on an external backend API for core workflow operations. The frontend now supports a local demo/fallback mode when that backend is missing or unreachable.
 
+## Features
+
+- Local API fallback for frontend execution without a backend
+- Honest browser-local captioning and LoRA planning utilities
+- PostgreSQL database schema integration (Users, Workflows, Datasets, Configs)
+- User Registration & Authentication flow
+- API Key generation, validation, and middleware protection
+- Dedicated workflow pages routing
+
 ## Local development
 
 ```bash

@@ -19,7 +19,6 @@ import cgi
 import datetime as dt
 import json
 import mimetypes
-import os
 import shlex
 import shutil
 import subprocess
@@ -59,6 +58,17 @@ JOB_ROOT = Path(tempfile.gettempdir()) / "vault-flows-local-runtime"
 JOB_ROOT.mkdir(parents=True, exist_ok=True)
 
 JOB_OUTPUTS: Dict[str, Path] = {}
+ALLOWED_MODELS_DIR = None
+ALLOWED_ORIGINS: set[str] = set()
+
+
+def set_cors_headers(handler: BaseHTTPRequestHandler) -> None:
+    origin = handler.headers.get("Origin", "")
+    if "*" in ALLOWED_ORIGINS or origin in ALLOWED_ORIGINS:
+        handler.send_header("Access-Control-Allow-Origin", origin if origin else "*")
+    handler.send_header("Access-Control-Allow-Headers", "*")
+    handler.send_header("Access-Control-Allow-Methods", "*")
+    handler.send_header("Access-Control-Allow-Private-Network", "true")
 
 
 def json_response(handler: BaseHTTPRequestHandler, status: int, payload: dict) -> None:
@@ -66,10 +76,7 @@ def json_response(handler: BaseHTTPRequestHandler, status: int, payload: dict) -
     handler.send_response(status)
     handler.send_header("Content-Type", "application/json")
     handler.send_header("Content-Length", str(len(encoded)))
-    handler.send_header("Access-Control-Allow-Origin", "*")
-    handler.send_header("Access-Control-Allow-Headers", "*")
-    handler.send_header("Access-Control-Allow-Methods", "*")
-    handler.send_header("Access-Control-Allow-Private-Network", "true")
+    set_cors_headers(handler)
     handler.end_headers()
     handler.wfile.write(encoded)
 
@@ -82,7 +89,13 @@ def scan_models(models_dir: str) -> dict:
     if not models_dir:
         raise ValueError("modelsDir is required")
 
-    root = Path(models_dir)
+    root = Path(models_dir).resolve()
+
+    if ALLOWED_MODELS_DIR:
+        allowed = Path(ALLOWED_MODELS_DIR).resolve()
+        if not root.is_relative_to(allowed):
+            raise ValueError(f"Security Error: modelsDir must be within {allowed}")
+
     if not root.exists():
         raise FileNotFoundError(f"Model directory does not exist: {models_dir}")
 
@@ -176,11 +189,11 @@ def run_faceswap_job(job: dict, source_path: Path, target_path: Path, server_hos
     requested_save_dir = job.get("saveDirectory", "")
 
     if requested_save_dir:
-        base_dir = os.path.abspath(JOB_ROOT)
-        resolved_path = os.path.abspath(os.path.join(base_dir, requested_save_dir))
-        if os.path.commonpath([base_dir, resolved_path]) != base_dir:
+        base_dir = Path(JOB_ROOT).resolve()
+        resolved_path = (base_dir / requested_save_dir).resolve()
+        if not resolved_path.is_relative_to(base_dir):
             raise ValueError("Security Error: Path traversal detected in saveDirectory.")
-        output_dir = Path(resolved_path)
+        output_dir = resolved_path
     else:
         output_dir = job_dir
 
@@ -259,10 +272,7 @@ class VaultFlowsBridgeHandler(BaseHTTPRequestHandler):
 
     def do_OPTIONS(self) -> None:  # noqa: N802
         self.send_response(HTTPStatus.OK)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Headers", "*")
-        self.send_header("Access-Control-Allow-Methods", "*")
-        self.send_header("Access-Control-Allow-Private-Network", "true")
+        set_cors_headers(self)
         self.send_header("Content-Length", "0")
         self.end_headers()
 
@@ -286,8 +296,7 @@ class VaultFlowsBridgeHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", mime_type)
             self.send_header("Content-Length", str(len(payload)))
             self.send_header("Content-Disposition", f'inline; filename="{output_path.name}"')
-            self.send_header("Access-Control-Allow-Origin", "*")
-            self.send_header("Access-Control-Allow-Private-Network", "true")
+            set_cors_headers(self)
             self.end_headers()
             self.wfile.write(payload)
             return
@@ -370,10 +379,19 @@ class VaultFlowsBridgeHandler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
+    global ALLOWED_MODELS_DIR, ALLOWED_ORIGINS
     parser = argparse.ArgumentParser(description="Run the Vault Flows local runtime bridge")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8484)
+    parser.add_argument("--allowed-models-dir", help="Restrict model scanning to this directory")
+    parser.add_argument("--allowed-origins", default="http://localhost:5173,http://127.0.0.1:5173", help="Comma-separated list of allowed CORS origins")
     args = parser.parse_args()
+
+    if args.allowed_models_dir:
+        ALLOWED_MODELS_DIR = args.allowed_models_dir
+
+    if args.allowed_origins:
+        ALLOWED_ORIGINS = {orig.strip() for orig in args.allowed_origins.split(",") if orig.strip()}
 
     server = ThreadingHTTPServer((args.host, args.port), VaultFlowsBridgeHandler)
     print(f"[VaultFlows local bridge] Listening on http://{args.host}:{args.port}")

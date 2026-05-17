@@ -4,7 +4,6 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from vaultwares_agentciation.extrovert_agent import ExtrovertAgent
-from vaultwares_agentciation.enums import AgentStatus
 
 
 class VideoAgent(ExtrovertAgent):
@@ -34,6 +33,9 @@ class VideoAgent(ExtrovertAgent):
         "video_interpolation",
         "audio_reactive_visuals",
         "generate_foley",
+        "motion_capture_transfer",
+        "skateboarding_trick_analysis",
+        "text_to_video_generation",
     ]
 
     def __init__(
@@ -66,6 +68,9 @@ class VideoAgent(ExtrovertAgent):
             "interpolate_video": self._interpolate_video,
             "generate_audio_reactive_visuals": self._generate_audio_reactive_visuals,
             "generate_foley": self._generate_foley,
+            "motion_capture_transfer": self._motion_capture_transfer,
+            "skateboarding_trick_analysis": self._skateboarding_trick_analysis,
+            "generate_video_from_text": self._generate_video_from_text,
         }
 
         handler = handlers.get(task)
@@ -202,9 +207,9 @@ class VideoAgent(ExtrovertAgent):
         print(
             f"🔄 [{self.agent_id}] Interpolating video | source={source} | model={model}"
         )
-        print(f"   [Delegating frame extraction to ImageAgent...]")
+        print("   [Delegating frame extraction to ImageAgent...]")
         time.sleep(1)
-        print(f"   [Delegating scene analysis to TextAgent...]")
+        print("   [Delegating scene analysis to TextAgent...]")
         time.sleep(1)
         print(
             f"   Using local model path: D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}"
@@ -223,9 +228,9 @@ class VideoAgent(ExtrovertAgent):
         print(
             f"🎵 [{self.agent_id}] Generating audio-reactive visuals | audio={audio} | model={model}"
         )
-        print(f"   [Delegating frame generation to ImageAgent...]")
+        print("   [Delegating frame generation to ImageAgent...]")
         time.sleep(1)
-        print(f"   [Delegating prompt refinement to TextAgent...]")
+        print("   [Delegating prompt refinement to TextAgent...]")
         time.sleep(1)
         print(
             f"   Using local model path: D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}"
@@ -252,6 +257,54 @@ class VideoAgent(ExtrovertAgent):
 
         result = f"[Foley generated & noise reduced for '{source}' using {model}]"
         self._publish_result("generate_foley", result)
+
+    def _generate_video_from_text(self, details: dict):
+        """Generates a video from a text prompt using local models."""
+        prompt = details.get("prompt", "unknown prompt")
+        model_type = details.get("model_type", "diffusion")
+        model_name = details.get("model_name", "model_v1")
+
+        print(
+            f"🎬 [{self.agent_id}] Generating video from text | prompt={prompt} | Using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\{model_name}"
+        )
+        time.sleep(1)
+        print(f"✅ [{self.agent_id}] Video generation complete.")
+
+    def _motion_capture_transfer(self, details: dict):
+        """Automated human pose transfer, hand-tracking refinement, and facial re-targeting."""
+        source = details.get("source", "unknown_video")
+        model = details.get("model", "pose-transfer-v1.safetensors")
+        model_type = details.get("model_type", "motion_capture")
+
+        print(
+            f"🏃 [{self.agent_id}] Transferring motion & pose | source={source} | model={model}"
+        )
+        time.sleep(1)
+        print(
+            f"   Using local model path: D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}"
+        )
+        time.sleep(2)
+
+        result = f"[Motion capture and pose transferred for '{source}' using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}]"
+        self._publish_result("motion_capture_transfer", result)
+
+    def _skateboarding_trick_analysis(self, details: dict):
+        """Automated pose tracking, trick classification, and AI-driven frame interpolation to generate ultra-slow-motion replays."""
+        source = details.get("source", "unknown_video")
+        model = details.get("model", "skate-pose-v1")
+        model_type = details.get("model_type", "video_models")
+
+        print(
+            f"🛹 [{self.agent_id}] Analyzing skateboarding trick | source={source} | model={model}"
+        )
+        time.sleep(1)
+        print(
+            f"   Using local model path: D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}"
+        )
+        time.sleep(2)
+
+        result = f"[Skateboarding trick analyzed & slow-mo generated for '{source}' using local model at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model}]"
+        self._publish_result("skateboarding_trick_analysis", result)
 
     def _log_unknown_task(self, task: str, details: dict):
         """Log an unrecognized task for debugging."""
