@@ -259,6 +259,15 @@ const DEFAULT_WORKFLOWS = [
     favorite: false,
     pin: false,
     lastRun: null,
+  },
+  {
+    id: 'wf-text-to-video-generation',
+    name: 'Text to Video Generation',
+    category: 'Video',
+    description: 'Generates high-quality video clips from text prompts using diffusion models. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\{model_name}.',
+    favorite: false,
+    pin: false,
+    lastRun: null,
   }
 ];
 const PRESET_WORKFLOW_IDS = new Set(DEFAULT_WORKFLOWS.map((workflow) => workflow.id));

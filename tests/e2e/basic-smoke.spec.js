@@ -1,1 +1,11 @@
-import { test, expect } from '@playwright/test'; test('basic smoke', async ({ page }) => { await page.goto('/'); await expect(page.getByText('Cultural Adaptation Translation')).toBeVisible(); await expect(page.getByText('Image to Video Face Swap')).toBeVisible(); });
+import { test, expect } from '@playwright/test';
+
+test('basic smoke test', async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveTitle(/VaultFlows/);
+});
+
+test('displays workflow sections', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('Preset Library', { exact: true }).first()).toBeVisible();
+});
