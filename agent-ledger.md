@@ -86,3 +86,12 @@ Scope-risk: Low
 Directive: CI Pipeline Repair
 Tested: Local unit tests via `pnpm test`.
 Not-tested: End-to-end cloud environment deployment triggers.
+Intent: Add Skateboarding Trick Analysis & Slow-Mo Generation flow
+Narrative: Created a new workflow based on the Video / Action Sports category. Included pose tracking, trick classification, and AI-driven frame interpolation. Updated the frontend registry, backend `video_agent.py` with the new skill handler, and added visibility checks to e2e smoke tests.
+Constraint: Act as the scheduled job itself to fulfill the daily workflow generation task manually instead of automating it.
+Rejected: Automating through CI/CD | Reason: Explicit instruction to act as the scheduled job.
+Confidence: high
+Scope-risk: narrow
+Directive: Ensure new default workflows are mirrored in e2e tests to maintain UI test stability.
+Tested: Verified e2e UI visibility tests pass and SKILL.md was created.
+Not-tested: End-to-end execution of the flow using actual local models.

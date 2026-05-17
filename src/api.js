@@ -261,6 +261,15 @@ const DEFAULT_WORKFLOWS = [
     lastRun: null,
   },
   {
+    id: 'wf-skateboarding-trick-analysis',
+    name: 'Skateboarding Trick Analysis & Slow-Mo Generation',
+    category: 'Video',
+    description: 'Provides automated pose tracking, trick classification, and AI-driven frame interpolation to generate ultra-slow-motion replays of skateboarding tricks. Uses local models at D:\\comfyui\\resources\\comfyui\\models\\{model_type}\\_{model_name}.',
+   favorite: false,
+    pin: false,
+    lastRun: null,
+  },
+  {
     id: 'wf-text-to-video-generation',
     name: 'Text to Video Generation',
     category: 'Video',
