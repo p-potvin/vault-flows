@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "test:node": "node --test src/**/*.test.js src/*.test.js",
     "bridge:local": "python run_local_runtime_bridge.py",
     "test": "vitest",
     "test:e2e": "playwright test",

@@ -1,3 +1,7 @@
+## 🚨-05-11 - Test Runner Bleed into Submodules
+**Symptom Pattern:** Running global `npm test` or `node --test` in the root repository fails because it recursively picks up test files inside submodules or nested projects (like `vault-themes/`) that require a different test runner (like `vitest`) or specific dependencies not present in the root `package.json`.
+**Root Cause:** The default `node --test` command recursively searches the entire directory tree for files matching test patterns, crossing boundaries into sub-projects that manage their own dependencies and test commands.
+**Prevention:** Explicitly scope test runners to the intended source directories (e.g., `node --test src/**/*.test.js src/*.test.js`) rather than relying on unbounded global recursion, or explicitly ignore known submodule directories using the test runner configuration.
 
 ## 🚨-02-28 - Test Globbing and CI Package Manager Drift
 **Symptom Pattern:** `pnpm test` triggers errors related to test runners like missing `vitest` in cross-cutting dependencies and `MODULE_NOT_FOUND`.
