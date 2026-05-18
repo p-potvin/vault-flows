@@ -3,7 +3,7 @@
 	url = https://github.com/p-potvin/vault-themes
     
 [submodule "vaultwares-agentciation"]
-	path = vaultwares-agentciation
+	path = vaultwares-adk
 	url = https://github.com/p-potvin/vaultwares-agentciation
 [submodule "facefusion"]
 	path = facefusion

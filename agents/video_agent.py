@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from vaultwares_agentciation.extrovert_agent import ExtrovertAgent
+from vaultwares_adk.extrovert_agent import ExtrovertAgent
 
 
 class VideoAgent(ExtrovertAgent):

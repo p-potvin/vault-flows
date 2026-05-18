@@ -6,8 +6,7 @@ test.describe('VaultFlows Frontend Smoke Tests', () => {
     await expect(page).toHaveTitle(/VaultFlows/i);
     await expect(page.locator('body')).toBeVisible();
   });
-  
-test.describe('Basic Smoke Tests', () => {
+
   test('displays workflow sections', async ({ page }) => {
     await page.goto('/');
 
@@ -31,12 +30,14 @@ test.describe('Basic Smoke Tests', () => {
     await element5.scrollIntoViewIfNeeded();
     await expect(element5).toBeVisible();
   });
-test('basic smoke test', async ({ page }) => {
-  await page.goto('/');
-  await expect(page).toHaveTitle(/VaultFlows/);
-});
 
-test('displays workflow sections', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.getByText('Preset Library', { exact: true }).first()).toBeVisible();
+  test('basic smoke test', async ({ page }) => {
+    await page.goto('/');
+    await expect(page).toHaveTitle(/VaultFlows/);
+  });
+
+  test('displays Preset Library', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByText('Preset Library', { exact: true }).first()).toBeVisible();
+  });
 });
