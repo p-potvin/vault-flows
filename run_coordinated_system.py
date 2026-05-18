@@ -171,9 +171,9 @@ def prepare_dispatch_branch(repo_path: Path, branch_name: str | None, base_branc
         result["warning"] = dirty.stderr.strip() or "Could not inspect git status."
         return result
 
-    existing = run_git(repo_path, ["rev-parse", "--verify", branch])
+    existing = run_git(repo_path, ["rev-parse", "--verify", "--", branch])
     if existing.returncode != 0:
-        created = run_git(repo_path, ["branch", branch])
+        created = run_git(repo_path, ["branch", "--", branch])
         result["created"] = created.returncode == 0
         if created.returncode != 0:
             result["warning"] = created.stderr.strip() or created.stdout.strip()
@@ -183,7 +183,7 @@ def prepare_dispatch_branch(repo_path: Path, branch_name: str | None, base_branc
         result["warning"] = "Branch exists but was not checked out because the work tree has uncommitted changes."
         return result
 
-    switched = run_git(repo_path, ["switch", branch])
+    switched = run_git(repo_path, ["switch", "--", branch])
     result["checked_out"] = switched.returncode == 0
     if switched.returncode != 0:
         result["warning"] = switched.stderr.strip() or switched.stdout.strip()
