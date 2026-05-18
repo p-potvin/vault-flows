@@ -1,0 +1,74 @@
+C:\Users\Administrator\Desktop\Github Repos\vault-flows\node_modules\.bin\vite:2
+basedir=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
+          ^^^^^^^
+
+SyntaxError: missing ) after argument list
+    at wrapSafe (node:internal/modules/cjs/loader:1638:18)
+    at Module._compile (node:internal/modules/cjs/loader:1680:20)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49
+
+Node.js v22.22.0
+C:\Users\Administrator\Desktop\Github Repos\vault-flows\node_modules\.bin\vite:2
+basedir=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
+          ^^^^^^^
+
+SyntaxError: missing ) after argument list
+    at wrapSafe (node:internal/modules/cjs/loader:1638:18)
+    at Module._compile (node:internal/modules/cjs/loader:1680:20)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49
+
+Node.js v22.22.0
+C:\Users\Administrator\Desktop\Github Repos\vault-flows\node_modules\.bin\vite:2
+basedir=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
+          ^^^^^^^
+
+SyntaxError: missing ) after argument list
+    at wrapSafe (node:internal/modules/cjs/loader:1638:18)
+    at Module._compile (node:internal/modules/cjs/loader:1680:20)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49
+
+Node.js v22.22.0
+C:\Users\Administrator\Desktop\Github Repos\vault-flows\node_modules\.bin\vite:2
+basedir=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
+          ^^^^^^^
+
+SyntaxError: missing ) after argument list
+    at wrapSafe (node:internal/modules/cjs/loader:1638:18)
+    at Module._compile (node:internal/modules/cjs/loader:1680:20)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49
+
+Node.js v22.22.0
+^C[2m8:^C:02 p.m.[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /workflows/run[39m
+Error: getaddrinfo ENOTFOUND 8000
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+[2m8:12:43 p.m.[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /workflows/run[39m
+Error: getaddrinfo ENOTFOUND 8000
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+^C^C^C^C[2m9:22:52 p.m.[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /auth/me[39m
+Error: getaddrinfo ENOTFOUND 8000
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)
+^C^C^C^C
