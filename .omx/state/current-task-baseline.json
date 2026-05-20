@@ -3,10 +3,10 @@
   "tasks": [
     {
       "branch_name": "main",
-      "worktree_path": "c:\\Users\\Administrator\\Desktop\\Github Repos\\Projects\\vault-flows",
+      "worktree_path": "C:\\Users\\Administrator\\Desktop\\Github Repos\\vault-flows",
       "status": "active",
       "created_at": "2026-04-14T01:34:31.180Z",
-      "updated_at": "2026-04-14T01:34:31.180Z"
+      "updated_at": "2026-05-19T23:12:28.585Z"
     }
   ]
 }

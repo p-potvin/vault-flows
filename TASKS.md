@@ -11,14 +11,14 @@ Mark completed setup tasks and align roadmap with ADK and UI Kit overhaul.
 ## 1 [ ] Migrate ADK & Expand Personas
 <!-- TASK_TYPE: LOCAL -->
 
-### 1a [ ] Rename vaultwares-agentciation directory to vaultwares-adk
+### 1a [ ] Rename vaultwares-adk directory to vaultwares-adk
 <!-- TASK_TYPE: LOCAL -->
-Execute `git mv vaultwares-agentciation vaultwares-adk`. Update `.gitmodules` if necessary to reflect the new submodule path. Rename the inner python package folder from `vaultwares_agentciation` to `vaultwares_adk`.
+Execute `git mv vaultwares-adk vaultwares-adk`. Update `.gitmodules` if necessary to reflect the new submodule path. Rename the inner python package folder from `vaultwares-adk` to `vaultwares_adk`.
 
 ### 1b [ ] Update backend imports to vaultwares_adk
 <!-- TASK_TYPE: CLOUD -->
 <!-- FILE_SCOPE: run_coordinated_system.py, backend/main.py, run_worker_agent.py, run_lonely_manager.py -->
-Search the entire `/vault-flows/` root for `vaultwares_agentciation` and replace it with `vaultwares_adk`. This includes all Python runner scripts and backend FastAPI routes.
+Search the entire `/vault-flows/` root for `vaultwares-adk` and replace it with `vaultwares_adk`. This includes all Python runner scripts and backend FastAPI routes.
 
 ### 1c [ ] Create Persona Markdown definitions
 <!-- TASK_TYPE: CLOUD -->

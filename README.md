@@ -1,6 +1,6 @@
 # Vault Flows
 
-Vault Flows is a Vite + React frontend for managing workflow definitions, backup and export operations, storage uploads, and a set of AI-adjacent workflow demos. The repository also contains a Python Redis-based multi-agent coordination prototype under `agents/` and `vaultwares_agentciation/`.
+Vault Flows is a Vite + React frontend for managing workflow definitions, backup and export operations, storage uploads, and a set of AI-adjacent workflow demos. The repository also contains a Python Redis-based multi-agent coordination prototype under `agents/` and `vaultwares-adk/`.
 
 ## Current state
 

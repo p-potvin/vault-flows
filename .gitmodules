@@ -1,10 +1,10 @@
-[submodule "vault-themes"]
-	path = vault-themes
-	url = https://github.com/p-potvin/vault-themes
+[submodule "vaultwares-themes"]
+	path = vaultwares-themes
+	url = https://github.com/p-potvin/vaultwares-themes
     
-[submodule "vaultwares-agentciation"]
+[submodule "vaultwares-adk"]
 	path = vaultwares-adk
-	url = https://github.com/p-potvin/vaultwares-agentciation
+	url = https://github.com/p-potvin/vaultwares-adk
 [submodule "facefusion"]
 	path = facefusion
 	url = https://github.com/facefusion/facefusion
