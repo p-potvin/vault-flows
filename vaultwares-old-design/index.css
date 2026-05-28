@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@import "../vaultwares-themes/theme-manager/exports/vault-tailwind-v4.css";
+@import "@xyflow/react/dist/style.css";
+
+:root {
+  font-family: "Segoe UI Semilight", "Segoe UI", Inter, system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* React Flow canvas baseline */
+.react-flow {
+  background: var(--background);
+}
+
+.react-flow__node {
+  border-radius: var(--radius-md, 8px);
+}
+
+.react-flow__edge-path {
+  stroke: var(--border);
+}
+
+.react-flow__controls-button {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}

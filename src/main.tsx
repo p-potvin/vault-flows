@@ -5,9 +5,9 @@ import './i18n/index'
 import './index.css'
 import App from './App'
 import { ErrorBoundary } from './ErrorBoundary'
-import { initTheme } from './lib/theme'
 
-initTheme()
+// vaultwares-revisited has no runtime theme switcher — Console + Warm coexist
+// by region. Tokens are static CSS vars from vaultwares-themes/assets/tokens.
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Missing #root element')

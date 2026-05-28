@@ -26,7 +26,7 @@
         "label": "Expand Outline",
         "position": { "x": 320, "y": 200 },
         "params": {
-          "model": "llama3",
+          "model": "nutboy02/Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated-uncenfull:Q2_K_MTX",
           "temperature": 0.7,
           "max_tokens": 1024,
           "system": "You are an expert content strategist. Given a blog topic, generate a detailed section-by-section outline with 5-7 sections, each including a heading and 2-3 bullet points of key ideas to cover. Output only the outline."
@@ -39,7 +39,7 @@
         "label": "Write Full Draft",
         "position": { "x": 580, "y": 200 },
         "params": {
-          "model": "llama3",
+          "model": "nutboy02/Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated-uncenfull:Q2_K_MTX",
           "temperature": 0.7,
           "max_tokens": 1024,
           "system": "You are a skilled blog writer. Given a structured outline, write a complete, engaging blog post with a compelling introduction, fully developed body sections, and a clear conclusion. Use a conversational yet authoritative tone. Output only the finished prose."

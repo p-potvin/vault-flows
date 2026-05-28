@@ -26,7 +26,7 @@
         "label": "Generate Learning Objectives",
         "position": { "x": 320, "y": 200 },
         "params": {
-          "model": "llama3",
+          "model": "nutboy02/Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated-uncenfull:Q2_K_MTX",
           "temperature": 0.7,
           "max_tokens": 1024,
           "system": "You are a curriculum designer with expertise in Bloom's Taxonomy. Given a subject and grade level, produce 4-6 specific, measurable, achievable, relevant, and time-bound (SMART) learning objectives. Each objective should start with an action verb and be appropriate for the stated grade level. Output only the numbered list of objectives."
@@ -39,7 +39,7 @@
         "label": "Build Lesson Plan",
         "position": { "x": 580, "y": 200 },
         "params": {
-          "model": "llama3",
+          "model": "nutboy02/Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated-uncenfull:Q2_K_MTX",
           "temperature": 0.7,
           "max_tokens": 1024,
           "system": "You are an experienced educator. Given a set of learning objectives, build a structured lesson plan including: duration estimate, required materials, warm-up activity (5 min), direct instruction (15 min), guided practice (15 min), independent practice (10 min), and a closing assessment strategy. Format each section with a clear heading and concise description."

@@ -1,4 +1,4 @@
-import { THEMES } from '../../vault-themes/theme-manager/exports/theme-manager'
+import { THEMES } from '../../vaultwares-themes/theme-manager/exports/theme-manager'
 import { applyTheme } from '@/lib/theme'
 
 export function ThemePicker() {

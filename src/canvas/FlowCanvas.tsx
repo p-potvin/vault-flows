@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import {
   ReactFlow,
   Background,
@@ -80,6 +80,31 @@ export function FlowCanvas() {
     storeEdges.map(flowEdgeToRF),
   )
 
+  // Sync store → rfNodes for DATA changes (params, label) — keeps inline form
+  // controls reactive to store updates. We intentionally do NOT touch
+  // position/measured/selected fields here; React Flow owns those, and
+  // overwriting them mid-measure causes the visibility:hidden feedback loop.
+  // Identity-checks on params/label avoid unnecessary node re-renders.
+  useEffect(() => {
+    setRfNodes((current) => {
+      let changed = false
+      const next = current.map((rfNode) => {
+        const storeNode = storeNodes.find((n) => n.id === rfNode.id)
+        if (!storeNode) return rfNode
+        const oldData = rfNode.data as unknown as FlowNode
+        if (oldData.params === storeNode.params && oldData.label === storeNode.label) {
+          return rfNode
+        }
+        changed = true
+        return {
+          ...rfNode,
+          data: { ...storeNode } as unknown as Record<string, unknown>,
+        }
+      })
+      return changed ? next : current
+    })
+  }, [storeNodes, setRfNodes])
+
   // Push position changes back into the Zustand store.
   // Dimension/selection changes are RF-internal — syncing them back would
   // reset nodes before RF finishes measuring, causing permanent visibility:hidden.
@@ -131,39 +156,31 @@ export function FlowCanvas() {
         fitView
         fitViewOptions={{ padding: 0.2 }}
         deleteKeyCode="Delete"
-        style={{ background: 'var(--background)' }}
+        style={{ background: 'transparent' }}
       >
         <Background
           variant={BackgroundVariant.Dots}
           gap={20}
           size={1}
-          color="var(--border)"
+          color="rgba(255,255,255,0.06)"
         />
-        <Controls
-          style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-md, 8px)',
-          }}
-        />
+        <Controls />
         <MiniMap
           nodeColor={(node) => {
             const data = node.data as Partial<FlowNode>
             const colorMap: Record<string, string> = {
-              input: 'var(--accent)',
-              llm: 'var(--info)',
-              transform: 'var(--warning)',
-              output: 'var(--success)',
-              display: 'var(--text-secondary)',
+              input: 'var(--vault-console-gold)',
+              image_input: 'var(--vault-console-gold)',
+              llm: 'var(--vault-console-violet)',
+              model_call: 'var(--vault-console-violet)',
+              comfyui_workflow: 'var(--vault-console-gold)',
+              transform: 'var(--vault-signal-relay)',
+              output: 'var(--vault-signal-online)',
+              display: 'var(--vault-signal-online)',
             }
-            return (data.type && colorMap[data.type]) ? colorMap[data.type]! : 'var(--surface-elevated)'
+            return (data.type && colorMap[data.type]) ? colorMap[data.type]! : 'rgba(255,255,255,0.3)'
           }}
-          style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-md, 8px)',
-          }}
-          maskColor="rgba(0,0,0,0.25)"
+          maskColor="rgba(0,0,0,0.4)"
         />
       </RF>
     </div>

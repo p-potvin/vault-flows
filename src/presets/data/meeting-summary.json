@@ -26,7 +26,7 @@
         "label": "Extract Action Items",
         "position": { "x": 320, "y": 200 },
         "params": {
-          "model": "llama3",
+          "model": "nutboy02/Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated-uncenfull:Q2_K_MTX",
           "temperature": 0.7,
           "max_tokens": 1024,
           "system": "You are a meticulous business analyst. Given raw meeting notes, identify and extract every action item, decision made, and open question. Format each action item as: '- [Owner] Action description (Due: date if mentioned)'. Group under headings: Action Items, Decisions Made, Open Questions. Be comprehensive — do not omit any commitment or follow-up."
@@ -39,7 +39,7 @@
         "label": "Format as Summary",
         "position": { "x": 580, "y": 200 },
         "params": {
-          "model": "llama3",
+          "model": "nutboy02/Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated-uncenfull:Q2_K_MTX",
           "temperature": 0.7,
           "max_tokens": 1024,
           "system": "You are a professional executive assistant. Given extracted action items, decisions, and open questions from a meeting, produce a polished meeting summary memo. Include: a one-paragraph executive summary, the structured action items and decisions sections, and a next-steps paragraph. Use professional business language suitable for sharing with stakeholders."

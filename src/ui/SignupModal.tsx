@@ -1,5 +1,10 @@
-import { useState, useRef, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { UserPlus, User, Lock, Mail, AlertCircle, X } from 'lucide-react'
+
+import { Card } from './components/Card'
+import { Field, TextInput } from './components/Field'
+import { Button } from './components/Button'
 import { register } from '@/api/client'
 
 interface SignupModalProps {
@@ -31,11 +36,11 @@ export function SignupModal({ onSuccess, onSwitchToLogin, onCancel }: SignupModa
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       if (msg.includes('409') || msg.includes('taken') || msg.includes('exists')) {
-        setError(t('auth.error_username_taken'))
+        setError(t('auth.error_username_taken', { defaultValue: 'Username is already taken.' }))
       } else if (msg.includes('fetch') || msg.includes('network') || msg.includes('Failed')) {
-        setError(t('auth.error_network'))
+        setError(t('auth.error_network', { defaultValue: 'Network unreachable. Try again.' }))
       } else {
-        setError(t('auth.error_signup'))
+        setError(t('auth.error_signup', { defaultValue: 'Sign-up failed. Try again.' }))
       }
     } finally {
       setLoading(false)
@@ -49,198 +54,115 @@ export function SignupModal({ onSuccess, onSwitchToLogin, onCancel }: SignupModa
   return (
     <div
       onClick={handleBackdropClick}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(0,0,0,0.65)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-        backdropFilter: 'blur(4px)',
-      }}
+      className="fixed inset-0 z-[1000] flex items-center justify-center bg-vw-console-bg/75 backdrop-blur-md"
     >
-      <div
-        style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-md, 12px)',
-          padding: '32px',
-          width: '100%',
-          maxWidth: '360px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.4)',
-        }}
-      >
-        {/* Header */}
-        <span style={{ fontWeight: 700, fontSize: '18px', color: 'var(--text)' }}>
-          {t('auth.signup_title')}
-        </span>
-
-        {/* Form */}
-        <form
-          onSubmit={(e) => void handleSubmit(e)}
-          style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
-        >
-          {/* Username */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={labelStyle}>{t('auth.username')}</label>
-            <input
-              ref={usernameRef}
-              type="text"
-              autoComplete="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              disabled={loading}
-              required
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Password */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={labelStyle}>{t('auth.password')}</label>
-            <input
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-              required
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Email — visually de-emphasised to signal optional */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-              <label style={labelStyle}>{t('auth.email')}</label>
-              <span
-                style={{
-                  fontSize: '11px',
-                  color: 'var(--text-secondary)',
-                  fontStyle: 'italic',
-                  fontWeight: 400,
-                  textTransform: 'none',
-                  letterSpacing: 'normal',
-                  opacity: 0.65,
-                }}
-              >
-                {t('auth.optional')}
-              </span>
+      <Card size="lg" className="w-full max-w-sm shadow-2xl">
+        <div className="flex flex-col gap-5 p-7">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="rounded-lg border border-vw-console-violet/20 bg-vw-console-violet/10 p-1.5">
+                <UserPlus className="h-4 w-4 text-vw-console-violet" />
+              </div>
+              <h2 className="font-sans text-lg font-semibold tracking-tight text-white">
+                {t('auth.signup_title', { defaultValue: 'Create an account' })}
+              </h2>
             </div>
-            <input
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-              placeholder="you@example.com"
-              style={{ ...inputStyle, opacity: 0.85 }}
-            />
-          </div>
-
-          {/* Error */}
-          {error && (
-            <div
-              style={{
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-md, 8px)',
-                background: 'rgba(224,92,74,0.12)',
-                border: '1px solid rgba(224,92,74,0.4)',
-                color: '#e05c4a',
-                fontSize: '13px',
-              }}
-            >
-              {error}
-            </div>
-          )}
-
-          {/* Actions */}
-          <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
             {onCancel && (
-              <button
-                type="button"
-                onClick={onCancel}
-                disabled={loading}
-                style={cancelBtnStyle}
-              >
-                Cancel
-              </button>
+              <Button variant="icon" size="sm" onClick={onCancel} title="Cancel">
+                <X className="h-4 w-4" />
+              </Button>
             )}
-            <button
-              type="submit"
-              disabled={loading || !username || !password}
-              style={{
-                flex: 1,
-                padding: '9px 16px',
-                background: loading ? 'var(--surface-elevated)' : 'var(--accent)',
-                color: loading ? 'var(--text-secondary)' : 'var(--text-inverse)',
-                border: 'none',
-                borderRadius: 'var(--radius-md, 8px)',
-                fontWeight: 600,
-                fontSize: '14px',
-                cursor: loading || !username || !password ? 'not-allowed' : 'pointer',
-                opacity: !username || !password ? 0.5 : 1,
-                transition: 'opacity 120ms ease-out',
-              }}
-            >
-              {loading ? t('auth.creating') : t('auth.signup_submit')}
-            </button>
           </div>
-        </form>
 
-        {/* Switch to login */}
-        <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center' }}>
-          {t('auth.have_account')}{' '}
-          <button
-            type="button"
-            onClick={onSwitchToLogin}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--accent)',
-              fontWeight: 600,
-              fontSize: '13px',
-              cursor: 'pointer',
-              padding: 0,
-            }}
-          >
-            {t('auth.login')}
-          </button>
-        </p>
-      </div>
+          <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col gap-4">
+            <Field label={t('auth.username', { defaultValue: 'Username' })} required>
+              <div className="relative">
+                <User className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/35" />
+                <TextInput
+                  ref={usernameRef as React.Ref<HTMLInputElement>}
+                  type="text"
+                  autoComplete="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={loading}
+                  required
+                  className="pl-9"
+                />
+              </div>
+            </Field>
+
+            <Field label={t('auth.password', { defaultValue: 'Password' })} required>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/35" />
+                <TextInput
+                  type="password"
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  required
+                  className="pl-9"
+                />
+              </div>
+            </Field>
+
+            <Field
+              label={t('auth.email', { defaultValue: 'Email' })}
+              hint={t('auth.optional', { defaultValue: 'optional' })}
+            >
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/35" />
+                <TextInput
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  placeholder="you@example.com"
+                  className="pl-9"
+                />
+              </div>
+            </Field>
+
+            {error && (
+              <div className="flex items-start gap-2 rounded-lg border border-vw-signal-alert/30 bg-vw-signal-alert/10 px-3 py-2">
+                <AlertCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-vw-signal-alert" />
+                <span className="font-sans text-xs text-vw-signal-alert">{error}</span>
+              </div>
+            )}
+
+            <div className="mt-1 flex gap-2.5">
+              {onCancel && (
+                <Button variant="secondary" size="md" onClick={onCancel} disabled={loading}>
+                  {t('common.cancel', { defaultValue: 'Cancel' })}
+                </Button>
+              )}
+              <Button
+                variant="primary"
+                size="md"
+                buttonType="submit"
+                disabled={loading || !username || !password}
+                fullWidth
+              >
+                {loading
+                  ? t('auth.creating', { defaultValue: 'Creating…' })
+                  : t('auth.signup_submit', { defaultValue: 'Sign up' })}
+              </Button>
+            </div>
+          </form>
+
+          <p className="text-center font-sans text-xs text-white/55">
+            {t('auth.have_account', { defaultValue: 'Already have an account?' })}{' '}
+            <button
+              type="button"
+              onClick={onSwitchToLogin}
+              className="font-mono text-[11px] font-bold uppercase tracking-wider text-vw-console-gold transition-colors hover:text-vw-signal-warning"
+            >
+              {t('auth.login', { defaultValue: 'Log in' })}
+            </button>
+          </p>
+        </div>
+      </Card>
     </div>
   )
-}
-
-const labelStyle: React.CSSProperties = {
-  fontSize: '12px',
-  fontWeight: 600,
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
-  color: 'var(--text-secondary)',
-}
-
-const inputStyle: React.CSSProperties = {
-  background: 'var(--surface-elevated, var(--surface))',
-  border: '1px solid var(--border)',
-  borderRadius: 'var(--radius-md, 8px)',
-  color: 'var(--text)',
-  padding: '8px 12px',
-  fontSize: '14px',
-  width: '100%',
-  boxSizing: 'border-box',
-}
-
-const cancelBtnStyle: React.CSSProperties = {
-  padding: '9px 16px',
-  background: 'transparent',
-  border: '1px solid var(--border)',
-  borderRadius: 'var(--radius-md, 8px)',
-  color: 'var(--text-secondary)',
-  fontSize: '14px',
-  cursor: 'pointer',
 }

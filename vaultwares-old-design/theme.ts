@@ -1,4 +1,4 @@
-import { THEMES, type VaultTheme } from '../../vault-themes/theme-manager/exports/theme-manager'
+import { THEMES, type VaultTheme } from '../../vaultwares-themes/theme-manager/exports/theme-manager'
 
 export function applyTheme(theme: VaultTheme) {
   const root = document.documentElement

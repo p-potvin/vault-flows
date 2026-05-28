@@ -1,37 +1,234 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "../vaultwares-themes/assets/tokens/css-variables.css";
 @import "tailwindcss";
-@import "../vault-themes/theme-manager/exports/vault-tailwind-v4.css";
 @import "@xyflow/react/dist/style.css";
 
+/* ---------------------------------------------------------------------------
+ * Tailwind @theme: expose the vaultwares-revisited tokens as Tailwind utility
+ * colors. `vw-console-*` for the operational (dark) palette, `vw-warm-*` for
+ * the document (paper) palette, `vw-signal-*` for state colors.
+ * ------------------------------------------------------------------------- */
+/* Local overrides: introduce a copper accent (replaces the old cyan
+ * signal-relay throughout vault-flows). Token name is `--vault-copper`. */
 :root {
-  font-family: "Segoe UI Semilight", "Segoe UI", Inter, system-ui, sans-serif;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
+  --vault-copper: #C77C45;
+  --vault-copper-muted: #8E5A33;
+  /* Remap signal-relay so existing references pick up copper automatically */
+  --vault-signal-relay: var(--vault-copper);
 }
 
+@theme {
+  --font-sans: "Inter", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --color-vw-copper: var(--vault-copper);
+  --color-vw-copper-muted: var(--vault-copper-muted);
+
+  /* Console (operational, dark) */
+  --color-vw-console-bg:       var(--vault-console-bg);
+  --color-vw-console-surface:  var(--vault-console-surface);
+  --color-vw-console-raised:   var(--vault-console-raised);
+  --color-vw-console-elevated: var(--vault-console-elevated);
+  --color-vw-console-gold:     var(--vault-console-gold);
+  --color-vw-console-violet:   var(--vault-console-violet);
+  --color-vw-console-text:     #ffffff;
+  --color-vw-console-muted:    var(--vault-console-text-secondary);
+  --color-vw-console-border:   var(--vault-console-border-subtle);
+
+  /* Warm (archival, paper) */
+  --color-vw-warm-bg:          var(--vault-warm-bg);
+  --color-vw-warm-raised:      var(--vault-warm-raised);
+  --color-vw-warm-muted:       var(--vault-warm-muted);
+  --color-vw-warm-ink:         var(--vault-ink);
+  --color-vw-warm-text:        var(--vault-ink);
+  --color-vw-warm-text-muted:  var(--vault-muted);
+  --color-vw-warm-gold:        var(--vault-gold);
+  --color-vw-warm-border:      var(--vault-warm-border-subtle);
+
+  /* Signals (status colors — shared between both spaces) */
+  --color-vw-signal-online:    var(--vault-signal-online);
+  --color-vw-signal-relay:     var(--vault-signal-relay);
+  --color-vw-signal-sync:      var(--vault-signal-sync);
+  --color-vw-signal-warning:   var(--vault-signal-warning);
+  --color-vw-signal-alert:     var(--vault-signal-alert);
+}
+
+/* ---------------------------------------------------------------------------
+ * Document defaults — vault-flows is an operational tool, so the page body
+ * defaults to Console mode. The Warm space lives inside, as panels.
+ * ------------------------------------------------------------------------- */
 html,
-body,
-#root {
-  height: 100%;
+body {
+  background-color: var(--vault-console-bg);
+  color: #fff;
+  font-family: "Inter", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
   margin: 0;
-  padding: 0;
 }
 
-/* React Flow canvas baseline */
-.react-flow {
-  background: var(--background);
+#root {
+  min-height: 100vh;
 }
 
-.react-flow__node {
-  border-radius: var(--radius-md, 8px);
+/* ---------------------------------------------------------------------------
+ * Shells — apply to a region to switch its conceptual space.
+ * ------------------------------------------------------------------------- */
+.vw-console-shell {
+  background:
+    radial-gradient(circle at 15% 0%, rgba(176, 124, 255, 0.18), transparent 32rem),
+    linear-gradient(180deg, var(--vault-console-surface), var(--vault-console-bg));
+  color: #fff;
 }
+
+.vw-warm-shell {
+  background:
+    radial-gradient(circle at 16% 0%, rgba(214, 164, 65, 0.18), transparent 28rem),
+    var(--vault-warm-bg);
+  color: var(--vault-ink);
+}
+
+/* ---------------------------------------------------------------------------
+ * Cards — `.vw-card` for console surfaces, `.vw-warm-card` for parchment.
+ * ------------------------------------------------------------------------- */
+.vw-card {
+  border: 1px solid var(--vault-console-border-subtle);
+  background: color-mix(in srgb, var(--vault-console-raised) 86%, transparent);
+  border-radius: 28px;
+}
+
+.vw-card-flat {
+  border: 1px solid var(--vault-console-border-subtle);
+  background: var(--vault-console-raised);
+  border-radius: 16px;
+}
+
+.vw-warm-card {
+  border: 1px solid var(--vault-warm-border-subtle);
+  background: var(--vault-warm-raised);
+  border-radius: 20px;
+  color: var(--vault-ink);
+}
+
+.vw-warm-card-flat {
+  border: 1px solid var(--vault-warm-border-subtle);
+  background: var(--vault-warm-raised);
+  border-radius: 12px;
+  color: var(--vault-ink);
+}
+
+/* ---------------------------------------------------------------------------
+ * LEDs — slow pulsing dots for live state. Use color utilities to tint.
+ * ------------------------------------------------------------------------- */
+.vw-led {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: ledPulse 2.4s ease-in-out infinite;
+  box-shadow: 0 0 6px currentColor;
+}
+
+.vw-led-static {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 4px currentColor;
+}
+
+@keyframes ledPulse {
+  0%   { opacity: 0.72; transform: scale(0.96); }
+  50%  { opacity: 1;    transform: scale(1); }
+  100% { opacity: 0.72; transform: scale(0.96); }
+}
+
+/* ---------------------------------------------------------------------------
+ * Scrollbars — terminal track aesthetic
+ * ------------------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--vault-console-raised);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vault-console-gold);
+}
+
+.vw-warm-shell ::-webkit-scrollbar-track { background: var(--vault-warm-muted); }
+.vw-warm-shell ::-webkit-scrollbar-thumb { background: rgba(22, 19, 32, 0.18); }
+.vw-warm-shell ::-webkit-scrollbar-thumb:hover { background: var(--vault-gold); }
+
+/* ---------------------------------------------------------------------------
+ * Selection
+ * ------------------------------------------------------------------------- */
+::selection {
+  background: color-mix(in srgb, var(--vault-console-violet) 35%, transparent);
+  color: #fff;
+}
+
+/* ---------------------------------------------------------------------------
+ * React Flow overrides — fit it into the console aesthetic.
+ * ------------------------------------------------------------------------- */
+.react-flow__renderer { background: transparent; }
 
 .react-flow__edge-path {
-  stroke: var(--border);
+  stroke: var(--vault-console-gold);
+  stroke-width: 1.6;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 4px rgba(214, 164, 65, 0.35));
+}
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: var(--vault-console-violet);
+  filter: drop-shadow(0 0 6px rgba(176, 124, 255, 0.45));
 }
 
-.react-flow__controls-button {
-  background: var(--surface);
-  border-color: var(--border);
-  color: var(--text);
+.react-flow__handle {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--vault-console-bg);
+  background: var(--vault-console-gold);
+  box-shadow: 0 0 4px rgba(214, 164, 65, 0.5);
+}
+.react-flow__handle:hover {
+  background: var(--vault-console-violet);
+  box-shadow: 0 0 6px rgba(176, 124, 255, 0.55);
+}
+
+.react-flow__background {
+  background-color: var(--vault-console-bg);
+}
+.react-flow__background-pattern {
+  color: rgba(255, 255, 255, 0.06);
+}
+
+.react-flow__controls,
+.react-flow__minimap {
+  background: color-mix(in srgb, var(--vault-console-raised) 86%, transparent) !important;
+  border: 1px solid var(--vault-console-border-subtle) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+.react-flow__controls button {
+  background: transparent !important;
+  color: #fff !important;
+  border-bottom: 1px solid var(--vault-console-border-subtle) !important;
+}
+.react-flow__controls button:hover {
+  background: var(--vault-console-elevated) !important;
+}
+
+.react-flow__attribution {
+  background: transparent !important;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
 }
