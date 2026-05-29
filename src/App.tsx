@@ -4,6 +4,7 @@ import { Workflow, ArrowRight, PanelRightClose, PanelRightOpen } from 'lucide-re
 
 import { FlowCanvas } from '@/canvas/FlowCanvas'
 import { WorkflowLibrary } from '@/ui/WorkflowLibrary'
+import { NodeBrowserSidebar } from '@/ui/NodeBrowserSidebar'
 import { NodeParamPanel } from '@/ui/NodeParamPanel'
 import { LoginModal } from '@/ui/LoginModal'
 import { SignupModal } from '@/ui/SignupModal'
@@ -18,9 +19,12 @@ import { useFlowStore } from '@/store/flowStore'
 import { runFlow } from '@/execution/runner'
 import { getToken, clearToken, getMe } from '@/api/client'
 
+type SidebarTab = 'workflows' | 'nodes'
+
 export default function App() {
   const { t } = useTranslation()
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarTab, setSidebarTab] = useState<SidebarTab>('workflows')
   const [paramPanelOpen, setParamPanelOpen] = useState(false)  // hidden by default — advanced view
   const [currentUser, setCurrentUser] = useState<string | null>(null)
   const [authModal, setAuthModal] = useState<'login' | 'signup' | null>(null)
@@ -127,16 +131,47 @@ export default function App() {
          * Keyed on currentUser so a fresh login auto-refreshes the catalog
          * instead of requiring a page reload. */}
         {sidebarOpen && (
-          <aside className="vw-warm-shell w-80 flex-shrink-0 overflow-y-auto border-r border-vw-console-border">
-            <div className="border-b border-vw-warm-border bg-vw-warm-bg/80 px-4 py-3 backdrop-blur-sm">
-              <h2 className="font-mono text-[10px] font-bold uppercase tracking-wider text-vw-warm-ink/60">
-                {t('workflow.library', { defaultValue: 'Workflow Library' })}
-              </h2>
+          <aside className="vw-warm-shell flex w-80 flex-shrink-0 flex-col overflow-hidden border-r border-vw-console-border">
+            {/* Tab strip — switch between the workflow library and the
+             * node-type browser. Keyboard: implicit via <button>. */}
+            <div role="tablist" className="flex border-b border-vw-warm-border bg-vw-warm-bg/80 backdrop-blur-sm">
+              <button
+                role="tab"
+                aria-selected={sidebarTab === 'workflows'}
+                onClick={() => setSidebarTab('workflows')}
+                className={`flex-1 px-4 py-3 font-mono text-[10px] font-bold uppercase tracking-wider transition-colors ${
+                  sidebarTab === 'workflows'
+                    ? 'border-b border-vw-console-gold text-vw-warm-ink'
+                    : 'text-vw-warm-ink/40 hover:text-vw-warm-ink/70'
+                }`}
+              >
+                {t('workflow.library', { defaultValue: 'Workflows' })}
+              </button>
+              <button
+                role="tab"
+                aria-selected={sidebarTab === 'nodes'}
+                onClick={() => setSidebarTab('nodes')}
+                className={`flex-1 px-4 py-3 font-mono text-[10px] font-bold uppercase tracking-wider transition-colors ${
+                  sidebarTab === 'nodes'
+                    ? 'border-b border-vw-console-gold text-vw-warm-ink'
+                    : 'text-vw-warm-ink/40 hover:text-vw-warm-ink/70'
+                }`}
+              >
+                {t('node.browser', { defaultValue: 'Nodes' })}
+              </button>
             </div>
-            <WorkflowLibrary
-              key={currentUser ?? 'guest'}
-              onWorkflowLoaded={() => setSidebarOpen(false)}
-            />
+            <div className="flex-1 overflow-hidden">
+              {sidebarTab === 'workflows' ? (
+                <div className="h-full overflow-y-auto">
+                  <WorkflowLibrary
+                    key={currentUser ?? 'guest'}
+                    onWorkflowLoaded={() => setSidebarOpen(false)}
+                  />
+                </div>
+              ) : (
+                <NodeBrowserSidebar />
+              )}
+            </div>
           </aside>
         )}
 
@@ -235,7 +270,7 @@ function EmptyState({ onOpenLibrary }: { onOpenLibrary: () => void }) {
         </h1>
         <p className="font-sans text-sm text-white/55">
           {t('app.tagline', {
-            defaultValue: 'Pick a workflow from the library to begin.',
+            defaultValue: 'Pick a workflow from the library, or drag a node from the Nodes tab to start a blank canvas.',
           })}
         </p>
       </div>

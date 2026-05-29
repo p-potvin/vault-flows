@@ -253,6 +253,72 @@ const imageGenBasic: Preset = {
   },
 }
 
+const faceFilter: Preset = {
+  id: 'face-filter',
+  name: 'Face Filter',
+  nameKey: 'presets.faceFilter.name',
+  domain: 'image',
+  description:
+    'Detect whether an uploaded image contains a human face using local vision AI. Returns a structured verdict with face count and confidence.',
+  descriptionKey: 'presets.faceFilter.description',
+  flow: {
+    id: 'flow-face-filter',
+    name: 'Face Filter',
+    phase: 0,
+    createdAt: '2026-05-28T00:00:00.000Z',
+    updatedAt: '2026-05-28T00:00:00.000Z',
+    nodes: [
+      {
+        id: 'n1',
+        type: 'image_input',
+        label: 'Source Image',
+        position: { x: 60, y: 200 },
+        params: { image_ref: '', preview_url: '', filename: '' },
+        preset: 'face-filter',
+      },
+      {
+        id: 'n2',
+        type: 'model_call',
+        label: 'Detect Faces',
+        position: { x: 340, y: 200 },
+        params: {
+          provider: 'ollama',
+          model: 'gemma4',
+          system:
+            'You are a precise image analysis tool. Your ONLY job is to detect human faces in images. Respond with ONLY a valid JSON object, no markdown, no explanation. Schema: {"has_face": boolean, "face_count": number, "confidence": number (0.0-1.0), "notes": string}. If you see zero faces, has_face is false and face_count is 0. Be strict — partial faces, face drawings, or animal faces do NOT count.',
+          prompt:
+            'Analyze this image. How many real human faces are visible? Respond with JSON only.',
+          temperature: 0.1,
+        },
+        preset: 'face-filter',
+      },
+      {
+        id: 'n3',
+        type: 'transform',
+        label: 'Parse Verdict',
+        position: { x: 620, y: 200 },
+        params: {
+          template: '{{input}}',
+        },
+        preset: 'face-filter',
+      },
+      {
+        id: 'n4',
+        type: 'display',
+        label: 'Result',
+        position: { x: 880, y: 200 },
+        params: {},
+        preset: 'face-filter',
+      },
+    ],
+    edges: [
+      { id: 'e1-2', source: 'n1', sourceHandle: 'source', target: 'n2', targetHandle: 'target' },
+      { id: 'e2-3', source: 'n2', sourceHandle: 'source', target: 'n3', targetHandle: 'target' },
+      { id: 'e3-4', source: 'n3', sourceHandle: 'source', target: 'n4', targetHandle: 'target' },
+    ],
+  },
+}
+
 const skateboardingTrickAnalysis: Preset = {
   id: 'skateboarding-trick-analysis',
   name: 'Skateboarding Trick Analysis & Slow-Mo Generation',
@@ -307,6 +373,7 @@ export const PRESETS: Preset[] = [
   lessonPlanBuilder,
   meetingSummary,
   imageGenBasic,
+  faceFilter,
   skateboardingTrickAnalysis,
 ]
 

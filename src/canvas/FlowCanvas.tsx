@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef, type DragEvent } from 'react'
 import {
   ReactFlow,
   Background,
@@ -7,6 +7,8 @@ import {
   MiniMap,
   useNodesState,
   useEdgesState,
+  useReactFlow,
+  ReactFlowProvider,
   type Node,
   type Edge,
   type OnNodesChange,
@@ -14,7 +16,8 @@ import {
   type NodeMouseHandler,
 } from '@xyflow/react'
 import { useFlowStore } from '@/store/flowStore'
-import type { FlowNode, FlowEdge } from '@/nodes/types'
+import type { FlowNode, FlowEdge, NodeType } from '@/nodes/types'
+import { NODE_REGISTRY } from '@/nodes/registry'
 import { nodeTypes } from './nodeTypes'
 
 // ─── Conversion helpers ───────────────────────────────────────────────────────
@@ -67,11 +70,25 @@ function rfEdgeToFlow(e: Edge): FlowEdge {
 const RF = ReactFlow as unknown as React.ComponentType<React.ComponentProps<typeof ReactFlow>>
 
 export function FlowCanvas() {
+  // ReactFlowProvider is required so the inner canvas can use useReactFlow()
+  // (which we need for screenToFlowPosition during drag-drop from the
+  // NodeBrowserSidebar).
+  return (
+    <ReactFlowProvider>
+      <FlowCanvasInner />
+    </ReactFlowProvider>
+  )
+}
+
+function FlowCanvasInner() {
   const storeNodes = useFlowStore((s) => s.nodes)
   const storeEdges = useFlowStore((s) => s.edges)
   const setStoreNodes = useFlowStore((s) => s.setNodes)
   const setStoreEdges = useFlowStore((s) => s.setEdges)
   const selectNode = useFlowStore((s) => s.selectNode)
+  const addNode = useFlowStore((s) => s.addNode)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const { screenToFlowPosition } = useReactFlow()
 
   const [rfNodes, setRfNodes, onNodesChange] = useNodesState<Node>(
     storeNodes.map(flowNodeToRF),
@@ -85,22 +102,36 @@ export function FlowCanvas() {
   // position/measured/selected fields here; React Flow owns those, and
   // overwriting them mid-measure causes the visibility:hidden feedback loop.
   // Identity-checks on params/label avoid unnecessary node re-renders.
+  //
+  // We also reconcile additions (NodeBrowserSidebar.addNode) and removals
+  // (canvas Delete key) here — without that, new nodes pushed into the
+  // store after mount never render because rfNodes was only initialized
+  // from storeNodes at mount time.
   useEffect(() => {
     setRfNodes((current) => {
       let changed = false
-      const next = current.map((rfNode) => {
-        const storeNode = storeNodes.find((n) => n.id === rfNode.id)
-        if (!storeNode) return rfNode
-        const oldData = rfNode.data as unknown as FlowNode
+      const byId = new Map(current.map((n) => [n.id, n]))
+      const next: Node[] = []
+      for (const storeNode of storeNodes) {
+        const existing = byId.get(storeNode.id)
+        if (!existing) {
+          changed = true
+          next.push(flowNodeToRF(storeNode))
+          continue
+        }
+        const oldData = existing.data as unknown as FlowNode
         if (oldData.params === storeNode.params && oldData.label === storeNode.label) {
-          return rfNode
+          next.push(existing)
+          continue
         }
         changed = true
-        return {
-          ...rfNode,
+        next.push({
+          ...existing,
           data: { ...storeNode } as unknown as Record<string, unknown>,
-        }
-      })
+        })
+      }
+      // Detect removals — any rfNode whose id is no longer in the store.
+      if (!changed && next.length !== current.length) changed = true
       return changed ? next : current
     })
   }, [storeNodes, setRfNodes])
@@ -143,8 +174,31 @@ export function FlowCanvas() {
     selectNode(null)
   }, [selectNode])
 
+  // ─── Drag-drop from NodeBrowserSidebar ───────────────────────────────────
+  // The sidebar sets `application/vault-flows-node` to the NodeType. We
+  // accept the drop, resolve the screen point to graph coordinates, and
+  // call the store's addNode so the new node lands where the user dropped.
+  const onDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'copy'
+  }, [])
+
+  const onDrop = useCallback(
+    (event: DragEvent<HTMLDivElement>) => {
+      event.preventDefault()
+      const type = event.dataTransfer.getData('application/vault-flows-node')
+      if (!type || !(type in NODE_REGISTRY)) return
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      })
+      addNode(type as NodeType, position)
+    },
+    [addNode, screenToFlowPosition],
+  )
+
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full" ref={wrapperRef} onDragOver={onDragOver} onDrop={onDrop}>
       <RF
         nodes={rfNodes}
         edges={rfEdges}
@@ -171,6 +225,8 @@ export function FlowCanvas() {
             const colorMap: Record<string, string> = {
               input: 'var(--vault-console-gold)',
               image_input: 'var(--vault-console-gold)',
+              load_text: 'var(--vault-console-gold)',
+              load_file: 'var(--vault-console-gold)',
               llm: 'var(--vault-console-violet)',
               model_call: 'var(--vault-console-violet)',
               comfyui_workflow: 'var(--vault-console-gold)',

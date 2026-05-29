@@ -11,6 +11,8 @@
 export type NodeType =
   | 'input'
   | 'image_input'      // client-uploaded image, server holds a signed ref
+  | 'load_text'        // text loaded from a file (.txt/.md) or pasted blob
+  | 'load_file'        // arbitrary file reference (path or upload token)
   | 'output'
   | 'llm'              // legacy alias for model_call + provider:ollama
   | 'model_call'       // provider-discriminated generation node

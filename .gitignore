@@ -8,6 +8,7 @@ build/
 venv/
 *.egg
 .env
+outputs/
 
 # Node / Frontend
 node_modules/

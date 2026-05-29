@@ -3,11 +3,13 @@ import type {
   FlowNode,
   FlowEdge,
   Flow,
+  NodeType,
   Preset,
   PresetDomain,
   ExecutionStatus,
   ExecutionResult,
 } from '@/nodes/types'
+import { NODE_REGISTRY } from '@/nodes/registry'
 import type { PipelinesWorkflow } from '@/api/client'
 
 interface FlowState {
@@ -33,6 +35,10 @@ interface FlowState {
   setPipelinesWorkflows: (workflows: PipelinesWorkflow[]) => void
   setNodes: (nodes: FlowNode[]) => void
   setEdges: (edges: FlowEdge[]) => void
+  /** Append a new node of the given type to the canvas at `position`
+   * (defaults to a staggered offset). Returns the new node's id so the
+   * caller can immediately select it. */
+  addNode: (type: NodeType, position?: { x: number; y: number }) => string
   updateNodeParam: (nodeId: string, key: string, value: unknown) => void
   selectNode: (nodeId: string | null) => void
   setExecutionStatus: (status: ExecutionStatus) => void
@@ -139,6 +145,51 @@ export const useFlowStore = create<FlowState>((set, get) => ({
   setNodes: (nodes) => set({ nodes }),
 
   setEdges: (edges) => set({ edges }),
+
+  addNode: (type, position) => {
+    const meta = NODE_REGISTRY[type]
+    // Stagger new nodes so multiple inserts at the same position fan out
+    // instead of stacking pixel-perfect on top of each other.
+    const stagger = get().nodes.length * 32
+    const pos = position ?? { x: 220 + stagger, y: 160 + stagger }
+    const id = (crypto.randomUUID?.() ?? `n-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`)
+    const newNode: FlowNode = {
+      id,
+      type,
+      label: meta.label,
+      position: pos,
+      params: { ...meta.defaultParams },
+    }
+    set((state) => {
+      // Adding a node when no workflow is loaded creates an "Untitled" preset
+      // so the canvas mounts. Without this the FlowCanvas stays hidden and
+      // the new node is invisible (App.tsx gates FlowCanvas on activePreset).
+      const now = new Date().toISOString()
+      const ensuredPreset: Preset = state.activePreset ?? {
+        id: id,
+        name: 'Untitled Flow',
+        nameKey: '',
+        domain: 'creative',
+        description: '',
+        descriptionKey: '',
+        flow: {
+          id,
+          name: 'Untitled Flow',
+          nodes: [],
+          edges: [],
+          phase: 0,
+          createdAt: now,
+          updatedAt: now,
+        },
+      }
+      return {
+        nodes: [...state.nodes, newNode],
+        selectedNodeId: id,
+        activePreset: ensuredPreset,
+      }
+    })
+    return id
+  },
 
   updateNodeParam: (nodeId, key, value) =>
     set((state) => ({
