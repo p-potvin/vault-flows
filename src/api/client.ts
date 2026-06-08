@@ -136,7 +136,7 @@ export async function getMe(): Promise<MeResponse> {
 // ---------------------------------------------------------------------------
 
 /**
- * Execute a flow graph through vaultwares-pipelines, which walks it
+ * Execute a flow graph through vaultwares-api, which walks it
  * topologically and calls Ollama for each LLM node.
  * Returns one ExecutionResult per node, in execution order.
  */
