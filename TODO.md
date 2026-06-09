@@ -1,6 +1,6 @@
 # Vault Flows TODO
 
-Current execution focus is moving the app from a broken backend-dependent shell to a deployable Vercel preview with an honest browser-local fallback mode.
+Current execution focus is moving the app from a broken backend-dependent shell to a deployable GreenCloud VPS preview with an honest browser-local fallback mode.
 
 ## Done
 
@@ -12,12 +12,12 @@ Current execution focus is moving the app from a broken backend-dependent shell 
 - panel-wiring [x] Wired workflow, config, and storage panels to the new data layer and removed missing-import build failures.
 - feature-honesty [x] Replaced obvious placeholder behavior with honest browser-local captioning and LoRA planning utilities.
 - verification-sweep [x] Re-ran lint, build, Playwright, and deployed-preview browser checks after wiring changes.
-- vercel-preview [x] Created a Vercel preview deployment for the current workspace state.
+- preview-deploy [x] Created a deployment preview for the current workspace state (Vercel; superseded 2026-06-09, now targeting GreenCloud VPS).
 
 ## In Progress
 
 - remote-api-contract [~] Define the real backend contract cleanly enough that the browser-local adapter can be replaced without UI churn.
-- deploy-target-alignment [~] Reconcile the repo’s Render automation with the new Vercel preview/deploy path.
+- deploy-target-alignment [~] Reconcile the repo’s Render automation with the new GreenCloud VPS deploy path.
 
 ## Next
 
@@ -25,7 +25,7 @@ Current execution focus is moving the app from a broken backend-dependent shell 
 - storage-providers [x] Decide whether provider-specific uploads remain demo metadata only or should move behind a real API contract.
 - config-contract [x] Tighten the configuration schema and UI around remote/local API mode visibility.
 - e2e-depth [ ] Expand Playwright coverage further to cover restore paths, image captioning interactions, and LoRA export artifacts.
-- vercel-deploy [ ] Claim and/or promote the preview deployment once the target Vercel project and ownership are finalized.
+- vps-deploy [ ] Set up the GreenCloud VPS deployment pipeline for the workspace and promote the preview once ownership is finalized.
 
 
 ### Web-Exposure & Security

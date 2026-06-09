@@ -9,7 +9,7 @@
 
 ## Phase 2: Ship a deployable demo
 
-- Persist workflows/config/uploads locally so the app behaves consistently on Vercel.
+- Persist workflows/config/uploads locally so the app behaves consistently on the VPS.
 - Improve workflow CRUD and user feedback paths.
 - Replace obvious placeholder flows with demo-safe, honest implementations.
 - Expand Playwright coverage to protect the deployable surface.

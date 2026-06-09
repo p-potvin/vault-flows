@@ -2,7 +2,7 @@
 Machine-local runtime bridge for Vault Flows.
 
 This service is intended to run on the same Windows machine as ComfyUI and any
-optional local video tooling such as FaceFusion. The deployed Vercel frontend
+optional local video tooling such as FaceFusion. The deployed VPS frontend
 uses it as a control/data bridge for:
   - scanning the exact local model directory
   - running a local image-to-video face-swap job

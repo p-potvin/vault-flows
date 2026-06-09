@@ -4,7 +4,7 @@ Vault Flows is a Vite + React frontend for managing workflow definitions, backup
 
 ## Current state
 
-- The web app is the primary runnable surface for Vercel deployment.
+- The web app is the primary runnable surface, served from the GreenCloud VPS.
 - The Python agent subsystem is present, but it is still mostly simulation and coordination scaffolding rather than production task execution.
 - The repo previously depended on an external backend API for core workflow operations. The frontend now supports a local demo/fallback mode when that backend is missing or unreachable.
 
@@ -27,7 +27,7 @@ npm run dev
 
 ## Local runtime bridge
 
-The Vercel-hosted UI can manage local execution, but it cannot scan or execute models directly from your Windows filesystem without a machine-local helper.
+The VPS-hosted UI can manage local execution, but it cannot scan or execute models directly from your Windows filesystem without a machine-local helper.
 
 Use the bundled bridge when you want to:
 
