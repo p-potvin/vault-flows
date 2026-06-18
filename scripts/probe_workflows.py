@@ -17,7 +17,7 @@ import sys
 import urllib.request
 import urllib.error
 
-PIPELINES = "http://127.0.0.1:9001"
+PIPELINES = "http://100.67.25.118:9001"
 COMFYUI = "http://127.0.0.1:8188"
 
 

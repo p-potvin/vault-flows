@@ -1,6 +1,6 @@
 """
 Bulk-convert ComfyUI editor workflow JSONs (Proven_Workflows folder) into
-vault-flows-compatible comfyui_graph steps and POST them to pipelines.
+vault-flows-compatible comfyui_graph steps and POST them to vaultwares-api.
 
 Per file we:
   1. Parse the editor format ({nodes, links, ...})
@@ -15,7 +15,7 @@ Per file we:
          downstream consumer if obvious)
   5. Generate a clean id like  flux2-klein-faceswap  and a name like
      "Flux 2 Klein · Face Swap (flux-2-klein-9b-fp8)"
-  6. POST to /workflows on pipelines
+  6. POST to /workflows on vaultwares-api
 
 Run:
     python convert_proven_workflows.py
@@ -30,7 +30,7 @@ import sys
 import urllib.request
 import urllib.error
 
-PIPELINES_BASE = "http://127.0.0.1:9001"
+PIPELINES_BASE = "http://100.67.25.118:9001"
 COMFYUI_BASE = "http://127.0.0.1:8188"
 PROVEN_DIR = r"C:\Users\Administrator\ComfyUI\user\default\workflows\Proven_Workflows"
 

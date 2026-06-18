@@ -21,7 +21,7 @@ import sys
 import urllib.request
 import urllib.error
 
-PIPELINES = "http://127.0.0.1:9001"
+PIPELINES = "http://100.67.25.118:9001"
 COMFYUI = "http://127.0.0.1:8188"
 INVENTORY = r"C:\Users\Administrator\AppData\Local\Temp\vf-fix\models_inventory.json"
 OUT_PATH = r"C:\Users\Administrator\Desktop\Github Repos\vault-flows\scripts\proven_workflows_diagnostic.md"

@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const apiTarget = env.VITE_API_URL || 'http://127.0.0.1:9001'
+  const apiTarget = env.VITE_API_URL || 'http://100.67.25.118:9001'
   const tlsKeyPath = env.VITE_TLS_KEY_FILE || path.resolve('.certs/localhost+127.0.0.1-key.pem')
   const tlsCertPath = env.VITE_TLS_CERT_FILE || path.resolve('.certs/localhost+127.0.0.1.pem')
   const shouldUseHttps = env.VITE_DISABLE_TLS !== '1'
@@ -16,8 +16,8 @@ export default defineConfig(({ mode }) => {
       ? { key: fs.readFileSync(tlsKeyPath), cert: fs.readFileSync(tlsCertPath) }
       : undefined
 
-  // Shared proxy table: /api → pipelines FastAPI. Pipelines then talks to
-  // Ollama (localhost:11434) and Postgres (localhost:5432) on this box.
+  // Shared proxy table: /api -> vaultwares-api. The API owns auth, DB access,
+  // queueing, and runtime orchestration.
   // Used by both `vite dev` and `vite preview` so the NSSM service can also
   // reach the backend without a separate nginx.
   const proxyConfig = {
